@@ -14,6 +14,7 @@ import { EmptyState, ExpiryBadge, Field, Loading, PageHeader, Pill, StatusBadge,
 import { REVIEW_STATUSES, categoryLabel, humanize } from "@/lib/constants";
 import { fmtBytes, fmtDate, fmtDateTime, fmtZAR } from "@/lib/format";
 import { expiryState } from "@/lib/readiness";
+import { Mobilisation } from "@/components/app/Mobilisation";
 
 export const Route = createFileRoute("/_authenticated/admin/applications/$applicationId")({ component: Review });
 
@@ -153,6 +154,7 @@ function Review() {
             ) : <p className="mt-2 text-sm text-muted-foreground">No decision is available for a {humanize(a.status).toLowerCase()} application.</p>}
             {a.status_note && <p className="mt-3 text-xs text-muted-foreground">Last note: {a.status_note}</p>}
           </section>
+          {a.status === "awarded" && <Mobilisation applicationId={applicationId} admin />}
           <section className="rounded-lg border bg-card p-4">
             <h2 className="font-display text-lg font-bold">Internal reviews</h2>
             <p className="mb-3 text-xs text-muted-foreground">Only MySol administrators see these.</p>

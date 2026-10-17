@@ -19,6 +19,7 @@ import { evaluateReadiness } from "@/lib/readiness";
 import { fmtDate, fmtDateTime, fmtZAR } from "@/lib/format";
 import { categoryLabel } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { Mobilisation } from "@/components/app/Mobilisation";
 
 export const Route = createFileRoute("/_authenticated/portal/applications/$applicationId")({ component: ApplicationPage });
 
@@ -126,6 +127,7 @@ function ApplicationPage() {
                 <AlertDialogFooter><AlertDialogCancel>Keep it</AlertDialogCancel><AlertDialogAction onClick={withdraw}>Withdraw</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
           ) : null} />
         {a.status_note && <p className="mb-4 rounded-md border bg-card p-3 text-sm"><span className="font-medium">Note from MySol:</span> {a.status_note}</p>}
+        {a.status === "awarded" && <div className="mb-6"><Mobilisation applicationId={applicationId} admin={false} /></div>}
         <div className="grid gap-6 lg:grid-cols-2">
           <section className="space-y-3 rounded-lg border bg-card p-4 text-sm">
             <div className="grid grid-cols-2 gap-3"><div><p className="text-xs text-muted-foreground">Price</p><p className="font-semibold">{fmtZAR(a.price)}</p></div><div><p className="text-xs text-muted-foreground">Duration</p><p className="font-semibold">{a.duration_weeks ? `${a.duration_weeks} weeks` : "—"}</p></div></div>

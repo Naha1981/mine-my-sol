@@ -1,3 +1,4 @@
+import { Captcha, captchaEnabled } from "@/components/app/Captcha";
 import { useState } from "react";
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -37,9 +38,12 @@ function AuthPage() {
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
   const register = mode === "register";
 
+  const [captcha, setCaptcha] = useState("");
+  const [capKey, setCapKey] = useState(0);
   async function go(e: React.FormEvent) {
     e.preventDefault();
     setFormError("");
+    if (captchaEnabled && !captcha) { setFormError("Please complete the security check first."); return; }
     const parsed = (register ? registerSchema : signinSchema).safeParse(form);
     if (!parsed.success) {
       const out: Record<string, string> = {};
@@ -54,18 +58,12 @@ function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email: form.email.trim(),
           password: form.password,
-          options: { data: { full_name: form.full_name.trim(), phone: form.phone.trim(), company_name: form.company_name.trim(), website: form.website, invite_code: form.invite_code.trim() } },
+          options: { ...(captcha ? { captchaToken: captcha } : {}), data: { full_name: form.full_name.trim(), phone: form.phone.trim(), company_name: form.company_name.trim(), website: form.website, invite_code: form.invite_code.trim() } },
         });
         if (error) throw error;
-        if (!data.session) {
-          const r = await supabase.auth.signInWithPassword({ email: form.email.trim(), password: form.password });
-          if (r.error) {
-            if (/not confirmed/i.test(r.error.message)) { setVerifySent(true); return; }
-            throw r.error;
-          }
-        }
+        if (!data.session) { setVerifySent(true); return; }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email: form.email.trim(), password: form.password });
+        const { error } = await supabase.auth.signInWithPassword({ email: form.email.trim(), password: form.password, ...(captcha ? { options: { captchaToken: captcha } } : {}) });
         if (error) throw error;
       }
       qc.clear();
@@ -79,7 +77,7 @@ function AuthPage() {
         : /already registered/i.test(m) ? "That email is already registered. Sign in instead."
         : /Database error/i.test(m) ? "We could not create your account. Check your details and try again."
         : /Invalid login/i.test(m) ? "Email or password is incorrect." : m);
-    } finally { setBusy(false); }
+    } finally { setBusy(false); if (captchaEnabled) { setCaptcha(""); setCapKey((k) => k + 1); } }
   }
 
   if (verifySent) return (
@@ -116,6 +114,7 @@ function AuthPage() {
           {register && <Field label="Invitation code (optional)" error={errors["invite_code"]} hint="Only if MySol sent you one. Leave blank to register your company yourself."><Input autoCapitalize="characters" value={form.invite_code} onChange={set("invite_code")} /></Field>}
           <Field label="Password" error={errors["password"]}><Input type="password" autoComplete={register ? "new-password" : "current-password"} value={form.password} onChange={set("password")} /></Field>
           {formError && <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">{formError}</p>}
+          <Captcha onToken={setCaptcha} resetKey={capKey} />
           <Button type="submit" className="w-full" disabled={busy}>{busy ? "Please wait…" : register ? "Create account" : "Sign in"}</Button>
           <p className="text-center text-sm text-muted-foreground">
             {register ? <>Already registered? <Link to="/auth" search={{ mode: "signin" }} className="font-medium text-primary underline">Sign in</Link></> : <>New contractor? <Link to="/auth" search={{ mode: "register" }} className="font-medium text-primary underline">Register your company</Link></>}
