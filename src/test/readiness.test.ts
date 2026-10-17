@@ -52,7 +52,7 @@ describe("readiness", () => {
 
   it("ignores documents with no uploaded file", () => {
     const r = evaluateReadiness([req("a", "csd")], [doc("c", "csd", null, 0)], { today });
-    expect(r.items[0].status).toBe("missing");
+    expect(r.items[0]?.status).toBe("missing");
   });
 
   it("in application mode only attached documents count", () => {
@@ -63,7 +63,7 @@ describe("readiness", () => {
 
   it("complete is not the same as verified", () => {
     const r = evaluateReadiness([req("a", "csd")], [doc("c", "csd", null)], { today });
-    expect(r.items[0].status).toBe("complete");
-    expect(r.items[0].verified).toBe(false);
+    expect(r.items[0]?.status).toBe("complete");
+    expect(r.items[0]?.verified).toBe(false);
   });
 });

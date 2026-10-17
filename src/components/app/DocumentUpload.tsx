@@ -52,11 +52,11 @@ export function DocumentUploadDialog({ orgId, open, onOpenChange, existing, defa
 
   async function submit() {
     const e: Record<string, string> = {};
-    if (!category) e.category = "Choose a category";
-    if (!title.trim()) e.title = "Give the document a name";
+    if (!category) e["category"] = "Choose a category";
+    if (!title.trim()) e["title"] = "Give the document a name";
     const fe = validateFile(file);
-    if (fe) e.file = fe;
-    if (issued && expires && expires < issued) e.expires = "Expiry date is before the issue date";
+    if (fe) e["file"] = fe;
+    if (issued && expires && expires < issued) e["expires"] = "Expiry date is before the issue date";
     setErrors(e);
     if (Object.keys(e).length || !file) return;
 
@@ -107,7 +107,7 @@ export function DocumentUploadDialog({ orgId, open, onOpenChange, existing, defa
         <div className="space-y-4">
           {!existing && (
             <>
-              <Field label="Category" error={errors.category}>
+              <Field label="Category" error={errors["category"]}>
                 <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger><SelectValue placeholder="Choose a category" /></SelectTrigger>
                   <SelectContent>
@@ -115,7 +115,7 @@ export function DocumentUploadDialog({ orgId, open, onOpenChange, existing, defa
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="Document name" error={errors.title}>
+              <Field label="Document name" error={errors["title"]}>
                 <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. SARS Tax Compliance Status 2026" maxLength={150} />
               </Field>
               <div className="grid grid-cols-2 gap-3">
@@ -124,10 +124,10 @@ export function DocumentUploadDialog({ orgId, open, onOpenChange, existing, defa
               </div>
             </>
           )}
-          <Field label="Expiry date" hint="Leave empty if this document does not expire" error={errors.expires}>
+          <Field label="Expiry date" hint="Leave empty if this document does not expire" error={errors["expires"]}>
             <Input type="date" value={expires ?? ""} onChange={(e) => setExpires(e.target.value)} />
           </Field>
-          <Field label="File" error={errors.file}>
+          <Field label="File" error={errors["file"]}>
             <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed bg-muted/40 px-4 py-6 text-center hover:bg-muted">
               <Upload className="size-6 text-primary" />
               <span className="text-sm font-medium">{file ? file.name : "Tap to choose a file or take a photo"}</span>

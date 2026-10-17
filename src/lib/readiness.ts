@@ -18,7 +18,7 @@ function startOfDay(d: Date) {
 
 /** Days until expiry (negative when expired). Dates are compared as calendar days. */
 export function daysUntil(expires: string, today: Date = new Date()) {
-  const [y, m, d] = expires.slice(0, 10).split("-").map(Number);
+  const [y = 0, m = 1, d = 1] = expires.slice(0, 10).split("-").map(Number);
   const exp = new Date(y, m - 1, d);
   return Math.round((exp.getTime() - startOfDay(today).getTime()) / 86400000);
 }

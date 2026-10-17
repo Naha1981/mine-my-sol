@@ -101,7 +101,7 @@ export function StatCard({ label, value, hint, tone }: { label: string; value: R
   );
 }
 
-export function Field({ label, children, hint, error }: { label: string; children: ReactNode; hint?: string; error?: string }) {
+export function Field({ label, children, hint, error }: { label: string; children: ReactNode; hint?: string | undefined; error?: string | undefined }) {
   return (
     <label className="block space-y-1.5">
       <span className="text-sm font-medium text-foreground">{label}</span>
