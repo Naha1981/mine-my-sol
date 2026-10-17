@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { Bell, CheckCheck } from "lucide-react";
@@ -7,7 +8,7 @@ import { fmtRelative } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { EmptyState, Loading, PageHeader } from "./ui-bits";
 
-export function NotificationsPage({ alerts }: { alerts?: React.ReactNode }) {
+export function NotificationsPage({ alerts }: { alerts?: ReactNode }) {
   const qc = useQueryClient();
   const router = useRouter();
   const q = useQuery({

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { categoryLabel } from "@/lib/constants";
 import { fmtDate } from "@/lib/format";
 import type { Readiness } from "@/lib/readiness";
@@ -27,7 +28,7 @@ export function ReadinessSummary({ r }: { r: Readiness }) {
   );
 }
 
-export function ReadinessList({ r, renderAction }: { r: Readiness; renderAction?: (reqId: string, category: string) => React.ReactNode }) {
+export function ReadinessList({ r, renderAction }: { r: Readiness; renderAction?: (reqId: string, category: string) => ReactNode }) {
   return (
     <ul className="divide-y rounded-lg border bg-card">
       {r.items.map((i) => (
