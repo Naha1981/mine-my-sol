@@ -15,15 +15,19 @@ function Overview() {
         if (error) throw error;
         return c ?? 0;
       };
-      const [open, toReview, contractors, unverified, closing, recent] = await Promise.all([
+      const [open, toReview, contractors, unverified, invited, applying, soon7, expired, closing, recent] = await Promise.all([
         count("projects", (x) => x.eq("status", "open")),
         count("applications", (x) => x.in("status", ["submitted", "under_review"])),
         count("organizations", (x) => x.eq("kind", "contractor").eq("status", "active")),
         count("documents", (x) => x.eq("verification", "unverified").gt("current_version", 0)),
+        count("invitations", (x) => x.eq("status", "pending")),
+        count("applications", (x) => x.eq("status", "draft")),
+        count("projects", (x) => x.eq("status", "open").gt("closes_at", new Date().toISOString()).lt("closes_at", new Date(Date.now() + 7 * 864e5).toISOString())),
+        count("applications", (x) => x.neq("status", "draft")),
         db.from("projects").select("id,title,status,closes_at").eq("status", "open").not("closes_at", "is", null).order("closes_at").limit(5),
         db.from("applications").select("id,status,submitted_at,projects(title),organizations(name)").neq("status", "draft").order("submitted_at", { ascending: false, nullsFirst: false }).limit(6),
       ]);
-      return { open, toReview, contractors, unverified, closing: closing.data ?? [], recent: recent.data ?? [] };
+      return { open, toReview, contractors, unverified, invited, applying, soon7, expired, closing: closing.data ?? [], recent: recent.data ?? [] };
     },
   });
   if (q.isLoading) return <Loading />;
@@ -37,6 +41,12 @@ function Overview() {
         <StatCard label="To review" value={d.toReview} hint="Submitted applications" tone={d.toReview ? "gold" : undefined} />
         <StatCard label="Active contractors" value={d.contractors} />
         <StatCard label="Documents to verify" value={d.unverified} tone={d.unverified ? "gold" : undefined} />
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard label="Invited, not joined" value={d.invited} />
+        <StatCard label="Submissions to date" value={d.expired} hint="All submitted applications" />
+        <StatCard label="Incomplete applications" value={d.applying} hint="Drafts in progress" />
+        <StatCard label="Closing in 7 days" value={d.soon7} tone={d.soon7 ? "gold" : undefined} />
       </div>
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <section>
