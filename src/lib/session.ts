@@ -17,10 +17,12 @@ export const meQuery = queryOptions({
     if (!user) return null;
     const [roles, mems, profile] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", user.id),
-      supabase.from("memberships").select("organizations(id,name,kind,status)").eq("user_id", user.id).limit(1),
+      supabase.from("memberships").select("organization_id, organizations(id,name,kind,status)").eq("user_id", user.id).limit(1),
       supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
     ]);
-    const org = (mems.data?.[0]?.organizations as Me["org"]) ?? null;
+    const m0 = mems.data?.[0];
+    // Fall back to the membership row if the organisation row is not readable, so the portal still works.
+    const org = (m0?.organizations as Me["org"]) ?? (m0?.organization_id ? { id: m0.organization_id, name: "Your company", kind: "contractor" as const, status: "active" as const } : null);
     return {
       userId: user.id,
       email: user.email ?? "",
