@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792195029976,
+      "tag": "0000_minemysol_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792195061949,
+      "tag": "0001_fixes_and_storage",
+      "breakpoints": true
+    }
+  ]
+}
