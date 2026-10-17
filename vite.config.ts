@@ -6,10 +6,14 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// STATIC_SPA=1 builds a static single-page bundle for free static hosting. Lovable's normal build is unchanged.
+const spa = process.env["STATIC_SPA"] === "1";
+
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    ...(spa ? { spa: { enabled: true } } : {}),
   },
 });

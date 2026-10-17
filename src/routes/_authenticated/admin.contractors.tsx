@@ -55,7 +55,7 @@ function Contractors() {
     if (error) return toast.error(errMsg(error));
     refresh();
   }
-  const link = typeof window !== "undefined" ? `${window.location.origin}/auth?mode=register` : "";
+  const link = typeof window !== "undefined" ? (window.location.hash.startsWith("#/") ? `${window.location.origin}${window.location.pathname}#/auth?mode=register` : `${window.location.origin}/auth?mode=register`) : "";
   const mailto = created ? `mailto:${created.email}?subject=${encodeURIComponent("Your MineMySol invitation")}&body=${encodeURIComponent(`Hello,\n\nYou have been invited to register ${created.name} on MySol's contractor portal.\n\nRegister here: ${link}\nInvitation code: ${created.code}\nUse this email address when you register: ${created.email}\n\nThe code is valid for 30 days.`)}` : "";
 
   return (

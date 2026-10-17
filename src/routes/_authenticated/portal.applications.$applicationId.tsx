@@ -30,6 +30,7 @@ function ApplicationPage() {
   const qc = useQueryClient();
   const q = useQuery({
     queryKey: ["portal", "application", applicationId],
+    gcTime: 0,
     queryFn: async () => {
       const a = await db.from("applications").select("*, projects(id,title,closes_at,status,requirements_version)").eq("id", applicationId).single();
       if (a.error) throw a.error;
@@ -100,6 +101,7 @@ function ApplicationPage() {
     setProblems([]);
     setBusy(true);
     if (!(await save())) { setBusy(false); return; }
+    refresh();
     const { data, error } = await db.rpc("submit_application", { _app: applicationId });
     setBusy(false);
     if (error) return toast.error(errMsg(error));
