@@ -1,3 +1,4 @@
+import { DOC_CATEGORIES } from "@/lib/constants";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Copy } from "lucide-react";
@@ -37,10 +38,10 @@ function PublicProject() {
             {q.data.p.summary && <p className="mt-4">{q.data.p.summary}</p>}
             <h2 className="mt-8 text-lg font-semibold">What you need to submit</h2>
             {q.data.reqs.length ? (
-              <ul className="mt-2 space-y-2">{q.data.reqs.map((r) => <li key={r.id} className="rounded-md border bg-card p-3 text-sm"><span className="font-medium">{r.label}</span> <span className="text-muted-foreground">· {r.category.replace(/_/g, " ")}{r.mandatory ? " · required" : ""}</span></li>)}</ul>
+              <ul className="mt-2 space-y-2">{q.data.reqs.map((r) => <li key={r.id} className="rounded-md border bg-card p-3 text-sm"><span className="font-medium">{r.label}</span> <span className="text-muted-foreground">· {(DOC_CATEGORIES.find((c) => c.value === r.category)?.label ?? r.category.replace(/_/g, " "))}{r.mandatory ? " · required" : ""}</span></li>)}</ul>
             ) : <p className="mt-2 text-sm text-muted-foreground">The checklist has not been published yet.</p>}
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg"><Link to="/auth" search={{ mode: "register" }}>Register your company to apply</Link></Button>
+              {q.data.p.status === "open" ? <Button asChild size="lg"><Link to="/auth" search={{ mode: "register" }}>Register your company to apply</Link></Button> : <p className="w-full text-sm font-medium text-muted-foreground">This opportunity is no longer taking submissions.</p>}
               <Button variant="outline" size="lg" onClick={share}><Copy className="size-4" /> Copy share link</Button>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">Registering does not give you access to invite-only projects.</p>

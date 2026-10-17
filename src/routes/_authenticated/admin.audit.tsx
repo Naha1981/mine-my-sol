@@ -34,7 +34,16 @@ function Audit() {
         </Select>
       } />
       {q.isLoading ? <Loading /> : q.isError ? <EmptyState title="The audit log could not be loaded" /> : !q.data?.length ? <EmptyState title="No events yet" /> : (
-        <div className="overflow-x-auto rounded-lg border bg-card">
+        <>
+        <ul className="divide-y rounded-lg border bg-card md:hidden">
+          {q.data.map((e) => (
+            <li key={e.id} className="px-4 py-3 text-sm">
+              <div className="flex items-center justify-between gap-2"><span className="font-medium">{humanize(String(e.action).toLowerCase())}</span><span className="text-xs text-muted-foreground">{humanize(e.entity)}</span></div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{e.actor?.full_name || e.actor?.email || "System"} · {fmtDateTime(e.created_at)}</div>
+            </li>
+          ))}
+        </ul>
+        <div className="hidden overflow-x-auto rounded-lg border bg-card md:block">
           <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-4 py-2">When</th><th className="px-4 py-2">Who</th><th className="px-4 py-2">Action</th><th className="px-4 py-2">Record</th></tr></thead>
             <tbody className="divide-y">
@@ -44,6 +53,7 @@ function Audit() {
             </tbody>
           </table>
         </div>
+        </>
       )}
     </>
   );
