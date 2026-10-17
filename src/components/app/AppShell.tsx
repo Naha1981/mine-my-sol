@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Link, useNavigate, type LinkProps } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, LogOut, Menu, Pickaxe } from "lucide-react";
+import { Bell, LogOut, Menu } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -12,11 +12,9 @@ export type NavItem = { to: LinkProps["to"]; label: string; icon: LucideIcon; ex
 
 export function Brand({ light }: { light?: boolean }) {
   return (
-    <span className={cn("flex items-center gap-2 font-display text-lg font-extrabold", light ? "text-sidebar-foreground" : "text-foreground")}>
-      <span className="flex size-8 items-center justify-center rounded-md bg-gold text-gold-foreground">
-        <Pickaxe className="size-4" />
-      </span>
-      <span>Mine<span className="text-gold">MySol</span></span>
+    <span className="flex items-center gap-2 font-display text-xl font-extrabold italic tracking-tight">
+      {light ? <img src="/icon-192.png" alt="" className="size-8 rounded-md" /> : <img src="/mark.png" alt="" className="h-8 w-auto" />}
+      <span className={light ? "text-white" : "text-primary"}>Mine<span className="text-gold">MySol</span></span>
     </span>
   );
 }
