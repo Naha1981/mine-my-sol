@@ -10,33 +10,284 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
+import { Route as AuthenticatedAdminContractorsRouteImport } from './routes/_authenticated/admin.contractors'
+import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin.notifications'
+import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal.index'
+import { Route as AuthenticatedPortalNotificationsRouteImport } from './routes/_authenticated/portal.notifications'
+import { Route as AuthenticatedPortalProfileRouteImport } from './routes/_authenticated/portal.profile'
+import { Route as AuthenticatedPortalVaultRouteImport } from './routes/_authenticated/portal.vault'
+import { Route as AuthenticatedAdminApplicationsIndexRouteImport } from './routes/_authenticated/admin.applications.index'
+import { Route as AuthenticatedAdminApplicationsApplicationIdRouteImport } from './routes/_authenticated/admin.applications.$applicationId'
+import { Route as AuthenticatedAdminProjectsIndexRouteImport } from './routes/_authenticated/admin.projects.index'
+import { Route as AuthenticatedAdminProjectsProjectIdRouteImport } from './routes/_authenticated/admin.projects.$projectId'
+import { Route as AuthenticatedPortalApplicationsIndexRouteImport } from './routes/_authenticated/portal.applications.index'
+import { Route as AuthenticatedPortalApplicationsApplicationIdRouteImport } from './routes/_authenticated/portal.applications.$applicationId'
+import { Route as AuthenticatedPortalProjectsIndexRouteImport } from './routes/_authenticated/portal.projects.index'
+import { Route as AuthenticatedPortalProjectsProjectIdRouteImport } from './routes/_authenticated/portal.projects.$projectId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminContractorsRoute =
+  AuthenticatedAdminContractorsRouteImport.update({
+    id: '/contractors',
+    path: '/contractors',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminNotificationsRoute =
+  AuthenticatedAdminNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedPortalIndexRoute =
+  AuthenticatedPortalIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalNotificationsRoute =
+  AuthenticatedPortalNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalProfileRoute =
+  AuthenticatedPortalProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalVaultRoute =
+  AuthenticatedPortalVaultRouteImport.update({
+    id: '/vault',
+    path: '/vault',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedAdminApplicationsIndexRoute =
+  AuthenticatedAdminApplicationsIndexRouteImport.update({
+    id: '/applications/',
+    path: '/applications/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminApplicationsApplicationIdRoute =
+  AuthenticatedAdminApplicationsApplicationIdRouteImport.update({
+    id: '/applications/$applicationId',
+    path: '/applications/$applicationId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminProjectsIndexRoute =
+  AuthenticatedAdminProjectsIndexRouteImport.update({
+    id: '/projects/',
+    path: '/projects/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminProjectsProjectIdRoute =
+  AuthenticatedAdminProjectsProjectIdRouteImport.update({
+    id: '/projects/$projectId',
+    path: '/projects/$projectId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedPortalApplicationsIndexRoute =
+  AuthenticatedPortalApplicationsIndexRouteImport.update({
+    id: '/applications/',
+    path: '/applications/',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalApplicationsApplicationIdRoute =
+  AuthenticatedPortalApplicationsApplicationIdRouteImport.update({
+    id: '/applications/$applicationId',
+    path: '/applications/$applicationId',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalProjectsIndexRoute =
+  AuthenticatedPortalProjectsIndexRouteImport.update({
+    id: '/projects/',
+    path: '/projects/',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalProjectsProjectIdRoute =
+  AuthenticatedPortalProjectsProjectIdRouteImport.update({
+    id: '/projects/$projectId',
+    path: '/projects/$projectId',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/contractors': typeof AuthenticatedAdminContractorsRoute
+  '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/portal/notifications': typeof AuthenticatedPortalNotificationsRoute
+  '/portal/profile': typeof AuthenticatedPortalProfileRoute
+  '/portal/vault': typeof AuthenticatedPortalVaultRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/portal/': typeof AuthenticatedPortalIndexRoute
+  '/admin/applications/$applicationId': typeof AuthenticatedAdminApplicationsApplicationIdRoute
+  '/admin/projects/$projectId': typeof AuthenticatedAdminProjectsProjectIdRoute
+  '/portal/applications/$applicationId': typeof AuthenticatedPortalApplicationsApplicationIdRoute
+  '/portal/projects/$projectId': typeof AuthenticatedPortalProjectsProjectIdRoute
+  '/admin/applications/': typeof AuthenticatedAdminApplicationsIndexRoute
+  '/admin/projects/': typeof AuthenticatedAdminProjectsIndexRoute
+  '/portal/applications/': typeof AuthenticatedPortalApplicationsIndexRoute
+  '/portal/projects/': typeof AuthenticatedPortalProjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/contractors': typeof AuthenticatedAdminContractorsRoute
+  '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/portal/notifications': typeof AuthenticatedPortalNotificationsRoute
+  '/portal/profile': typeof AuthenticatedPortalProfileRoute
+  '/portal/vault': typeof AuthenticatedPortalVaultRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/portal': typeof AuthenticatedPortalIndexRoute
+  '/admin/applications/$applicationId': typeof AuthenticatedAdminApplicationsApplicationIdRoute
+  '/admin/projects/$projectId': typeof AuthenticatedAdminProjectsProjectIdRoute
+  '/portal/applications/$applicationId': typeof AuthenticatedPortalApplicationsApplicationIdRoute
+  '/portal/projects/$projectId': typeof AuthenticatedPortalProjectsProjectIdRoute
+  '/admin/applications': typeof AuthenticatedAdminApplicationsIndexRoute
+  '/admin/projects': typeof AuthenticatedAdminProjectsIndexRoute
+  '/portal/applications': typeof AuthenticatedPortalApplicationsIndexRoute
+  '/portal/projects': typeof AuthenticatedPortalProjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/contractors': typeof AuthenticatedAdminContractorsRoute
+  '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/_authenticated/portal/notifications': typeof AuthenticatedPortalNotificationsRoute
+  '/_authenticated/portal/profile': typeof AuthenticatedPortalProfileRoute
+  '/_authenticated/portal/vault': typeof AuthenticatedPortalVaultRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
+  '/_authenticated/admin/applications/$applicationId': typeof AuthenticatedAdminApplicationsApplicationIdRoute
+  '/_authenticated/admin/projects/$projectId': typeof AuthenticatedAdminProjectsProjectIdRoute
+  '/_authenticated/portal/applications/$applicationId': typeof AuthenticatedPortalApplicationsApplicationIdRoute
+  '/_authenticated/portal/projects/$projectId': typeof AuthenticatedPortalProjectsProjectIdRoute
+  '/_authenticated/admin/applications/': typeof AuthenticatedAdminApplicationsIndexRoute
+  '/_authenticated/admin/projects/': typeof AuthenticatedAdminProjectsIndexRoute
+  '/_authenticated/portal/applications/': typeof AuthenticatedPortalApplicationsIndexRoute
+  '/_authenticated/portal/projects/': typeof AuthenticatedPortalProjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/portal'
+    | '/admin/audit'
+    | '/admin/contractors'
+    | '/admin/notifications'
+    | '/portal/notifications'
+    | '/portal/profile'
+    | '/portal/vault'
+    | '/admin/'
+    | '/portal/'
+    | '/admin/applications/$applicationId'
+    | '/admin/projects/$projectId'
+    | '/portal/applications/$applicationId'
+    | '/portal/projects/$projectId'
+    | '/admin/applications/'
+    | '/admin/projects/'
+    | '/portal/applications/'
+    | '/portal/projects/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/admin/audit'
+    | '/admin/contractors'
+    | '/admin/notifications'
+    | '/portal/notifications'
+    | '/portal/profile'
+    | '/portal/vault'
+    | '/admin'
+    | '/portal'
+    | '/admin/applications/$applicationId'
+    | '/admin/projects/$projectId'
+    | '/portal/applications/$applicationId'
+    | '/portal/projects/$projectId'
+    | '/admin/applications'
+    | '/admin/projects'
+    | '/portal/applications'
+    | '/portal/projects'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/admin'
+    | '/_authenticated/portal'
+    | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/contractors'
+    | '/_authenticated/admin/notifications'
+    | '/_authenticated/portal/notifications'
+    | '/_authenticated/portal/profile'
+    | '/_authenticated/portal/vault'
+    | '/_authenticated/admin/'
+    | '/_authenticated/portal/'
+    | '/_authenticated/admin/applications/$applicationId'
+    | '/_authenticated/admin/projects/$projectId'
+    | '/_authenticated/portal/applications/$applicationId'
+    | '/_authenticated/portal/projects/$projectId'
+    | '/_authenticated/admin/applications/'
+    | '/_authenticated/admin/projects/'
+    | '/_authenticated/portal/applications/'
+    | '/_authenticated/portal/projects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +299,223 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/portal': {
+      id: '/_authenticated/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof AuthenticatedPortalRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/contractors': {
+      id: '/_authenticated/admin/contractors'
+      path: '/contractors'
+      fullPath: '/admin/contractors'
+      preLoaderRoute: typeof AuthenticatedAdminContractorsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/notifications': {
+      id: '/_authenticated/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AuthenticatedAdminNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/portal/': {
+      id: '/_authenticated/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof AuthenticatedPortalIndexRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/notifications': {
+      id: '/_authenticated/portal/notifications'
+      path: '/notifications'
+      fullPath: '/portal/notifications'
+      preLoaderRoute: typeof AuthenticatedPortalNotificationsRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/profile': {
+      id: '/_authenticated/portal/profile'
+      path: '/profile'
+      fullPath: '/portal/profile'
+      preLoaderRoute: typeof AuthenticatedPortalProfileRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/vault': {
+      id: '/_authenticated/portal/vault'
+      path: '/vault'
+      fullPath: '/portal/vault'
+      preLoaderRoute: typeof AuthenticatedPortalVaultRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/admin/applications/': {
+      id: '/_authenticated/admin/applications/'
+      path: '/applications'
+      fullPath: '/admin/applications/'
+      preLoaderRoute: typeof AuthenticatedAdminApplicationsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/applications/$applicationId': {
+      id: '/_authenticated/admin/applications/$applicationId'
+      path: '/applications/$applicationId'
+      fullPath: '/admin/applications/$applicationId'
+      preLoaderRoute: typeof AuthenticatedAdminApplicationsApplicationIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/projects/': {
+      id: '/_authenticated/admin/projects/'
+      path: '/projects'
+      fullPath: '/admin/projects/'
+      preLoaderRoute: typeof AuthenticatedAdminProjectsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/projects/$projectId': {
+      id: '/_authenticated/admin/projects/$projectId'
+      path: '/projects/$projectId'
+      fullPath: '/admin/projects/$projectId'
+      preLoaderRoute: typeof AuthenticatedAdminProjectsProjectIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/portal/applications/': {
+      id: '/_authenticated/portal/applications/'
+      path: '/applications'
+      fullPath: '/portal/applications/'
+      preLoaderRoute: typeof AuthenticatedPortalApplicationsIndexRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/applications/$applicationId': {
+      id: '/_authenticated/portal/applications/$applicationId'
+      path: '/applications/$applicationId'
+      fullPath: '/portal/applications/$applicationId'
+      preLoaderRoute: typeof AuthenticatedPortalApplicationsApplicationIdRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/projects/': {
+      id: '/_authenticated/portal/projects/'
+      path: '/projects'
+      fullPath: '/portal/projects/'
+      preLoaderRoute: typeof AuthenticatedPortalProjectsIndexRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/projects/$projectId': {
+      id: '/_authenticated/portal/projects/$projectId'
+      path: '/projects/$projectId'
+      fullPath: '/portal/projects/$projectId'
+      preLoaderRoute: typeof AuthenticatedPortalProjectsProjectIdRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminContractorsRoute: typeof AuthenticatedAdminContractorsRoute
+  AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminApplicationsApplicationIdRoute: typeof AuthenticatedAdminApplicationsApplicationIdRoute
+  AuthenticatedAdminProjectsProjectIdRoute: typeof AuthenticatedAdminProjectsProjectIdRoute
+  AuthenticatedAdminApplicationsIndexRoute: typeof AuthenticatedAdminApplicationsIndexRoute
+  AuthenticatedAdminProjectsIndexRoute: typeof AuthenticatedAdminProjectsIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+  AuthenticatedAdminContractorsRoute: AuthenticatedAdminContractorsRoute,
+  AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminApplicationsApplicationIdRoute:
+    AuthenticatedAdminApplicationsApplicationIdRoute,
+  AuthenticatedAdminProjectsProjectIdRoute:
+    AuthenticatedAdminProjectsProjectIdRoute,
+  AuthenticatedAdminApplicationsIndexRoute:
+    AuthenticatedAdminApplicationsIndexRoute,
+  AuthenticatedAdminProjectsIndexRoute: AuthenticatedAdminProjectsIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedPortalRouteChildren {
+  AuthenticatedPortalNotificationsRoute: typeof AuthenticatedPortalNotificationsRoute
+  AuthenticatedPortalProfileRoute: typeof AuthenticatedPortalProfileRoute
+  AuthenticatedPortalVaultRoute: typeof AuthenticatedPortalVaultRoute
+  AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
+  AuthenticatedPortalApplicationsApplicationIdRoute: typeof AuthenticatedPortalApplicationsApplicationIdRoute
+  AuthenticatedPortalProjectsProjectIdRoute: typeof AuthenticatedPortalProjectsProjectIdRoute
+  AuthenticatedPortalApplicationsIndexRoute: typeof AuthenticatedPortalApplicationsIndexRoute
+  AuthenticatedPortalProjectsIndexRoute: typeof AuthenticatedPortalProjectsIndexRoute
+}
+
+const AuthenticatedPortalRouteChildren: AuthenticatedPortalRouteChildren = {
+  AuthenticatedPortalNotificationsRoute: AuthenticatedPortalNotificationsRoute,
+  AuthenticatedPortalProfileRoute: AuthenticatedPortalProfileRoute,
+  AuthenticatedPortalVaultRoute: AuthenticatedPortalVaultRoute,
+  AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
+  AuthenticatedPortalApplicationsApplicationIdRoute:
+    AuthenticatedPortalApplicationsApplicationIdRoute,
+  AuthenticatedPortalProjectsProjectIdRoute:
+    AuthenticatedPortalProjectsProjectIdRoute,
+  AuthenticatedPortalApplicationsIndexRoute:
+    AuthenticatedPortalApplicationsIndexRoute,
+  AuthenticatedPortalProjectsIndexRoute: AuthenticatedPortalProjectsIndexRoute,
+}
+
+const AuthenticatedPortalRouteWithChildren =
+  AuthenticatedPortalRoute._addFileChildren(AuthenticatedPortalRouteChildren)
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedPortalRoute: typeof AuthenticatedPortalRouteWithChildren
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedPortalRoute: AuthenticatedPortalRouteWithChildren,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

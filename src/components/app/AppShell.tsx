@@ -16,7 +16,7 @@ export function Brand({ light }: { light?: boolean }) {
       <span className="flex size-8 items-center justify-center rounded-md bg-gold text-gold-foreground">
         <Pickaxe className="size-4" />
       </span>
-      Mine<span className="text-gold">MySol</span>
+      <span>Mine<span className="text-gold">MySol</span></span>
     </span>
   );
 }
