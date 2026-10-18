@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
+import { Route as PProjectIdRouteImport } from './routes/p.$projectId'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminContractorsRouteImport } from './routes/_authenticated/admin.contractors'
@@ -21,6 +22,7 @@ import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_a
 import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal.index'
 import { Route as AuthenticatedPortalNotificationsRouteImport } from './routes/_authenticated/portal.notifications'
 import { Route as AuthenticatedPortalProfileRouteImport } from './routes/_authenticated/portal.profile'
+import { Route as AuthenticatedPortalTenderreadyRouteImport } from './routes/_authenticated/portal.tenderready'
 import { Route as AuthenticatedPortalVaultRouteImport } from './routes/_authenticated/portal.vault'
 import { Route as AuthenticatedAdminApplicationsIndexRouteImport } from './routes/_authenticated/admin.applications.index'
 import { Route as AuthenticatedAdminApplicationsApplicationIdRouteImport } from './routes/_authenticated/admin.applications.$applicationId'
@@ -54,6 +56,11 @@ const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
   id: '/portal',
   path: '/portal',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const PProjectIdRoute = PProjectIdRouteImport.update({
+  id: '/p/$projectId',
+  path: '/p/$projectId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
@@ -93,6 +100,12 @@ const AuthenticatedPortalProfileRoute =
   AuthenticatedPortalProfileRouteImport.update({
     id: '/profile',
     path: '/profile',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalTenderreadyRoute =
+  AuthenticatedPortalTenderreadyRouteImport.update({
+    id: '/tenderready',
+    path: '/tenderready',
     getParentRoute: () => AuthenticatedPortalRoute,
   } as any)
 const AuthenticatedPortalVaultRoute =
@@ -155,11 +168,13 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/p/$projectId': typeof PProjectIdRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/contractors': typeof AuthenticatedAdminContractorsRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/portal/notifications': typeof AuthenticatedPortalNotificationsRoute
   '/portal/profile': typeof AuthenticatedPortalProfileRoute
+  '/portal/tenderready': typeof AuthenticatedPortalTenderreadyRoute
   '/portal/vault': typeof AuthenticatedPortalVaultRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/portal/': typeof AuthenticatedPortalIndexRoute
@@ -175,11 +190,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/p/$projectId': typeof PProjectIdRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/contractors': typeof AuthenticatedAdminContractorsRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/portal/notifications': typeof AuthenticatedPortalNotificationsRoute
   '/portal/profile': typeof AuthenticatedPortalProfileRoute
+  '/portal/tenderready': typeof AuthenticatedPortalTenderreadyRoute
   '/portal/vault': typeof AuthenticatedPortalVaultRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/portal': typeof AuthenticatedPortalIndexRoute
@@ -199,11 +216,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/p/$projectId': typeof PProjectIdRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/contractors': typeof AuthenticatedAdminContractorsRoute
   '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/_authenticated/portal/notifications': typeof AuthenticatedPortalNotificationsRoute
   '/_authenticated/portal/profile': typeof AuthenticatedPortalProfileRoute
+  '/_authenticated/portal/tenderready': typeof AuthenticatedPortalTenderreadyRoute
   '/_authenticated/portal/vault': typeof AuthenticatedPortalVaultRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
@@ -223,11 +242,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/portal'
+    | '/p/$projectId'
     | '/admin/audit'
     | '/admin/contractors'
     | '/admin/notifications'
     | '/portal/notifications'
     | '/portal/profile'
+    | '/portal/tenderready'
     | '/portal/vault'
     | '/admin/'
     | '/portal/'
@@ -243,11 +264,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/p/$projectId'
     | '/admin/audit'
     | '/admin/contractors'
     | '/admin/notifications'
     | '/portal/notifications'
     | '/portal/profile'
+    | '/portal/tenderready'
     | '/portal/vault'
     | '/admin'
     | '/portal'
@@ -266,11 +289,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/admin'
     | '/_authenticated/portal'
+    | '/p/$projectId'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/contractors'
     | '/_authenticated/admin/notifications'
     | '/_authenticated/portal/notifications'
     | '/_authenticated/portal/profile'
+    | '/_authenticated/portal/tenderready'
     | '/_authenticated/portal/vault'
     | '/_authenticated/admin/'
     | '/_authenticated/portal/'
@@ -288,6 +313,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  PProjectIdRoute: typeof PProjectIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -326,6 +352,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal'
       preLoaderRoute: typeof AuthenticatedPortalRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/p/$projectId': {
+      id: '/p/$projectId'
+      path: '/p/$projectId'
+      fullPath: '/p/$projectId'
+      preLoaderRoute: typeof PProjectIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -374,6 +407,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/portal/profile'
       preLoaderRoute: typeof AuthenticatedPortalProfileRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/tenderready': {
+      id: '/_authenticated/portal/tenderready'
+      path: '/tenderready'
+      fullPath: '/portal/tenderready'
+      preLoaderRoute: typeof AuthenticatedPortalTenderreadyRouteImport
       parentRoute: typeof AuthenticatedPortalRoute
     }
     '/_authenticated/portal/vault': {
@@ -473,6 +513,7 @@ const AuthenticatedAdminRouteWithChildren =
 interface AuthenticatedPortalRouteChildren {
   AuthenticatedPortalNotificationsRoute: typeof AuthenticatedPortalNotificationsRoute
   AuthenticatedPortalProfileRoute: typeof AuthenticatedPortalProfileRoute
+  AuthenticatedPortalTenderreadyRoute: typeof AuthenticatedPortalTenderreadyRoute
   AuthenticatedPortalVaultRoute: typeof AuthenticatedPortalVaultRoute
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
   AuthenticatedPortalApplicationsApplicationIdRoute: typeof AuthenticatedPortalApplicationsApplicationIdRoute
@@ -484,6 +525,7 @@ interface AuthenticatedPortalRouteChildren {
 const AuthenticatedPortalRouteChildren: AuthenticatedPortalRouteChildren = {
   AuthenticatedPortalNotificationsRoute: AuthenticatedPortalNotificationsRoute,
   AuthenticatedPortalProfileRoute: AuthenticatedPortalProfileRoute,
+  AuthenticatedPortalTenderreadyRoute: AuthenticatedPortalTenderreadyRoute,
   AuthenticatedPortalVaultRoute: AuthenticatedPortalVaultRoute,
   AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
   AuthenticatedPortalApplicationsApplicationIdRoute:
@@ -516,6 +558,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  PProjectIdRoute: PProjectIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

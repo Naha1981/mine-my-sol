@@ -65,7 +65,7 @@ function Landing() {
           <ul className="space-y-3">
             {projects.data.map((p) => (
               <li key={p.id} className="rounded-lg border bg-card p-4">
-                <div className="flex flex-wrap items-center gap-2"><p className="font-display font-semibold">{p.title}</p><StatusBadge status={p.status} /><ClosingBadge closesAt={p.closes_at} status={p.status} /></div>
+                <div className="flex flex-wrap items-center gap-2"><Link to="/p/$projectId" params={{ projectId: p.id }} className="font-display font-semibold underline-offset-2 hover:underline">{p.title}</Link><StatusBadge status={p.status} /><ClosingBadge closesAt={p.closes_at} status={p.status} /></div>
                 {p.summary && <p className="mt-1 text-sm text-muted-foreground">{p.summary}</p>}
                 <p className="mt-2 text-xs text-muted-foreground">{[p.location, p.trade].filter(Boolean).join(" · ")}{p.closes_at ? ` · closes ${fmtDate(p.closes_at)}` : ""}</p>
               </li>
