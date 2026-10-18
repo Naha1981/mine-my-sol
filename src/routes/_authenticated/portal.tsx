@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { db } from "@/lib/db";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { Briefcase, FileText, FolderKanban, LayoutDashboard, Send, UserRound } from "lucide-react";
+import { Gauge, Briefcase, FileText, FolderKanban, LayoutDashboard, Send, UserRound } from "lucide-react";
 import { AppShell, type NavItem } from "@/components/app/AppShell";
 
 export const Route = createFileRoute("/_authenticated/portal")({
@@ -18,6 +18,7 @@ const nav: NavItem[] = [
   { to: "/portal/vault", label: "Vault", icon: FileText, mobile: true },
   { to: "/portal/applications", label: "Applications", icon: Send, mobile: true },
   { to: "/portal/tenderready", label: "TenderReady", icon: Briefcase, mobile: false },
+  { to: "/fleet", label: "FleetPulse", icon: Gauge, mobile: false },
   { to: "/portal/profile", label: "Company profile", icon: UserRound },
 ];
 

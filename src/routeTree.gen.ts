@@ -18,7 +18,9 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignalsRouteImport } from './routes/signals'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedFleetRouteImport } from './routes/_authenticated/fleet'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
+import { Route as FTokenRouteImport } from './routes/f.$token'
 import { Route as PProjectIdRouteImport } from './routes/p.$projectId'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
@@ -83,10 +85,20 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedFleetRoute = AuthenticatedFleetRouteImport.update({
+  id: '/fleet',
+  path: '/fleet',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
   id: '/portal',
   path: '/portal',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const FTokenRoute = FTokenRouteImport.update({
+  id: '/f/$token',
+  path: '/f/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PProjectIdRoute = PProjectIdRouteImport.update({
   id: '/p/$projectId',
@@ -208,7 +220,9 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signals': typeof SignalsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/fleet': typeof AuthenticatedFleetRoute
   '/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/f/$token': typeof FTokenRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/contractors': typeof AuthenticatedAdminContractorsRoute
@@ -237,6 +251,8 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signals': typeof SignalsRoute
+  '/fleet': typeof AuthenticatedFleetRoute
+  '/f/$token': typeof FTokenRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/contractors': typeof AuthenticatedAdminContractorsRoute
@@ -268,7 +284,9 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signals': typeof SignalsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/fleet': typeof AuthenticatedFleetRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/f/$token': typeof FTokenRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/contractors': typeof AuthenticatedAdminContractorsRoute
@@ -300,7 +318,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signals'
     | '/admin'
+    | '/fleet'
     | '/portal'
+    | '/f/$token'
     | '/p/$projectId'
     | '/admin/audit'
     | '/admin/contractors'
@@ -329,6 +349,8 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/signals'
+    | '/fleet'
+    | '/f/$token'
     | '/p/$projectId'
     | '/admin/audit'
     | '/admin/contractors'
@@ -359,7 +381,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signals'
     | '/_authenticated/admin'
+    | '/_authenticated/fleet'
     | '/_authenticated/portal'
+    | '/f/$token'
     | '/p/$projectId'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/contractors'
@@ -390,6 +414,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignalsRoute: typeof SignalsRoute
+  FTokenRoute: typeof FTokenRoute
   PProjectIdRoute: typeof PProjectIdRoute
 }
 
@@ -458,12 +483,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/fleet': {
+      id: '/_authenticated/fleet'
+      path: '/fleet'
+      fullPath: '/fleet'
+      preLoaderRoute: typeof AuthenticatedFleetRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/portal': {
       id: '/_authenticated/portal'
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof AuthenticatedPortalRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/f/$token': {
+      id: '/f/$token'
+      path: '/f/$token'
+      fullPath: '/f/$token'
+      preLoaderRoute: typeof FTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/p/$projectId': {
       id: '/p/$projectId'
@@ -663,11 +702,13 @@ const AuthenticatedPortalRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedFleetRoute: typeof AuthenticatedFleetRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedFleetRoute: AuthenticatedFleetRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRouteWithChildren,
 }
 
@@ -684,6 +725,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignalsRoute: SignalsRoute,
+  FTokenRoute: FTokenRoute,
   PProjectIdRoute: PProjectIdRoute,
 }
 export const routeTree = rootRouteImport
