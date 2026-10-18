@@ -31,6 +31,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [form, setForm] = useState({ full_name: "", phone: "", company_name: "", website: "", email: "", invite_code: "", password: "" });
+  const [accountType, setAccountType] = useState<"contractor" | "buyer">("contractor");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -58,7 +59,7 @@ function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email: form.email.trim(),
           password: form.password,
-          options: { ...(captcha ? { captchaToken: captcha } : {}), data: { full_name: form.full_name.trim(), phone: form.phone.trim(), company_name: form.company_name.trim(), website: form.website, invite_code: form.invite_code.trim() } },
+          options: { ...(captcha ? { captchaToken: captcha } : {}), data: { full_name: form.full_name.trim(), phone: form.phone.trim(), company_name: form.company_name.trim(), website: form.website, invite_code: accountType === "buyer" ? "" : form.invite_code.trim(), account_type: accountType } },
         });
         if (error) throw error;
         if (!data.session) { setVerifySent(true); return; }
@@ -99,9 +100,16 @@ function AuthPage() {
       <main className="flex flex-1 items-start justify-center px-4 pb-12 pt-6 sm:items-center">
         <form onSubmit={go} noValidate className="w-full max-w-md space-y-4 rounded-xl border bg-card p-6 shadow-sm">
           <div>
-            <h1 className="text-2xl font-bold">{register ? "Register your company" : "Sign in"}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{register ? "Create a contractor account for your company. Verify your email, then browse and apply for tenders." : "Access for MySol and registered contractors."}</p>
+            <h1 className="text-2xl font-bold">{register ? "Create your account" : "Sign in"}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">{register ? (accountType === "buyer" ? "Set up your company workspace to publish tenders and review contractor submissions. Your data stays private to your company." : "Create an account for your company, then browse and apply for tenders.") : "Sign in to your MineMySol account."}</p>
           </div>
+          {register && (
+            <div role="radiogroup" aria-label="Account type" className="grid grid-cols-2 gap-2">
+              {([["contractor", "I'm a contractor"], ["buyer", "I post tenders (buying company)"]] as const).map(([v, l]) => (
+                <button key={v} type="button" role="radio" aria-checked={accountType === v} onClick={() => setAccountType(v)} className={"rounded-md border p-3 text-left text-sm font-medium " + (accountType === v ? "border-primary bg-primary/10 text-primary" : "text-muted-foreground")}>{l}</button>
+              ))}
+            </div>
+          )}
           {register && (
             <>
               <Field label="Full name" error={errors["full_name"]}><Input autoComplete="name" value={form.full_name} onChange={set("full_name")} /></Field>
@@ -111,14 +119,14 @@ function AuthPage() {
             </>
           )}
           <Field label="Email address" error={errors["email"]}><Input type="email" autoComplete="email" inputMode="email" value={form.email} onChange={set("email")} /></Field>
-          {register && <Field label="Invitation code (optional)" error={errors["invite_code"]} hint="Only if MySol sent you one. Leave blank to register your company yourself."><Input autoCapitalize="characters" value={form.invite_code} onChange={set("invite_code")} /></Field>}
+          {register && accountType === "contractor" && <Field label="Invitation code (optional)" error={errors["invite_code"]} hint="Only if MySol sent you one. Leave blank to register your company yourself."><Input autoCapitalize="characters" value={form.invite_code} onChange={set("invite_code")} /></Field>}
           <Field label="Password" error={errors["password"]}><Input type="password" autoComplete={register ? "new-password" : "current-password"} value={form.password} onChange={set("password")} /></Field>
           {formError && <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">{formError}</p>}
           <Captcha onToken={setCaptcha} resetKey={capKey} />
           <Button type="submit" className="w-full" disabled={busy}>{busy ? "Please wait…" : register ? "Create account" : "Sign in"}</Button>
           {!register && <p className="text-center text-sm"><Link to="/forgot-password" className="font-medium text-primary underline">Forgot your password?</Link></p>}
           <p className="text-center text-sm text-muted-foreground">
-            {register ? <>Already registered? <Link to="/auth" search={{ mode: "signin" }} className="font-medium text-primary underline">Sign in</Link></> : <>New contractor? <Link to="/auth" search={{ mode: "register" }} className="font-medium text-primary underline">Register your company</Link></>}
+            {register ? <>Already registered? <Link to="/auth" search={{ mode: "signin" }} className="font-medium text-primary underline">Sign in</Link></> : <>New here? <Link to="/auth" search={{ mode: "register" }} className="font-medium text-primary underline">Create an account</Link></>}
           </p>
         </form>
       </main>

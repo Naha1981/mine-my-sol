@@ -6,7 +6,7 @@
 set -euo pipefail
 export STATIC_SPA=1 SUPABASE_URL="$VITE_SUPABASE_URL" SUPABASE_PUBLISHABLE_KEY="$VITE_SUPABASE_PUBLISHABLE_KEY"
 unset VITE_HASH_ROUTER
-npm ci
+[ -d node_modules ] || npm ci
 npm run build
 rm -rf deploy/cloudflare/dist && mkdir -p deploy/cloudflare/dist
 cp -r .output/public/* deploy/cloudflare/dist/
