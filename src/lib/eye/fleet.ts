@@ -1,6 +1,6 @@
 // SAMPLE DATA ONLY. Synthetic 24-machine fleet, 7 days. Replace with imported machine / fuel / fault CSVs.
 export type Day = { engineH: number; idleH: number; litres: number; tonnes: number; faults: string[] };
-export type FleetMachine = { id: string; site: "s4" | "s2" | "s7"; type: "A40 hauler" | "Excavator" | "Dozer" | "Water cart"; days: Day[] };
+export type FleetMachine = { id: string; site: string; type: string; days: Day[] };
 export type Assumptions = { dieselRPerL: number; idleBurnLPerH: Record<string, number>; baselineIdleShare: number; marginRPerH: Record<string, number>; hoursPerFault: number };
 export const DEFAULTS: Assumptions = {
   dieselRPerL: 22,
@@ -12,7 +12,7 @@ export const DEFAULTS: Assumptions = {
 
 let seed = 20261018;
 const rnd = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
-const spec: [string, FleetMachine["site"], FleetMachine["type"]][] = [
+const spec: [string, string, string][] = [
   ["A40-09","s4","A40 hauler"],["A40-12","s4","A40 hauler"],["A40-17","s4","A40 hauler"],["A40-18","s4","A40 hauler"],["A40-19","s4","A40 hauler"],
   ["EX-03","s4","Excavator"],["EX-04","s4","Excavator"],["DZ-02","s4","Dozer"],["DZ-03","s4","Dozer"],["WC-01","s4","Water cart"],
   ["A40-21","s2","A40 hauler"],["A40-22","s2","A40 hauler"],["A40-23","s2","A40 hauler"],["A40-24","s2","A40 hauler"],["EX-05","s2","Excavator"],["EX-06","s2","Excavator"],["DZ-05","s2","Dozer"],["WC-02","s2","Water cart"],
