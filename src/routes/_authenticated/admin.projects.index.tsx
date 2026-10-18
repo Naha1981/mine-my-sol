@@ -20,9 +20,9 @@ function Projects() {
   const [title, setTitle] = useState("");
   const [busy, setBusy] = useState(false);
   const q = useQuery({
-    queryKey: ["admin", "projects"],
+    queryKey: ["admin", "projects", me.org?.id],
     queryFn: async () => {
-      const { data, error } = await db.from("projects").select("id,reference,title,status,visibility,location,closes_at,applications(id,status)").order("created_at", { ascending: false });
+      const { data, error } = await db.from("projects").select("id,reference,title,status,visibility,location,closes_at,applications(id,status)").eq("buyer_org_id", me.org?.id ?? "").order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
