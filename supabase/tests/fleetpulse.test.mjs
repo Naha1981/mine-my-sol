@@ -1,0 +1,62 @@
+// Isolation + behaviour test for supabase/fleetpulse.sql on a local Postgres (PGlite) with a minimal stub of the base schema.
+// Run: npm i @electric-sql/pglite && node fleetpulse.test.mjs <path to fleetpulse.sql> <path to rollback.sql>
+import { PGlite } from "@electric-sql/pglite";
+import fs from "node:fs";
+const [sqlPath, rbPath] = process.argv.slice(2);
+const db = new PGlite();
+const A = "00000000-0000-0000-0000-0000000000a1", B = "00000000-0000-0000-0000-0000000000b1", OA = "11111111-1111-1111-1111-1111111111a1", OB = "11111111-1111-1111-1111-1111111111b1";
+await db.exec(`
+create role anon nologin; create role authenticated nologin;
+create schema auth; create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true),'')::uuid $$;
+create table public.organizations(id uuid primary key, name text, kind text);
+create table public.memberships(user_id uuid, organization_id uuid);
+create function public.is_org_member(_o uuid) returns boolean language sql stable security definer as $$ select exists(select 1 from public.memberships m where m.user_id=auth.uid() and m.organization_id=_o) $$;
+insert into public.organizations values ('${OA}','Alpha Haulage','contractor'),('${OB}','Beta Mining','buyer');
+insert into public.memberships values ('${A}','${OA}'),('${B}','${OB}');
+grant usage on schema public, auth to anon, authenticated; grant all on all tables in schema public to authenticated; grant select on public.organizations to anon;
+`);
+const apply = async () => { await db.exec(fs.readFileSync(sqlPath, "utf8")); await db.exec("grant all on all tables in schema public to authenticated; grant select, usage on all sequences in schema public to authenticated;"); };
+await apply(); await apply(); // idempotent
+let pass = 0, fail = 0; const ok = (n, c) => { c ? pass++ : fail++; console.log((c ? "PASS " : "FAIL ") + n); };
+const as = async (role, uid, sql, p) => { await db.exec(`set role ${role}; select set_config('request.jwt.claim.sub','${uid ?? ""}',false);`); try { return await db.query(sql, p); } finally { await db.exec("reset role"); } };
+const fails = async (role, uid, sql, p) => { try { await as(role, uid, sql, p); return false; } catch { return true; } };
+const row = (org, id, extra = "") => `insert into fp_daily(org_id,machine_id,day,engine_h,idle_h,litres) values ('${org}','${id}','2026-10-17',10,2,300)`;
+await as("authenticated", A, row(OA, "A-1")); await as("authenticated", B, row(OB, "B-1"));
+ok("company A sees only its own rows", (await as("authenticated", A, "select machine_id from fp_daily")).rows.map(r => r.machine_id).join() === "A-1");
+ok("company B sees only its own rows", (await as("authenticated", B, "select machine_id from fp_daily")).rows.map(r => r.machine_id).join() === "B-1");
+ok("A cannot insert rows into B", await fails("authenticated", A, row(OB, "X")));
+ok("A cannot update B rows (0 affected)", (await as("authenticated", A, "update fp_daily set litres=1 where machine_id='B-1' returning 1")).rows.length === 0);
+ok("A cannot delete B rows (0 affected)", (await as("authenticated", A, "delete from fp_daily where machine_id='B-1' returning 1")).rows.length === 0);
+ok("B row survived", (await as("authenticated", B, "select 1 from fp_daily where machine_id='B-1'")).rows.length === 1);
+ok("anon cannot read fleet data", await fails("anon", null, "select * from fp_daily"));
+ok("anon cannot read tokens", await fails("anon", null, "select * from fp_tokens"));
+ok("anon cannot read events", await fails("anon", null, "select * from fp_events"));
+ok("idle above engine hours rejected", await fails("authenticated", A, `insert into fp_daily(org_id,machine_id,day,engine_h,idle_h,litres) values ('${OA}','Z','2026-10-17',5,9,1)`));
+ok("settings isolated", (await as("authenticated", A, `insert into fp_settings(org_id,diesel_price) values ('${OA}',31.95) returning 1`)).rows.length === 1 && (await as("authenticated", B, "select * from fp_settings")).rows.length === 0 && await fails("authenticated", B, `insert into fp_settings(org_id) values ('${OA}')`));
+ok("diesel out of range rejected", await fails("authenticated", A, `update fp_settings set diesel_price=1`));
+const ta = (await as("authenticated", A, `insert into fp_tokens(org_id,label) values ('${OA}','Prospect 1') returning token,id`)).rows[0];
+ok("A cannot create token for B", await fails("authenticated", A, `insert into fp_tokens(org_id,label) values ('${OB}','x')`));
+ok("B cannot see A tokens", (await as("authenticated", B, "select * from fp_tokens")).rows.length === 0);
+ok("token is long random", ta.token.length === 64);
+const open = (await as("anon", null, "select public.fp_open($1,$2) as v", [ta.token, "Mozilla/5.0 iPhone"])).rows[0].v;
+ok("anon link open returns only A's data", open && open.company === "Alpha Haulage" && open.rows.length === 1 && open.rows[0].machine_id === "A-1");
+ok("bad token returns null", (await as("anon", null, "select public.fp_open('nope','') as v")).rows[0].v === null);
+await as("anon", null, "select public.fp_open($1,$2)", [ta.token, "WhatsApp/2.23 link preview bot"]);
+await as("anon", null, "select public.fp_event($1,'estimate_run','{\"x\":1}','Mozilla')", [ta.token]);
+await as("anon", null, "select public.fp_event($1,'link_opened','{}','Mozilla')", [ta.token]); // not allowed via event
+const ev = (await as("authenticated", A, "select type,is_bot from fp_events order by id")).rows;
+ok("opens logged, bot flagged, estimate logged, spoofed link_opened ignored", ev.length === 3 && ev[0].is_bot === false && ev[1].is_bot === true && ev[2].type === "estimate_run");
+ok("B cannot read A events", (await as("authenticated", B, "select * from fp_events")).rows.length === 0);
+ok("clients cannot insert events", await fails("authenticated", A, `insert into fp_events(org_id,token_id,type) values ('${OA}','${ta.id}','link_opened')`));
+await as("authenticated", A, "update fp_tokens set revoked_at=now() where label='Prospect 1'");
+ok("revoked token stops working", (await as("anon", null, "select public.fp_open($1,'') as v", [ta.token])).rows[0].v === null);
+for (let i = 0; i < 210; i++) await db.exec(`insert into fp_events(org_id,token_id,type) select org_id,id,'screen_viewed' from fp_tokens where label='Prospect 1' and false`);
+const t2 = (await as("authenticated", A, `insert into fp_tokens(org_id,label) values ('${OA}','Rate') returning token`)).rows[0].token;
+for (let i = 0; i < 205; i++) await as("anon", null, "select public.fp_event($1,'screen_viewed','{}','m')", [t2]);
+ok("event rate limit holds at 200/hour", (await as("authenticated", A, "select count(*)::int c from fp_events e join fp_tokens t on t.id=e.token_id where t.label='Rate'")).rows[0].c === 200);
+ok("fp_org returns own company", (await as("authenticated", B, "select public.fp_org() o")).rows[0].o === OB);
+await db.exec(fs.readFileSync(rbPath, "utf8"));
+ok("rollback removes module", (await db.query("select count(*)::int c from pg_tables where tablename like 'fp_%'")).rows[0].c === 0 && (await db.query("select count(*)::int c from pg_proc where proname like 'fp_%'")).rows[0].c === 0);
+ok("base tables untouched by rollback", (await db.query("select count(*)::int c from organizations")).rows[0].c === 2);
+await apply(); ok("re-apply after rollback works", (await db.query("select count(*)::int c from pg_tables where tablename like 'fp_%'")).rows[0].c === 4);
+console.log(`${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);
