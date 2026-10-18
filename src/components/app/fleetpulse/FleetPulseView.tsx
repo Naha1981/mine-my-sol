@@ -309,6 +309,8 @@ function LinksTab({ orgId }: { orgId: string }) {
   });
   const ev = useQuery({
     queryKey: ["fp-events"],
+    refetchOnMount: "always",
+    staleTime: 0,
     queryFn: async () =>
       (
         await db
