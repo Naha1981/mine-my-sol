@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { meQuery } from "@/lib/session";
 import { ArrowRight, FileCheck2, ShieldCheck, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -23,22 +24,30 @@ function Landing() {
       return data;
     },
   });
+  const me = useQuery(meQuery);
+  const home = me.data?.isAdmin ? "/admin" : "/portal";
   return (
     <div className="min-h-screen bg-background">
       <header className="flex items-center justify-between px-4 py-4 sm:px-8">
         <Brand />
-        <Button asChild size="sm"><Link to="/auth">Sign in</Link></Button>
+        {me.data ? <Button asChild size="sm"><Link to={home}>Open my portal</Link></Button> : <Button asChild size="sm"><Link to="/auth">Sign in</Link></Button>}
       </header>
       <section className="bg-sidebar px-4 py-14 text-sidebar-foreground sm:px-8 sm:py-20">
         <div className="mx-auto max-w-4xl">
           <p className="text-xs font-semibold uppercase tracking-widest text-gold">Contractor and tender portal</p>
           <h1 className="mt-3 text-3xl font-extrabold leading-tight sm:text-5xl">Register once. Keep your documents current. Apply with confidence.</h1>
           <p className="mt-4 max-w-2xl text-base text-sidebar-foreground/80 sm:text-lg">
-            MineMySol is MySol's private portal for approved contractors. Store your compliance documents, see exactly what each opportunity needs, and submit when your checklist is complete.
+            MineMySol is MySol's contractor and tender portal. Register your company in minutes, store your compliance documents, see exactly what each opportunity needs, and submit when your checklist is complete.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg" className="bg-gold text-gold-foreground hover:bg-gold/90"><Link to="/auth">Sign in <ArrowRight className="size-4" /></Link></Button>
-            <Button asChild size="lg" variant="outline" className="border-sidebar-foreground/30 bg-transparent text-sidebar-foreground hover:bg-sidebar-accent"><Link to="/auth" search={{ mode: "register" }}>I have an invitation code</Link></Button>
+            {me.data ? (
+              <Button asChild size="lg" className="bg-gold text-gold-foreground hover:bg-gold/90"><Link to={home}>Open my portal <ArrowRight className="size-4" /></Link></Button>
+            ) : (
+              <>
+                <Button asChild size="lg" className="bg-gold text-gold-foreground hover:bg-gold/90"><Link to="/auth" search={{ mode: "register" }}>Register your company <ArrowRight className="size-4" /></Link></Button>
+                <Button asChild size="lg" variant="outline" className="border-sidebar-foreground/30 bg-transparent text-sidebar-foreground hover:bg-sidebar-accent"><Link to="/auth">Sign in</Link></Button>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -60,7 +69,7 @@ function Landing() {
         {projects.isLoading ? <Loading /> : projects.isError ? (
           <EmptyState title="Opportunities could not be loaded" body="Please refresh the page. If it keeps happening, contact MySol." />
         ) : !projects.data?.length ? (
-          <EmptyState title="No public opportunities right now" body="Invited contractors see their opportunities after signing in." />
+          <EmptyState title="No public opportunities right now" body="Register your company to see opportunities you are invited to and to prepare your documents." />
         ) : (
           <ul className="space-y-3">
             {projects.data.map((p) => (
@@ -73,7 +82,7 @@ function Landing() {
           </ul>
         )}
       </section>
-      <footer className="border-t px-4 py-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} MineMySol. Private portal for invited contractors.</footer>
+      <footer className="border-t px-4 py-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} MineMySol. Contractor and tender portal.</footer>
     </div>
   );
 }

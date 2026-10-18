@@ -100,7 +100,7 @@ function AuthPage() {
         <form onSubmit={go} noValidate className="w-full max-w-md space-y-4 rounded-xl border bg-card p-6 shadow-sm">
           <div>
             <h1 className="text-2xl font-bold">{register ? "Register your company" : "Sign in"}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{register ? "Create a contractor account for your company. Verify your email, then browse and apply for tenders." : "Access for MySol and invited contractors."}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{register ? "Create a contractor account for your company. Verify your email, then browse and apply for tenders." : "Access for MySol and registered contractors."}</p>
           </div>
           {register && (
             <>
