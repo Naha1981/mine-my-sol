@@ -4,6 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { Camera, Download, Mic, Pause, Play, Send, Volume2 } from "lucide-react";
 import { SAMPLE_SITES, type Site } from "@/lib/eye/sample";
 import { answer, causes, pct, risk } from "@/lib/eye/engine";
+import { FleetSignals, fleetLines } from "./FleetSignals";
 
 
 const chip = (c: string) => c === "confirmed" ? "bg-emerald-100 text-emerald-900" : c === "inferred" ? "bg-amber-100 text-amber-900" : "bg-stone-200 text-stone-800";
@@ -112,7 +113,7 @@ export function EyeView() {
     const extra: string[] = [];
     if (card) extra.push(`Pin open: ${card.kind} ${card.title}`, ...card.lines.map(([k, v]) => `${k}: ${v}`));
     if (log[0]) extra.push(`Question asked: ${log[0].q}`, `Answer given: ${log[0].a}`);
-    setSnaps((x) => [...x, { n: x.length + 1, at: new Date().toISOString(), site: site.name, shift: t >= 720 ? "Shift summary" : `Replay ${clock(t)}`, caption: note.trim(), img, sha, lines: [`${pct(site)}% of target (${site.actual.toLocaleString()} of ${site.target.toLocaleString()} t)`, ...lines, ...extra] }]);
+    setSnaps((x) => [...x, { n: x.length + 1, at: new Date().toISOString(), site: site.name, shift: t >= 720 ? "Shift summary" : `Replay ${clock(t)}`, caption: note.trim(), img, sha, lines: [`${pct(site)}% of target (${site.actual.toLocaleString()} of ${site.target.toLocaleString()} t)`, ...lines, ...fleetLines(site.id, 22), ...extra] }]);
     setNote("");
   }
   async function exportPack() {
@@ -211,6 +212,7 @@ export function EyeView() {
           ))}
         </ol>
       </div>
+      <FleetSignals siteId={site.id} />
       <div className="rounded-xl border bg-card p-3">
         <div className="flex gap-2">
           <button onClick={listen} aria-label="Speak" className={`rounded-lg border px-3 ${listening ? "bg-red-600 text-white" : ""}`}><Mic size={18} /></button>
