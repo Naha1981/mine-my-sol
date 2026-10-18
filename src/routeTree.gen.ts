@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BotRouteImport } from './routes/bot'
 import { Route as EyeRouteImport } from './routes/eye'
 import { Route as SignalsRouteImport } from './routes/signals'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -48,6 +49,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BotRoute = BotRouteImport.update({
+  id: '/bot',
+  path: '/bot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EyeRoute = EyeRouteImport.update({
@@ -184,6 +190,7 @@ const AuthenticatedPortalProjectsProjectIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/bot': typeof BotRoute
   '/eye': typeof EyeRoute
   '/signals': typeof SignalsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -211,6 +218,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/bot': typeof BotRoute
   '/eye': typeof EyeRoute
   '/signals': typeof SignalsRoute
   '/p/$projectId': typeof PProjectIdRoute
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/bot': typeof BotRoute
   '/eye': typeof EyeRoute
   '/signals': typeof SignalsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -267,6 +276,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/bot'
     | '/eye'
     | '/signals'
     | '/admin'
@@ -294,6 +304,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/bot'
     | '/eye'
     | '/signals'
     | '/p/$projectId'
@@ -320,6 +331,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/bot'
     | '/eye'
     | '/signals'
     | '/_authenticated/admin'
@@ -349,6 +361,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  BotRoute: typeof BotRoute
   EyeRoute: typeof EyeRoute
   SignalsRoute: typeof SignalsRoute
   PProjectIdRoute: typeof PProjectIdRoute
@@ -375,6 +388,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bot': {
+      id: '/bot'
+      path: '/bot'
+      fullPath: '/bot'
+      preLoaderRoute: typeof BotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/eye': {
@@ -619,6 +639,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  BotRoute: BotRoute,
   EyeRoute: EyeRoute,
   SignalsRoute: SignalsRoute,
   PProjectIdRoute: PProjectIdRoute,
