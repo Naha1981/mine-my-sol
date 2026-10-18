@@ -122,6 +122,14 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  // Static hosting only serves the root, so demo links arrive as /?demo=<token> and move to /signals client-side.
+  useEffect(() => {
+    const d = new URLSearchParams(window.location.search).get("demo");
+    if (d && window.location.pathname === "/") {
+      window.history.replaceState(null, "", `/signals?t=${encodeURIComponent(d)}`);
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

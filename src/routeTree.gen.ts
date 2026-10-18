@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as EyeRouteImport } from './routes/eye'
+import { Route as SignalsRouteImport } from './routes/signals'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 import { Route as PProjectIdRouteImport } from './routes/p.$projectId'
@@ -52,6 +53,11 @@ const AuthRoute = AuthRouteImport.update({
 const EyeRoute = EyeRouteImport.update({
   id: '/eye',
   path: '/eye',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignalsRoute = SignalsRouteImport.update({
+  id: '/signals',
+  path: '/signals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/eye': typeof EyeRoute
+  '/signals': typeof SignalsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteWithChildren
   '/p/$projectId': typeof PProjectIdRoute
@@ -205,6 +212,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/eye': typeof EyeRoute
+  '/signals': typeof SignalsRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/contractors': typeof AuthenticatedAdminContractorsRoute
@@ -231,6 +239,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/eye': typeof EyeRoute
+  '/signals': typeof SignalsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
   '/p/$projectId': typeof PProjectIdRoute
@@ -259,6 +268,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/eye'
+    | '/signals'
     | '/admin'
     | '/portal'
     | '/p/$projectId'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/eye'
+    | '/signals'
     | '/p/$projectId'
     | '/admin/audit'
     | '/admin/contractors'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/eye'
+    | '/signals'
     | '/_authenticated/admin'
     | '/_authenticated/portal'
     | '/p/$projectId'
@@ -338,6 +350,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   EyeRoute: typeof EyeRoute
+  SignalsRoute: typeof SignalsRoute
   PProjectIdRoute: typeof PProjectIdRoute
 }
 
@@ -369,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/eye'
       fullPath: '/eye'
       preLoaderRoute: typeof EyeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signals': {
+      id: '/signals'
+      path: '/signals'
+      fullPath: '/signals'
+      preLoaderRoute: typeof SignalsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -600,6 +620,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   EyeRoute: EyeRoute,
+  SignalsRoute: SignalsRoute,
   PProjectIdRoute: PProjectIdRoute,
 }
 export const routeTree = rootRouteImport

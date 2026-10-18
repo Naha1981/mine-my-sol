@@ -11,7 +11,7 @@ export function fleetLines(siteId: string, diesel: number): string[] {
   return [`Fleet signals (sample fleet, 7 days, diesel R${diesel}/L): ${sigs.length} raised, estimated leak ${money(totalLeak(sigs))} a week`, ...sigs.map((s) => `${label[s.rule]}: ${s.headline}, about ${money(s.leakR)}`)];
 }
 
-export function FleetSignals({ siteId }: { siteId: string }) {
+export function FleetSignals({ siteId, locked = false }: { siteId: string; locked?: boolean }) {
   const [diesel, setDiesel] = useState(DEFAULTS.dieselRPerL);
   const [all, setAll] = useState(false);
   const sigs = useMemo(() => runRules(FLEET, { ...DEFAULTS, dieselRPerL: diesel }), [diesel]);
@@ -21,7 +21,7 @@ export function FleetSignals({ siteId }: { siteId: string }) {
     <div className="rounded-xl border bg-card p-3 text-sm" data-testid="fleet-signals">
       <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-display">Fleet signals <span className="text-xs font-normal text-muted-foreground">24 machines, 7 days, sample</span></h2>
-        <button onClick={() => setAll((v) => !v)} className="rounded-full border px-2 py-0.5 text-xs">{all ? "Show this site" : "Show all sites"}</button>
+        {!locked && <button onClick={() => setAll((v) => !v)} className="rounded-full border px-2 py-0.5 text-xs">{all ? "Show this site" : "Show all sites"}</button>}
       </div>
       <p className="mb-2 text-muted-foreground"><b>Purpose:</b> find money leaking from idle machines, heavy fuel use and repeat faults. <b>Look at:</b> the rand figure on each signal. <b>Then:</b> Add to evidence puts this site's signals in the pack.</p>
       <div className="mb-2 grid grid-cols-2 gap-2">
