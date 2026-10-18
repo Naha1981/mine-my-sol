@@ -116,6 +116,7 @@ function AuthPage() {
           {formError && <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">{formError}</p>}
           <Captcha onToken={setCaptcha} resetKey={capKey} />
           <Button type="submit" className="w-full" disabled={busy}>{busy ? "Please wait…" : register ? "Create account" : "Sign in"}</Button>
+          {!register && <p className="text-center text-sm"><Link to="/forgot-password" className="font-medium text-primary underline">Forgot your password?</Link></p>}
           <p className="text-center text-sm text-muted-foreground">
             {register ? <>Already registered? <Link to="/auth" search={{ mode: "signin" }} className="font-medium text-primary underline">Sign in</Link></> : <>New contractor? <Link to="/auth" search={{ mode: "register" }} className="font-medium text-primary underline">Register your company</Link></>}
           </p>

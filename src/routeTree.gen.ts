@@ -14,6 +14,8 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BotRouteImport } from './routes/bot'
 import { Route as EyeRouteImport } from './routes/eye'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignalsRouteImport } from './routes/signals'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
@@ -59,6 +61,16 @@ const BotRoute = BotRouteImport.update({
 const EyeRoute = EyeRouteImport.update({
   id: '/eye',
   path: '/eye',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignalsRoute = SignalsRouteImport.update({
@@ -192,6 +204,8 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/bot': typeof BotRoute
   '/eye': typeof EyeRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signals': typeof SignalsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteWithChildren
@@ -220,6 +234,8 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/bot': typeof BotRoute
   '/eye': typeof EyeRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signals': typeof SignalsRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -248,6 +264,8 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/bot': typeof BotRoute
   '/eye': typeof EyeRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signals': typeof SignalsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
@@ -278,6 +296,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bot'
     | '/eye'
+    | '/forgot-password'
+    | '/reset-password'
     | '/signals'
     | '/admin'
     | '/portal'
@@ -306,6 +326,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bot'
     | '/eye'
+    | '/forgot-password'
+    | '/reset-password'
     | '/signals'
     | '/p/$projectId'
     | '/admin/audit'
@@ -333,6 +355,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bot'
     | '/eye'
+    | '/forgot-password'
+    | '/reset-password'
     | '/signals'
     | '/_authenticated/admin'
     | '/_authenticated/portal'
@@ -363,6 +387,8 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BotRoute: typeof BotRoute
   EyeRoute: typeof EyeRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SignalsRoute: typeof SignalsRoute
   PProjectIdRoute: typeof PProjectIdRoute
 }
@@ -402,6 +428,20 @@ declare module '@tanstack/react-router' {
       path: '/eye'
       fullPath: '/eye'
       preLoaderRoute: typeof EyeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signals': {
@@ -641,6 +681,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BotRoute: BotRoute,
   EyeRoute: EyeRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SignalsRoute: SignalsRoute,
   PProjectIdRoute: PProjectIdRoute,
 }
