@@ -5,6 +5,9 @@ import { Camera, Download, Mic, Pause, Play, Send, Volume2 } from "lucide-react"
 import { SAMPLE_SITES, type Site } from "@/lib/eye/sample";
 import { answer, causes, pct, risk } from "@/lib/eye/engine";
 import { FleetSignals, fleetLines } from "./FleetSignals";
+import { loadMine } from "@/lib/eye/store";
+import { runRules, money } from "@/lib/eye/rules";
+import { DEFAULTS } from "@/lib/eye/fleet";
 
 
 const chip = (c: string) => c === "confirmed" ? "bg-emerald-100 text-emerald-900" : c === "inferred" ? "bg-amber-100 text-amber-900" : "bg-stone-200 text-stone-800";
@@ -32,6 +35,9 @@ export function EyeView() {
   const [snaps, setSnaps] = useState<Snap[]>([]);
   const [note, setNote] = useState("");
   const [t, setT] = useState(720);
+  const [mine, setMine] = useState<ReturnType<typeof loadMine>>(null);
+  useEffect(() => { setMine(loadMine()); }, []);
+  const mineMk = useRef<maplibregl.Marker[]>([]);
   const [playing, setPlaying] = useState(false);
   const rec = useRef<{ kind: string; el: HTMLElement; mk: maplibregl.Marker; a?: number; b?: number; path?: [number, number][] }[]>([]);
   const cs = useMemo(() => causes(site), [site]);
@@ -88,6 +94,27 @@ export function EyeView() {
     m.fitBounds(b, { padding: 40, duration: 1800, maxZoom: 16 });
   }, [site]);
 
+  const goMine = () => {
+    const m = map.current; if (!m || !mine) return;
+    const pts = mine.fleet.filter((x) => x.at).map((x) => x.at!);
+    if (pts.length) { const b = new maplibregl.LngLatBounds(); pts.forEach((c) => b.extend(c)); m.fitBounds(b, { padding: 60, duration: 1500, maxZoom: 16 }); }
+  };
+  useEffect(() => {
+    const m = map.current; if (!m) return;
+    mineMk.current.forEach((x) => x.remove()); mineMk.current = [];
+    if (!mine) return;
+    const sigs = runRules(mine.fleet, DEFAULTS);
+    for (const x of mine.fleet) {
+      if (!x.at) continue;
+      const mySigs = sigs.filter((s) => s.machine === x.id);
+      const e = el(`eye-pin eye-m ${mySigs.length ? "eye-idle" : ""}`, x.id);
+      const mk = new maplibregl.Marker({ element: e }).setLngLat(x.at).addTo(m); mineMk.current.push(mk);
+      const eng = x.days.reduce((a, d) => a + d.engineH, 0), idle = x.days.reduce((a, d) => a + d.idleH, 0), lit = x.days.reduce((a, d) => a + d.litres, 0), tn = x.days.reduce((a, d) => a + d.tonnes, 0);
+      const show = () => setCard({ title: x.id, kind: `${x.type} (your imported fleet)`, lines: [["Site in file", x.site], ["Idle share", `${eng ? Math.round(idle / eng * 100) : 0}% of ${eng.toFixed(1)} engine hours`], ["Fuel used", `${Math.round(lit).toLocaleString()} litres`], ["Tonnes moved", `${Math.round(tn).toLocaleString()} t`], ["Signals", mySigs.length ? mySigs.map((s) => `${s.headline}, about ${money(s.leakR)} a week`).join("; ") : "None raised"], ["In dispute", "No"]] });
+      e.onclick = show; e.onmouseenter = show;
+    }
+  }, [mine]);
+
   useEffect(() => {
     for (const r of rec.current) {
       if (t >= 720) { r.el.style.opacity = "1"; r.el.style.display = ""; if (r.kind === "machine" && r.path) r.mk.setLngLat(r.path[0]!); continue; }
@@ -113,7 +140,7 @@ export function EyeView() {
     const extra: string[] = [];
     if (card) extra.push(`Pin open: ${card.kind} ${card.title}`, ...card.lines.map(([k, v]) => `${k}: ${v}`));
     if (log[0]) extra.push(`Question asked: ${log[0].q}`, `Answer given: ${log[0].a}`);
-    setSnaps((x) => [...x, { n: x.length + 1, at: new Date().toISOString(), site: site.name, shift: t >= 720 ? "Shift summary" : `Replay ${clock(t)}`, caption: note.trim(), img, sha, lines: [`${pct(site)}% of target (${site.actual.toLocaleString()} of ${site.target.toLocaleString()} t)`, ...lines, ...fleetLines(site.id, 22), ...extra] }]);
+    setSnaps((x) => [...x, { n: x.length + 1, at: new Date().toISOString(), site: site.name, shift: t >= 720 ? "Shift summary" : `Replay ${clock(t)}`, caption: note.trim(), img, sha, lines: [`${pct(site)}% of target (${site.actual.toLocaleString()} of ${site.target.toLocaleString()} t)`, ...lines, ...fleetLines(site.id, 22), ...(mine ? fleetLines(site.id, 22, mine.fleet, true) : []), ...extra] }]);
     setNote("");
   }
   async function exportPack() {
@@ -161,6 +188,7 @@ export function EyeView() {
           </button>
         ))}
       </div>
+      {mine && <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-2 text-sm" data-testid="mine-chip"><span>Your imported fleet ({mine.fleet.length} machines, {mine.name}) is loaded.</span>{mine.fleet.some((x) => x.at) ? <button onClick={goMine} className="rounded-full border px-3 py-1">Show on map</button> : <span className="text-muted-foreground">No lat/lon columns in the file, so no map pins. Signals still go into the pack.</span>}</div>}
       <p className="rounded-lg border bg-card p-2 text-sm"><b>Purpose:</b> see where the lost tonnes came from. <b>Look at:</b> orange delay pins, red DISPUTED pins, blue video clips. <b>Then:</b> press Add to evidence to seal this exact view into the evidence pack.</p>
       <div className="relative">
         <div ref={mapEl} className="h-[48vh] min-h-[300px] w-full overflow-hidden rounded-xl border" onClick={(e) => { if (e.target === e.currentTarget || (e.target as HTMLElement).tagName === "CANVAS") setCard(null); }} />
@@ -213,6 +241,7 @@ export function EyeView() {
         </ol>
       </div>
       <FleetSignals siteId={site.id} />
+      {mine && <FleetSignals siteId={site.id} fleet={mine.fleet} imported />}
       <div className="rounded-xl border bg-card p-3">
         <div className="flex gap-2">
           <button onClick={listen} aria-label="Speak" className={`rounded-lg border px-3 ${listening ? "bg-red-600 text-white" : ""}`}><Mic size={18} /></button>

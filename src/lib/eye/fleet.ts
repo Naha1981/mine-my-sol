@@ -1,6 +1,6 @@
 // SAMPLE DATA ONLY. Synthetic 24-machine fleet, 7 days. Replace with imported machine / fuel / fault CSVs.
 export type Day = { engineH: number; idleH: number; litres: number; tonnes: number; faults: string[] };
-export type FleetMachine = { id: string; site: string; type: string; days: Day[] };
+export type FleetMachine = { id: string; site: string; type: string; days: Day[]; at?: [number, number] };
 export type Assumptions = { dieselRPerL: number; idleBurnLPerH: Record<string, number>; baselineIdleShare: number; marginRPerH: Record<string, number>; hoursPerFault: number };
 export const DEFAULTS: Assumptions = {
   dieselRPerL: 22,

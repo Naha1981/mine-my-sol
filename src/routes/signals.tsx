@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { FleetSignals } from "@/components/app/FleetSignals";
 import { FLEET, type FleetMachine } from "@/lib/eye/fleet";
 import { parseFleetCsv, TEMPLATE } from "@/lib/eye/csv";
+import { loadMine, saveMine } from "@/lib/eye/store";
 import { makeToken, readToken, type Demo } from "@/lib/eye/token";
 
 const NAMES: Record<string, string> = { s4: "Site 4", s2: "Site 2", s7: "Site 7" };
@@ -35,7 +36,7 @@ function CsvImport({ onData }: { onData: (f: FleetMachine[] | null) => void }) {
     if (!file) return;
     if (file.size > 5_000_000) { setMsg(["File is over 5 MB."]); return; }
     const r = parseFleetCsv(await file.text()); setMsg(r.errors);
-    if (r.fleet.length) { onData(r.fleet); setOk(`Read ${r.rows} rows for ${r.fleet.length} machines from ${file.name}.`); } else { onData(null); setOk(""); }
+    if (r.fleet.length) { saveMine(r.fleet, file.name); onData(r.fleet); setOk(`Read ${r.rows} rows for ${r.fleet.length} machines from ${file.name}.`); } else { onData(null); setOk(""); }
   }
   function template() { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([TEMPLATE], { type: "text/csv" })); a.download = "fleet-template.csv"; a.click(); }
   return (
@@ -45,7 +46,7 @@ function CsvImport({ onData }: { onData: (f: FleetMachine[] | null) => void }) {
       <div className="flex flex-wrap items-center gap-2">
         <input data-testid="csv-file" type="file" accept=".csv,text/csv" onChange={(e) => load(e.target.files?.[0])} className="min-w-0 flex-1" />
         <button onClick={template} className="rounded-lg border px-3 py-1.5">Download template</button>
-        {ok && <button onClick={() => { onData(null); setOk(""); setMsg([]); }} className="rounded-lg border px-3 py-1.5">Back to sample</button>}
+        {ok && <button onClick={() => { saveMine(null); onData(null); setOk(""); setMsg([]); }} className="rounded-lg border px-3 py-1.5">Back to sample</button>}
       </div>
       {ok && <p className="mt-2 font-semibold" data-testid="csv-ok">{ok}</p>}
       {msg.length > 0 && <ul className="mt-2 list-disc pl-5 text-red-800" data-testid="csv-errors">{msg.map((m) => <li key={m}>{m}</li>)}</ul>}
@@ -55,6 +56,7 @@ function CsvImport({ onData }: { onData: (f: FleetMachine[] | null) => void }) {
 
 function Page() {
   const [mine, setMine] = useState<FleetMachine[] | null>(null);
+  useEffect(() => { const m = loadMine(); if (m) setMine(m.fleet); }, []);
   const [state, setState] = useState<"loading" | "open" | "demo" | "expired" | "bad">("loading");
   const [demo, setDemo] = useState<Demo | null>(null); const [site, setSite] = useState("s4");
   useEffect(() => { (async () => {
@@ -74,7 +76,7 @@ function Page() {
         <p className="rounded-lg border bg-card p-2 text-sm" data-testid="demo-banner">Demo for <b>{demo.l}</b>, {NAMES[demo.s]}. Expires {new Date(demo.e).toLocaleDateString("en-ZA")}. View only.</p>
         <FleetSignals siteId={demo.s} locked />
       </>)}
-      {state === "open" && (<><CsvImport onData={setMine} /><FleetSignals key={mine ? "mine" : "sample"} siteId={site} fleet={mine ?? FLEET} imported={Boolean(mine)} />{!mine && <Creator onPick={setSite} />}</>)}
+      {state === "open" && (<>{mine && <p className="rounded-lg border bg-card p-2 text-sm" data-testid="csv-saved">Your saved file ({mine.length} machines) is loaded. It is kept in this browser and also feeds the Operations Eye and its evidence pack.</p>}<CsvImport onData={setMine} /><FleetSignals key={mine ? "mine" : "sample"} siteId={site} fleet={mine ?? FLEET} imported={Boolean(mine)} />{!mine && <Creator onPick={setSite} />}</>)}
     </div>
   );
 }

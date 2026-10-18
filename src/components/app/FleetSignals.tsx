@@ -5,8 +5,9 @@ import { money, runRules, totalLeak, type Signal } from "@/lib/eye/rules";
 const label = { idle: "Idle share", fuel: "Fuel rate", fault: "Repeat fault" } as const;
 const SITES: Record<string, string> = { s4: "Site 4", s2: "Site 2", s7: "Site 7" };
 
-export function fleetLines(siteId: string, diesel: number): string[] {
-  const sigs = runRules(FLEET, { ...DEFAULTS, dieselRPerL: diesel }).filter((s) => s.site === siteId);
+export function fleetLines(siteId: string, diesel: number, fleet: FleetMachine[] = FLEET, imported = false): string[] {
+  const sigs = runRules(fleet, { ...DEFAULTS, dieselRPerL: diesel }).filter((s) => imported || s.site === siteId);
+  if (imported) return sigs.length ? [`Imported fleet signals (your CSV, ${fleet.length} machines, diesel R${diesel}/L): ${sigs.length} raised, estimated leak ${money(totalLeak(sigs))} a week`, ...sigs.map((s) => `${label[s.rule]}: ${s.headline}, about ${money(s.leakR)}`)] : ["Imported fleet signals: none raised."];
   if (!sigs.length) return ["Fleet signals: none raised for this site (sample fleet, 7 days)."];
   return [`Fleet signals (sample fleet, 7 days, diesel R${diesel}/L): ${sigs.length} raised, estimated leak ${money(totalLeak(sigs))} a week`, ...sigs.map((s) => `${label[s.rule]}: ${s.headline}, about ${money(s.leakR)}`)];
 }
