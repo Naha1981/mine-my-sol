@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Mic, Pause, Play, Send, Volume2 } from "lucide-react";
+import { Camera, Download, Mic, Pause, Play, Send, Volume2 } from "lucide-react";
 import { SAMPLE_SITES, type Site } from "@/lib/eye/sample";
 import { answer, causes, pct, risk } from "@/lib/eye/engine";
 
@@ -11,6 +11,9 @@ const chip = (c: string) => c === "confirmed" ? "bg-emerald-100 text-emerald-900
 const mins = (hhmm: string) => { const [h, mm] = hhmm.split(":").map(Number) as [number, number]; return (h * 60 + mm - 18 * 60 + 1440) % 1440; };
 function clock(t: number) { const x = (18 * 60 + t) % 1440; return `${String(Math.floor(x / 60)).padStart(2, "0")}:${String(x % 60).padStart(2, "0")}`; }
 
+
+async function sha256(buf: ArrayBuffer) { const h = await crypto.subtle.digest("SHA-256", buf); return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, "0")).join(""); }
+const esc = (x: string) => x.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string));
 function el(cls: string, text = "") { const d = document.createElement("div"); d.className = cls; d.textContent = text; return d; }
 
 export function EyeView() {
@@ -24,6 +27,9 @@ export function EyeView() {
   const markers = useRef<maplibregl.Marker[]>([]);
   const audio = useRef<HTMLAudioElement | null>(null);
   const [card, setCard] = useState<{ title: string; kind: string; lines: [string, string][]; disputed?: boolean } | null>(null);
+  type Snap = { n: number; at: string; site: string; shift: string; caption: string; img: string; sha: string; lines: string[] };
+  const [snaps, setSnaps] = useState<Snap[]>([]);
+  const [note, setNote] = useState("");
   const [t, setT] = useState(720);
   const [playing, setPlaying] = useState(false);
   const rec = useRef<{ kind: string; el: HTMLElement; mk: maplibregl.Marker; a?: number; b?: number; path?: [number, number][] }[]>([]);
@@ -32,7 +38,7 @@ export function EyeView() {
   useEffect(() => {
     if (!mapEl.current || map.current) return;
     map.current = new maplibregl.Map({
-      container: mapEl.current, center: sites[0]!.center, zoom: 14.2, attributionControl: { compact: true },
+      container: mapEl.current, center: sites[0]!.center, zoom: 14.2, canvasContextAttributes: { preserveDrawingBuffer: true }, attributionControl: { compact: true },
       style: { version: 8, sources: { sat: { type: "raster", tileSize: 256, attribution: "Imagery Esri, Maxar", tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"] } }, layers: [{ id: "sat", type: "raster", source: "sat" }] },
     });
     (window as any).__eyeMap = map.current;
@@ -95,6 +101,28 @@ export function EyeView() {
     return () => clearInterval(id);
   }, [playing]);
 
+
+  async function addToEvidence() {
+    const m = map.current; if (!m) return;
+    m.triggerRepaint(); await Promise.race([new Promise((r) => m.once("render", () => r(null))), new Promise((r) => setTimeout(r, 1500))]);
+    const img = m.getCanvas().toDataURL("image/png");
+    const bytes = Uint8Array.from(atob(img.split(",")[1]!), (c) => c.charCodeAt(0));
+    const sha = await sha256(bytes.buffer);
+    const lines = causes(site).map((c) => `${c.rank}. ${c.label}: about ${c.tonnes.toLocaleString()} t, ${c.conf}${c.disputed ? ", DISPUTED" : ""}`);
+    const extra: string[] = [];
+    if (card) extra.push(`Pin open: ${card.kind} ${card.title}`, ...card.lines.map(([k, v]) => `${k}: ${v}`));
+    if (log[0]) extra.push(`Question asked: ${log[0].q}`, `Answer given: ${log[0].a}`);
+    setSnaps((x) => [...x, { n: x.length + 1, at: new Date().toISOString(), site: site.name, shift: t >= 720 ? "Shift summary" : `Replay ${clock(t)}`, caption: note.trim(), img, sha, lines: [`${pct(site)}% of target (${site.actual.toLocaleString()} of ${site.target.toLocaleString()} t)`, ...lines, ...extra] }]);
+    setNote("");
+  }
+  async function exportPack() {
+    if (!snaps.length) return;
+    const enc = new TextEncoder().encode(snaps.map((x) => x.sha).join("|"));
+    const seal = await sha256(enc.buffer);
+    const html = `<!doctype html><meta charset="utf-8"><title>MineMySol evidence pack</title><style>body{font:15px system-ui;max-width:760px;margin:24px auto;padding:0 12px;color:#1c1c1c}img{max-width:100%;border:1px solid #999}code{word-break:break-all;font-size:12px}.lim{background:#fff3cd;padding:8px;border-radius:6px}</style><h1>MineMySol evidence pack</h1><p class="lim"><b>SAMPLE DATA.</b> Figures, machines and clips are synthetic. Imagery: Esri, Maxar. Causes are rule-based estimates, not findings of fact.</p><p>Created ${new Date().toISOString()}. Snapshots: ${snaps.length}.</p><p>Pack seal (SHA-256 of snapshot hashes): <code>${seal}</code></p>${snaps.map((x) => `<hr><h2>Snapshot ${x.n}: ${esc(x.site)}</h2><p>${esc(x.shift)} | captured ${x.at}</p>${x.caption ? `<p><b>Note:</b> ${esc(x.caption)}</p>` : ""}<img src="${x.img}" alt="Map snapshot ${x.n}"><p>${x.lines.map(esc).join("<br>")}</p><p>Source: MineMySol Operations Eye (sample data), satellite basemap Esri. Limits: sample figures only; pin positions are illustrative.<br>Snapshot SHA-256: <code>${x.sha}</code></p>`).join("")}`;
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([html], { type: "text/html" })); a.download = `minemysol-evidence-pack-${Date.now()}.html`; a.click();
+  }
+
   function play(key: string) {
     audio.current?.pause();
     const a = new Audio(`/eye-audio/${key.replace(":", "-")}.mp3`);
@@ -132,6 +160,7 @@ export function EyeView() {
           </button>
         ))}
       </div>
+      <p className="rounded-lg border bg-card p-2 text-sm"><b>Purpose:</b> see where the lost tonnes came from. <b>Look at:</b> orange delay pins, red DISPUTED pins, blue video clips. <b>Then:</b> press Add to evidence to seal this exact view into the evidence pack.</p>
       <div className="relative">
         <div ref={mapEl} className="h-[48vh] min-h-[300px] w-full overflow-hidden rounded-xl border" onClick={(e) => { if (e.target === e.currentTarget || (e.target as HTMLElement).tagName === "CANVAS") setCard(null); }} />
         {card && (
@@ -148,6 +177,17 @@ export function EyeView() {
         <button onClick={() => { if (t >= 720) setT(0); setPlaying((p) => !p); }} aria-label="Replay shift" className="rounded-lg bg-primary p-2 text-primary-foreground">{playing ? <Pause size={18} /> : <Play size={18} />}</button>
         <input type="range" min={0} max={720} step={6} value={t} onChange={(e) => { setPlaying(false); setT(Number(e.target.value)); }} className="min-w-0 flex-1" aria-label="Shift time" />
         <span className="w-24 text-right text-sm tabular-nums">{t >= 720 ? "Shift summary" : clock(t)}</span>
+      </div>
+      <div className="rounded-xl border bg-card p-3 text-sm">
+        <div className="flex gap-2">
+          <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Optional note for this snapshot" className="min-w-0 flex-1 rounded-lg border bg-background px-3 py-2 text-base" />
+          <button onClick={addToEvidence} className="flex items-center gap-1 rounded-lg bg-primary px-3 text-primary-foreground"><Camera size={16} />Add to evidence</button>
+        </div>
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <span data-testid="pack-count">{snaps.length} snapshot{snaps.length === 1 ? "" : "s"} in the pack</span>
+          <button onClick={exportPack} disabled={!snaps.length} className="flex items-center gap-1 rounded-lg border px-3 py-1.5 disabled:opacity-50"><Download size={16} />Export pack</button>
+        </div>
+        {snaps.length > 0 && <ul className="mt-2 space-y-1">{snaps.map((x) => <li key={x.n} className="flex items-center gap-2"><img src={x.img} alt="" className="h-10 w-14 rounded border object-cover" /><span className="min-w-0 flex-1 truncate">{x.n}. {x.site.split(" (")[0]} - {x.shift}</span><code className="text-xs">{x.sha.slice(0, 8)}</code></li>)}</ul>}
       </div>
       <div className="grid grid-cols-3 gap-2 text-center">
         <div className="rounded-lg border bg-card p-2"><div className="text-xs text-muted-foreground">Actual</div><div className="font-display text-lg">{site.actual.toLocaleString()} t</div></div>
