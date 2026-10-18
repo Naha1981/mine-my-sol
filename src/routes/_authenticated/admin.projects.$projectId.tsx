@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -34,9 +34,12 @@ function ProjectEditor() {
   });
   const [f, setF] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const dirty = useRef(false);
+  const [pubError, setPubError] = useState<string | null>(null);
   const [newReq, setNewReq] = useState({ category: "", label: "", mandatory: true });
   useEffect(() => {
     if (!q.data) return;
+    if (dirty.current) return; // keep unsaved edits when the checklist or invites change
     const p = q.data.p;
     setF({
       title: p.title ?? "", reference: p.reference ?? "", summary: p.summary ?? "", scope: p.scope ?? "", location: p.location ?? "", trade: p.trade ?? "",
@@ -44,7 +47,7 @@ function ProjectEditor() {
     });
   }, [q.data?.p.id, q.data?.p.updated_at]); // eslint-disable-line react-hooks/exhaustive-deps
   const refresh = () => { qc.invalidateQueries({ queryKey: ["admin"] }); };
-  const set = (k: string) => (e: { target: { value: string } }) => setF((s) => ({ ...s, [k]: e.target.value }));
+  const set = (k: string) => (e: { target: { value: string } }) => { dirty.current = true; setF((s) => ({ ...s, [k]: e.target.value })); };
 
   if (q.isLoading) return <Loading />;
   if (q.isError || !q.data) return <EmptyState title="Project not found" body="It may have been removed." />;
@@ -60,15 +63,20 @@ function ProjectEditor() {
       evaluation_criteria: f["evaluation_criteria"] || null, ...extra,
     }).eq("id", projectId);
     setBusy(false);
-    if (error) return toast.error(errMsg(error));
+    if (error) { setPubError(errMsg(error)); return toast.error(errMsg(error)); }
+    dirty.current = false;
     toast.success("Saved");
     refresh();
   }
   async function setStatus(status: string) {
+    setPubError(null);
     if (status === "open") {
-      if (!reqs.length) return toast.error("Add at least one checklist item before publishing");
-      if (!f["closes_at"]) return toast.error("Set a closing date before publishing");
-      if (p.visibility === "invited" && !invited.size && f["visibility"] === "invited") return toast.error("Invite at least one contractor, or make the project public");
+      const problem =
+        !reqs.length ? "Add at least one checklist item before publishing"
+        : !f["closes_at"] ? "Set a closing date before publishing, then press Publish again"
+        : (p.visibility === "invited" && !invited.size && f["visibility"] === "invited") ? "Invite at least one contractor, or make the project public"
+        : null;
+      if (problem) { setPubError(problem); toast.error(problem); return; }
     }
     await save({ status });
   }
@@ -102,6 +110,7 @@ function ProjectEditor() {
           {(p.status === "draft" || p.status === "open") && <Button variant="outline" onClick={() => setStatus("cancelled")} disabled={busy}>Cancel project</Button>}
         </>
       } />
+      {pubError && <div role="alert" className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">{pubError}</div>}
       <div className="grid gap-6 lg:grid-cols-5">
         <section className="space-y-4 rounded-lg border bg-card p-4 lg:col-span-3">
           <h2 className="font-display text-lg font-bold">Details</h2>
