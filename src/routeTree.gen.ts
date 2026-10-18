@@ -12,12 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as EyeRouteImport } from './routes/eye'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 import { Route as PProjectIdRouteImport } from './routes/p.$projectId'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminContractorsRouteImport } from './routes/_authenticated/admin.contractors'
+import { Route as AuthenticatedAdminEyeRouteImport } from './routes/_authenticated/admin.eye'
 import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin.notifications'
 import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal.index'
 import { Route as AuthenticatedPortalNotificationsRouteImport } from './routes/_authenticated/portal.notifications'
@@ -45,6 +47,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EyeRoute = EyeRouteImport.update({
+  id: '/eye',
+  path: '/eye',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -78,6 +85,11 @@ const AuthenticatedAdminContractorsRoute =
     path: '/contractors',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminEyeRoute = AuthenticatedAdminEyeRouteImport.update({
+  id: '/eye',
+  path: '/eye',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminNotificationsRoute =
   AuthenticatedAdminNotificationsRouteImport.update({
     id: '/notifications',
@@ -166,11 +178,13 @@ const AuthenticatedPortalProjectsProjectIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/eye': typeof EyeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteWithChildren
   '/p/$projectId': typeof PProjectIdRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/contractors': typeof AuthenticatedAdminContractorsRoute
+  '/admin/eye': typeof AuthenticatedAdminEyeRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/portal/notifications': typeof AuthenticatedPortalNotificationsRoute
   '/portal/profile': typeof AuthenticatedPortalProfileRoute
@@ -190,9 +204,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/eye': typeof EyeRoute
   '/p/$projectId': typeof PProjectIdRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/contractors': typeof AuthenticatedAdminContractorsRoute
+  '/admin/eye': typeof AuthenticatedAdminEyeRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/portal/notifications': typeof AuthenticatedPortalNotificationsRoute
   '/portal/profile': typeof AuthenticatedPortalProfileRoute
@@ -214,11 +230,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/eye': typeof EyeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
   '/p/$projectId': typeof PProjectIdRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/contractors': typeof AuthenticatedAdminContractorsRoute
+  '/_authenticated/admin/eye': typeof AuthenticatedAdminEyeRoute
   '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/_authenticated/portal/notifications': typeof AuthenticatedPortalNotificationsRoute
   '/_authenticated/portal/profile': typeof AuthenticatedPortalProfileRoute
@@ -240,11 +258,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/eye'
     | '/admin'
     | '/portal'
     | '/p/$projectId'
     | '/admin/audit'
     | '/admin/contractors'
+    | '/admin/eye'
     | '/admin/notifications'
     | '/portal/notifications'
     | '/portal/profile'
@@ -264,9 +284,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/eye'
     | '/p/$projectId'
     | '/admin/audit'
     | '/admin/contractors'
+    | '/admin/eye'
     | '/admin/notifications'
     | '/portal/notifications'
     | '/portal/profile'
@@ -287,11 +309,13 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/eye'
     | '/_authenticated/admin'
     | '/_authenticated/portal'
     | '/p/$projectId'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/contractors'
+    | '/_authenticated/admin/eye'
     | '/_authenticated/admin/notifications'
     | '/_authenticated/portal/notifications'
     | '/_authenticated/portal/profile'
@@ -313,6 +337,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  EyeRoute: typeof EyeRoute
   PProjectIdRoute: typeof PProjectIdRoute
 }
 
@@ -337,6 +362,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eye': {
+      id: '/eye'
+      path: '/eye'
+      fullPath: '/eye'
+      preLoaderRoute: typeof EyeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -379,6 +411,13 @@ declare module '@tanstack/react-router' {
       path: '/contractors'
       fullPath: '/admin/contractors'
       preLoaderRoute: typeof AuthenticatedAdminContractorsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/eye': {
+      id: '/_authenticated/admin/eye'
+      path: '/eye'
+      fullPath: '/admin/eye'
+      preLoaderRoute: typeof AuthenticatedAdminEyeRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/notifications': {
@@ -485,6 +524,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminContractorsRoute: typeof AuthenticatedAdminContractorsRoute
+  AuthenticatedAdminEyeRoute: typeof AuthenticatedAdminEyeRoute
   AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminApplicationsApplicationIdRoute: typeof AuthenticatedAdminApplicationsApplicationIdRoute
@@ -496,6 +536,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminContractorsRoute: AuthenticatedAdminContractorsRoute,
+  AuthenticatedAdminEyeRoute: AuthenticatedAdminEyeRoute,
   AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminApplicationsApplicationIdRoute:
@@ -558,6 +599,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  EyeRoute: EyeRoute,
   PProjectIdRoute: PProjectIdRoute,
 }
 export const routeTree = rootRouteImport
