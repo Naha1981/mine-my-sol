@@ -19,10 +19,10 @@ await pg.getByRole("tab", { name: "Links" }).click(); await pg.waitForTimeout(80
 await pg.getByPlaceholder("Who is it for (name or company)").fill("Phone test prospect"); await pg.getByRole("button", { name: "Create link" }).click(); await pg.waitForTimeout(2500);
 const link = await pg.locator("code").first().innerText(); console.log("link", link); await shot("fleet-links");
 const sp = await ctx.newPage(); await sp.setViewportSize({ width: 390, height: 844 });
-const anon = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true }); const ap = await anon.newPage();
+const anon = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1" }); const ap = await anon.newPage();
 await ap.goto(link.replace(/^https?:\/\/[^/]+/, base)); await ap.waitForTimeout(4000); await ap.screenshot({ path: "/tmp/ui-shared.png" });
 console.log("shared insights:", await ap.getByTestId("insight").count(), "overflowX:", await ap.evaluate(() => document.documentElement.scrollWidth > innerWidth));
-await ap.getByRole("tab", { name: "Estimate" }).click(); await ap.waitForTimeout(1200); await ap.getByRole("button", { name: /Talk to/ }).click(); await ap.waitForTimeout(1500);
+await ap.getByRole("tab", { name: "Estimate" }).click(); await ap.waitForTimeout(1200); await ap.locator("input[type=number]").first().fill("12"); await ap.locator("input[type=number]").nth(1).click(); await ap.waitForTimeout(800); await ap.getByRole("button", { name: /Talk to/ }).click(); await ap.waitForTimeout(1500);
 await pg.getByRole("tab", { name: "Idle & fuel" }).click(); await pg.getByRole("tab", { name: "Links" }).click(); await pg.waitForTimeout(1500); await shot("fleet-links2");
 console.log("scorecard:", (await pg.getByTestId("scorecard").innerText()).replace(/\n/g, " "));
 console.log("overflowX private:", await pg.evaluate(() => document.documentElement.scrollWidth > innerWidth));

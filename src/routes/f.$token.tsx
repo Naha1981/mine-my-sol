@@ -47,12 +47,15 @@ function SharedView() {
     })();
   }, [token, rpc]);
   const ev = (type: string, payload: Record<string, unknown> = {}) => {
-    void rpc.rpc("fp_event", {
-      p_token: token,
-      p_type: type,
-      p_payload: payload,
-      p_ua: navigator.userAgent,
-    });
+    // The query builder only sends when awaited, so run it explicitly.
+    void (async () => {
+      await rpc.rpc("fp_event", {
+        p_token: token,
+        p_type: type,
+        p_payload: payload,
+        p_ua: navigator.userAgent,
+      });
+    })();
   };
   useEffect(() => {
     if (v) ev("screen_viewed", { tab }); // eslint-disable-next-line react-hooks/exhaustive-deps
