@@ -37,7 +37,7 @@ export function runRules(fleet: FleetMachine[] = FLEET, a: Assumptions = DEFAULT
       const r = rate(m);
       if (r > med * FUEL_LIMIT) {
         const t = sum(m.days.map((d) => d.tonnes));
-        out.push({ rule: "fuel", machine: m.id, site: m.site, type: m.type, headline: `${m.id} burns ${(r / med).toFixed(2)}x the fuel per tonne`, detail: `${r.toFixed(2)} L/t against a ${med.toFixed(2)} L/t median for ${type}s. Limit ${FUEL_LIMIT}x. Extra fuel cost is projected to 7 days from ${daysInSample(m)} observed day(s).`, leakR: (r - med) * t * a.dieselRPerL * weeklyScale(m), conf: "inferred" });
+        out.push({ rule: "fuel", machine: m.id, site: m.site, type: m.type, headline: `${m.id} burns ${(r / med).toFixed(2)}x the fuel per tonne`, detail: `${r.toFixed(2)} L/t against a ${med.toFixed(2)} L/t median for ${type}s. Limit ${FUEL_LIMIT}x. ${periodDetail(m)}`, leakR: (r - med) * t * a.dieselRPerL * weeklyScale(m), conf: "inferred" });
       }
     }
   }
@@ -45,7 +45,7 @@ export function runRules(fleet: FleetMachine[] = FLEET, a: Assumptions = DEFAULT
   for (const m of fleet) {
     const counts = new Map<string, number>(); m.days.forEach((d) => d.faults.forEach((f) => counts.set(f, (counts.get(f) ?? 0) + 1)));
     for (const [code, n] of counts) if (n >= FAULT_LIMIT) {
-      out.push({ rule: "fault", machine: m.id, site: m.site, type: m.type, headline: `${m.id}: ${code}, ${n} times in 7 days`, detail: `Same fault repeating. Estimated ${a.hoursPerFault} h lost each time at ${rand(a.marginRPerH[m.type] ?? 1000)}/h margin. ${periodDetail(m)}`, leakR: n * a.hoursPerFault * (a.marginRPerH[m.type] ?? 1000) * weeklyScale(m), conf: "inferred" });
+      out.push({ rule: "fault", machine: m.id, site: m.site, type: m.type, headline: `${m.id}: ${code}, ${n} times in ${daysInSample(m)} day(s)`, detail: `Same fault repeating. Estimated ${a.hoursPerFault} h lost each time at ${rand(a.marginRPerH[m.type] ?? 1000)}/h margin. ${periodDetail(m)}`, leakR: n * a.hoursPerFault * (a.marginRPerH[m.type] ?? 1000) * weeklyScale(m), conf: "inferred" });
     }
   }
   return out.sort((x, y) => y.leakR - x.leakR);
