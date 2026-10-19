@@ -36,7 +36,10 @@ describe("registration schema", () => {
 
 describe("sign-in schema", () => {
   it("keeps sign-in validation independent from the registration invitation requirement", () => {
-    expect(signinSchema.safeParse({ email: "admin@example.com", password: "password" }).success).toBe(true);
-    expect(signinSchema.safeParse({ email: "admin@example.com", password: "" }).success).toBe(false);
+    const valid = signinSchema.safeParse({ email: "admin@example.com", password: "password" });
+    const missingPassword = signinSchema.safeParse({ email: "admin@example.com", password: "" });
+
+    expect(valid.success).toBe(true);
+    expect(missingPassword.success).toBe(false);
   });
 });
