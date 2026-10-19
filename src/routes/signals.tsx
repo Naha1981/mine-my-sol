@@ -31,12 +31,12 @@ function Creator({ onPick }: { onPick: (s: string) => void }) {
 }
 
 function CsvImport({ onData }: { onData: (f: FleetMachine[] | null) => void }) {
-  const [msg, setMsg] = useState<string[]>([]); const [ok, setOk] = useState("");
+  const [msg, setMsg] = useState<string[]>([]); const [warnings, setWarnings] = useState<string[]>([]); const [ok, setOk] = useState("");
   async function load(file: File | undefined) {
     if (!file) return;
-    if (file.size > 5_000_000) { setMsg(["File is over 5 MB."]); return; }
-    const r = parseFleetCsv(await file.text()); setMsg(r.errors);
-    if (r.fleet.length) { saveMine(r.fleet, file.name); onData(r.fleet); setOk(`Read ${r.rows} rows for ${r.fleet.length} machines from ${file.name}.`); } else { onData(null); setOk(""); }
+    if (file.size > 5_000_000) { setMsg(["File is over 5 MB."]); setWarnings([]); setOk(""); return; }
+    const r = parseFleetCsv(await file.text()); setMsg(r.errors); setWarnings(r.warnings);
+    if (r.fleet.length) { saveMine(r.fleet, file.name); onData(r.fleet); setOk(`Read ${r.rows} rows for ${r.fleet.length} machines from ${file.name}.`); } else { saveMine(null); onData(null); setOk(""); }
   }
   function template() { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([TEMPLATE], { type: "text/csv" })); a.download = "fleet-template.csv"; a.click(); }
   return (
@@ -46,9 +46,10 @@ function CsvImport({ onData }: { onData: (f: FleetMachine[] | null) => void }) {
       <div className="flex flex-wrap items-center gap-2">
         <input data-testid="csv-file" type="file" accept=".csv,text/csv" onChange={(e) => load(e.target.files?.[0])} className="min-w-0 flex-1" />
         <button onClick={template} className="rounded-lg border px-3 py-1.5">Download template</button>
-        {ok && <button onClick={() => { saveMine(null); onData(null); setOk(""); setMsg([]); }} className="rounded-lg border px-3 py-1.5">Back to sample</button>}
+        {ok && <button onClick={() => { saveMine(null); onData(null); setOk(""); setMsg([]); setWarnings([]); }} className="rounded-lg border px-3 py-1.5">Back to sample</button>}
       </div>
       {ok && <p className="mt-2 font-semibold" data-testid="csv-ok">{ok}</p>}
+      {warnings.length > 0 && <ul className="mt-2 list-disc pl-5 text-amber-800" data-testid="csv-warnings">{warnings.map((m) => <li key={m}>{m}</li>)}</ul>}
       {msg.length > 0 && <ul className="mt-2 list-disc pl-5 text-red-800" data-testid="csv-errors">{msg.map((m) => <li key={m}>{m}</li>)}</ul>}
     </div>
   );
