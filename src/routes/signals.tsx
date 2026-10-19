@@ -34,9 +34,9 @@ function CsvImport({ onData }: { onData: (f: FleetMachine[] | null) => void }) {
   const [msg, setMsg] = useState<string[]>([]); const [warnings, setWarnings] = useState<string[]>([]); const [ok, setOk] = useState("");
   async function load(file: File | undefined) {
     if (!file) return;
-    if (file.size > 5_000_000) { setMsg(["File is over 5 MB."]); setWarnings([]); return; }
+    if (file.size > 5_000_000) { setMsg(["File is over 5 MB."]); setWarnings([]); setOk(""); return; }
     const r = parseFleetCsv(await file.text()); setMsg(r.errors); setWarnings(r.warnings);
-    if (r.fleet.length) { saveMine(r.fleet, file.name); onData(r.fleet); setOk(`Read ${r.rows} rows for ${r.fleet.length} machines from ${file.name}.`); } else { onData(null); setOk(""); }
+    if (r.fleet.length) { saveMine(r.fleet, file.name); onData(r.fleet); setOk(`Read ${r.rows} rows for ${r.fleet.length} machines from ${file.name}.`); } else { saveMine(null); onData(null); setOk(""); }
   }
   function template() { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([TEMPLATE], { type: "text/csv" })); a.download = "fleet-template.csv"; a.click(); }
   return (
