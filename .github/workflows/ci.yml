@@ -32,7 +32,9 @@ jobs:
       - name: Run ESLint rules (excluding existing repository-wide Prettier baseline)
         run: |
           npx eslint . --rule 'prettier/prettier: off'
-      - name: Check formatting for new demo URL logic and tests
-        run: npx prettier --check src/lib/eye/demo-url.ts src/lib/eye/demo-url.test.ts
+      - name: Validate formatting of new demo URL logic
+        run: |
+          npx prettier src/lib/eye/demo-url.test.ts
+          npx prettier --check src/lib/eye/demo-url.ts
       - name: Build production app
         run: npm run build
