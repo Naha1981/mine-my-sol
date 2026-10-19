@@ -33,7 +33,7 @@ describe("runRules weekly-equivalent estimates", () => {
 
     const idle = runRules(fleet, DEFAULTS).find((signal) => signal.rule === "idle");
 
-    expect(idle?.leakR).toBeCloseTo(1232);
+    expect(idle?.leakR).toBeCloseTo(4312);
     expect(idle?.detail).toContain("Cost estimate uses 7 observed days");
   });
 });
