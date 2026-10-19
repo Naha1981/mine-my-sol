@@ -23,11 +23,13 @@
 
 ## 3. Critical account-bootstrap and registration gate
 
-The current self-signup trigger in `drizzle/migrations/0003_self_signup.sql` promotes the first account to administrator when no administrator role exists. This is unsafe to leave unexamined on an internet-accessible fresh project.
+The original self-signup trigger in `drizzle/migrations/0003_self_signup.sql` contains a first-account administrator shortcut and permits no-code contractor signup. The secure replacement is `drizzle/migrations/0005_secure_invitation_only_registration.sql`. Do not onboard production users until this replacement is applied to the intended live database and the trigger is verified.
 
-- [ ] Before opening registration to the public, initialise the intended MySol administrator using a controlled setup process, or keep public registration disabled until an approved secure bootstrap is in place.
+- [ ] Apply `0005_secure_invitation_only_registration.sql` to the intended live database and verify the existing `on_auth_user_created` trigger still calls `public.handle_new_user()`.
+- [ ] Bootstrap the first MySol administrator using a trusted server-side Supabase Auth Admin API call that sets `app_metadata.minemysol_initial_admin = true` at account creation. Do not use public signup or user-editable metadata to grant administrator access; never expose the service-role key in a browser bundle.
+- [ ] Confirm an ordinary signup without an invitation fails and that a valid invitation only works for its exact email address.
 - [ ] Confirm the live project already has the expected administrator and that an unauthorised new account cannot obtain administrator permissions.
-- [ ] Decide whether contractor self-registration is intended or whether the client requires invitation-only access. The landing-page copy currently describes a private portal for approved contractors, while registration permits an optional invite code.
+- [x] Registration is invitation-only in the updated application code; the database trigger enforces the same policy after the migration is applied.
 - [ ] If CAPTCHA is required, set `VITE_TURNSTILE_SITE_KEY` and configure the matching Turnstile/CAPTCHA provider in Supabase Auth. Confirm the provider rejects missing or invalid tokens server-side; hiding the widget in the UI is not enforcement.
 - [ ] Test email verification, account recovery, suspended-user handling and sign-out on the actual target environment.
 
