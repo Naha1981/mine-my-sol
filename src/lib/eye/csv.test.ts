@@ -12,6 +12,8 @@ describe("parseFleetCsv", () => {
     expect(parsed.fleet).toHaveLength(1);
     expect(parsed.fleet[0]?.days).toHaveLength(2);
     expect(parsed.errors).toEqual([]);
+    expect(parsed.warnings.join(" ")).toContain("2026-10-12 to 2026-10-13");
+    expect(parsed.warnings.join(" ")).toContain("2 distinct date(s)");
   });
 
   it("uses only the latest seven-calendar-day window in the file", () => {
@@ -24,8 +26,8 @@ describe("parseFleetCsv", () => {
 
     expect(parsed.rows).toBe(2);
     expect(parsed.fleet[0]?.days).toHaveLength(2);
-    expect(parsed.errors[0]).toContain("2026-10-02 to 2026-10-08");
-    expect(parsed.errors[0]).toContain("Skipped 1 older row");
+    expect(parsed.warnings.join(" ")).toContain("2026-10-02 to 2026-10-08");
+    expect(parsed.warnings.join(" ")).toContain("Skipped 1 older row");
   });
 
   it("rejects impossible or non-ISO dates instead of treating them as current data", () => {
