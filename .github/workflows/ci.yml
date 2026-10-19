@@ -42,3 +42,41 @@ jobs:
         run: npx prettier --check src/lib/eye/demo-url.ts src/lib/eye/demo-url.test.ts src/lib/auth-schemas.ts src/lib/auth-schemas.test.ts
       - name: Build production app
         run: npm run build
+
+  auth-db-migration:
+    name: PostgreSQL auth migration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: minemysol_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d minemysol_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Create minimal Supabase Auth fixture
+        env:
+          PGPASSWORD: postgres
+        run: psql -h 127.0.0.1 -U postgres -d minemysol_test -v ON_ERROR_STOP=1 -f tests/sql/auth_bootstrap_fixture.sql
+      - name: Apply secure signup trigger migration
+        env:
+          PGPASSWORD: postgres
+        run: psql -h 127.0.0.1 -U postgres -d minemysol_test -v ON_ERROR_STOP=1 -f drizzle/migrations/0005_secure_invitation_only_registration.sql
+      - name: Attach Auth signup trigger
+        env:
+          PGPASSWORD: postgres
+        run: psql -h 127.0.0.1 -U postgres -d minemysol_test -v ON_ERROR_STOP=1 -c 'CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();'
+      - name: Test initial-admin bootstrap and invitation enforcement
+        env:
+          PGPASSWORD: postgres
+        run: psql -h 127.0.0.1 -U postgres -d minemysol_test -v ON_ERROR_STOP=1 -f tests/sql/auth_bootstrap_cases.sql
