@@ -412,6 +412,284 @@ export type Database = {
           },
         ]
       }
+      external_tender_items: {
+        Row: {
+          category: string | null
+          id: string
+          label: string
+          mandatory: boolean
+          organization_id: string
+          sort_order: number
+          tender_id: string
+        }
+        Insert: {
+          category?: string | null
+          id?: string
+          label: string
+          mandatory?: boolean
+          organization_id: string
+          sort_order?: number
+          tender_id: string
+        }
+        Update: {
+          category?: string | null
+          id?: string
+          label?: string
+          mandatory?: boolean
+          organization_id?: string
+          sort_order?: number
+          tender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_tender_items_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_tender_items_tender_id_fkey"
+            columns: ["tender_id"]
+            isOneToOne: false
+            referencedRelation: "external_tenders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      external_tenders: {
+        Row: {
+          buyer: string | null
+          closes_at: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          title: string
+        }
+        Insert: {
+          buyer?: string | null
+          closes_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          title: string
+        }
+        Update: {
+          buyer?: string | null
+          closes_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_tenders_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fp_daily: {
+        Row: {
+          created_at: string
+          day: string
+          engine_h: number
+          fault_code: string | null
+          fault_severity: string | null
+          id: string
+          idle_h: number
+          is_sample: boolean
+          litres: number
+          machine_id: string
+          machine_type: string
+          org_id: string
+          site: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          engine_h: number
+          fault_code?: string | null
+          fault_severity?: string | null
+          id?: string
+          idle_h: number
+          is_sample?: boolean
+          litres: number
+          machine_id: string
+          machine_type?: string
+          org_id: string
+          site?: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          engine_h?: number
+          fault_code?: string | null
+          fault_severity?: string | null
+          id?: string
+          idle_h?: number
+          is_sample?: boolean
+          litres?: number
+          machine_id?: string
+          machine_type?: string
+          org_id?: string
+          site?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fp_daily_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fp_events: {
+        Row: {
+          created_at: string
+          id: number
+          is_bot: boolean
+          org_id: string
+          payload: Json
+          token_id: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          is_bot?: boolean
+          org_id: string
+          payload?: Json
+          token_id: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          is_bot?: boolean
+          org_id?: string
+          payload?: Json
+          token_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fp_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fp_events_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "fp_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fp_settings: {
+        Row: {
+          baseline_idle_share: number
+          diesel_price: number | null
+          diesel_source: string | null
+          diesel_verified: boolean
+          fault_repeat: number
+          fuel_sd: number
+          idle_burn_lph: number
+          idle_limit: number
+          org_id: string
+          updated_at: string
+        }
+        Insert: {
+          baseline_idle_share?: number
+          diesel_price?: number | null
+          diesel_source?: string | null
+          diesel_verified?: boolean
+          fault_repeat?: number
+          fuel_sd?: number
+          idle_burn_lph?: number
+          idle_limit?: number
+          org_id: string
+          updated_at?: string
+        }
+        Update: {
+          baseline_idle_share?: number
+          diesel_price?: number | null
+          diesel_source?: string | null
+          diesel_verified?: boolean
+          fault_repeat?: number
+          fuel_sd?: number
+          idle_burn_lph?: number
+          idle_limit?: number
+          org_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fp_settings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fp_tokens: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          label: string
+          notes: string | null
+          org_id: string
+          revoked_at: string | null
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          label: string
+          notes?: string | null
+          org_id: string
+          revoked_at?: string | null
+          token?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          label?: string
+          notes?: string | null
+          org_id?: string
+          revoked_at?: string | null
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fp_tokens_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invitations: {
         Row: {
           accepted_org_id: string | null
@@ -456,6 +734,21 @@ export type Database = {
           },
         ]
       }
+      mail_cfg: {
+        Row: {
+          k: string
+          v: string
+        }
+        Insert: {
+          k: string
+          v: string
+        }
+        Update: {
+          k?: string
+          v?: string
+        }
+        Relationships: []
+      }
       memberships: {
         Row: {
           created_at: string
@@ -478,6 +771,60 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "memberships_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mobilisation_items: {
+        Row: {
+          application_id: string
+          created_at: string
+          done: boolean
+          done_at: string | null
+          due_date: string | null
+          id: string
+          label: string
+          note: string | null
+          organization_id: string
+          sort_order: number
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          done?: boolean
+          done_at?: string | null
+          due_date?: string | null
+          id?: string
+          label: string
+          note?: string | null
+          organization_id: string
+          sort_order?: number
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          done?: boolean
+          done_at?: string | null
+          due_date?: string | null
+          id?: string
+          label?: string
+          note?: string | null
+          organization_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mobilisation_items_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mobilisation_items_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -717,6 +1064,30 @@ export type Database = {
           },
         ]
       }
+      pw_reset_codes: {
+        Row: {
+          attempts: number
+          code_hash: string
+          email: string
+          expires_at: string
+          sent_at: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          email: string
+          expires_at: string
+          sent_at?: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          email?: string
+          expires_at?: string
+          sent_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           application_id: string
@@ -781,11 +1152,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_can_app: { Args: { _a: string }; Returns: boolean }
+      admin_can_org: { Args: { _o: string }; Returns: boolean }
+      admin_can_project: { Args: { _p: string }; Returns: boolean }
+      admin_can_user: { Args: { _u: string }; Returns: boolean }
       award_application: {
         Args: { _app: string; _notes: string; _value: number }
         Returns: undefined
       }
       can_view_project: { Args: { _project: string }; Returns: boolean }
+      complete_password_reset: {
+        Args: { p_code: string; p_email: string; p_password: string }
+        Returns: boolean
+      }
+      fp_event: {
+        Args: {
+          p_payload?: Json
+          p_token: string
+          p_type: string
+          p_ua?: string
+        }
+        Returns: undefined
+      }
+      fp_is_bot: { Args: { p_ua: string }; Returns: boolean }
+      fp_open: { Args: { p_token: string; p_ua?: string }; Returns: Json }
+      fp_org: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -810,6 +1201,18 @@ export type Database = {
         }
         Returns: undefined
       }
+      notify_project_admins: {
+        Args: {
+          _body: string
+          _kind: string
+          _link: string
+          _project: string
+          _title: string
+        }
+        Returns: undefined
+      }
+      refresh_my_expiry_reminders: { Args: never; Returns: number }
+      request_password_reset: { Args: { p_email: string }; Returns: undefined }
       set_application_status: {
         Args: {
           _app: string
@@ -825,6 +1228,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      start_mobilisation: { Args: { _app: string }; Returns: undefined }
       submit_application: { Args: { _app: string }; Returns: Json }
       withdraw_application: { Args: { _app: string }; Returns: undefined }
     }
