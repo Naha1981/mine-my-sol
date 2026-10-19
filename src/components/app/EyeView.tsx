@@ -9,6 +9,19 @@ import { loadMine } from "@/lib/eye/store";
 import { runRules, money } from "@/lib/eye/rules";
 import { DEFAULTS } from "@/lib/eye/fleet";
 
+type SpeechRecognitionLike = {
+  lang: string;
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+};
+
+type EyeWindow = Window & {
+  __eyeMap?: maplibregl.Map;
+  SpeechRecognition?: new () => SpeechRecognitionLike;
+  webkitSpeechRecognition?: new () => SpeechRecognitionLike;
+};
+
 
 const chip = (c: string) => c === "confirmed" ? "bg-emerald-100 text-emerald-900" : c === "inferred" ? "bg-amber-100 text-amber-900" : "bg-stone-200 text-stone-800";
 
@@ -48,7 +61,7 @@ export function EyeView() {
       container: mapEl.current, center: sites[0]!.center, zoom: 14.2, canvasContextAttributes: { preserveDrawingBuffer: true }, attributionControl: { compact: true },
       style: { version: 8, sources: { sat: { type: "raster", tileSize: 256, attribution: "Imagery Esri, Maxar", tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"] } }, layers: [{ id: "sat", type: "raster", source: "sat" }] },
     });
-    (window as any).__eyeMap = map.current;
+    (window as EyeWindow).__eyeMap = map.current;
     return () => { map.current?.remove(); map.current = null; };
   }, []);
 
@@ -164,10 +177,11 @@ export function EyeView() {
     setQ(""); play(r.key);
   }
   function listen() {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const browserWindow = window as EyeWindow;
+    const SR = browserWindow.SpeechRecognition || browserWindow.webkitSpeechRecognition;
     if (!SR) { setLog((l) => [{ q: "Voice input", a: "This browser has no speech input. Type your question." }, ...l]); return; }
     const rec = new SR(); rec.lang = "en-ZA"; setListening(true);
-    rec.onresult = (e: any) => ask(e.results[0][0].transcript);
+    rec.onresult = (e) => ask(e.results[0]?.[0]?.transcript ?? "");
     rec.onend = () => setListening(false); rec.start();
   }
   const gap = site.target - site.actual;

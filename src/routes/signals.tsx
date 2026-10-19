@@ -4,6 +4,7 @@ import { FleetSignals } from "@/components/app/FleetSignals";
 import { FLEET, type FleetMachine } from "@/lib/eye/fleet";
 import { parseFleetCsv, TEMPLATE } from "@/lib/eye/csv";
 import { loadMine, saveMine } from "@/lib/eye/store";
+import { buildSignalsDemoUrl } from "@/lib/eye/demo-url";
 import { makeToken, readToken, type Demo } from "@/lib/eye/token";
 
 const NAMES: Record<string, string> = { s4: "Site 4", s2: "Site 2", s7: "Site 7" };
@@ -12,7 +13,7 @@ function Creator({ onPick }: { onPick: (s: string) => void }) {
   const [site, setSite] = useState("s4"); const [days, setDays] = useState(7); const [label, setLabel] = useState(""); const [link, setLink] = useState(""); const [copied, setCopied] = useState(false);
   async function make() {
     const d: Demo = { s: site, l: label.trim().slice(0, 40) || "Demo", e: Date.now() + days * 86400000 };
-    setLink(`${location.origin}/?demo=${await makeToken(d)}`); setCopied(false);
+    setLink(buildSignalsDemoUrl(location.origin, await makeToken(d))); setCopied(false);
   }
   return (
     <div className="rounded-xl border bg-card p-3 text-sm" data-testid="demo-creator">
@@ -34,7 +35,7 @@ function CsvImport({ onData }: { onData: (f: FleetMachine[] | null) => void }) {
   const [msg, setMsg] = useState<string[]>([]); const [warnings, setWarnings] = useState<string[]>([]); const [ok, setOk] = useState("");
   async function load(file: File | undefined) {
     if (!file) return;
-    if (file.size > 5_000_000) { setMsg(["File is over 5 MB."]); setWarnings([]); setOk(""); return; }
+    if (file.size > 5_000_000) { setMsg(["File is over 5 MB. The existing saved dataset was left unchanged."]); setWarnings([]); setOk(""); return; }
     const r = parseFleetCsv(await file.text()); setMsg(r.errors); setWarnings(r.warnings);
     if (r.fleet.length) { saveMine(r.fleet, file.name); onData(r.fleet); setOk(`Read ${r.rows} rows for ${r.fleet.length} machines from ${file.name}.`); } else { saveMine(null); onData(null); setOk(""); }
   }
