@@ -62,6 +62,18 @@ describe("parseFleetCsv", () => {
     expect(parsed.errors.join(" ")).toContain("conflicting site or type");
   });
 
+  it("skips duplicate machine/date records to avoid double-counting daily totals", () => {
+    const parsed = parseFleetCsv([
+      header,
+      row("A1", "2026-10-13"),
+      row("A1", "2026-10-13"),
+    ].join("\n"));
+
+    expect(parsed.rows).toBe(1);
+    expect(parsed.fleet[0]?.days).toHaveLength(1);
+    expect(parsed.errors.join(" ")).toContain("duplicate record for machine A1");
+  });
+
   it("refuses oversized CSVs instead of silently processing only the first 20,000 rows", () => {
     const oversized = [header, ...Array.from({ length: 20_001 }, (_, i) => row(`A${i}`, "2026-10-13"))].join("\n");
     const parsed = parseFleetCsv(oversized);
