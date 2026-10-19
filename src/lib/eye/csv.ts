@@ -89,6 +89,7 @@ export function parseFleetCsv(text: string): Parsed {
   const currentWindow = candidates.filter((row) => row.dateTimestamp >= startTimestamp);
   const skippedOlder = candidates.length - currentWindow.length;
   const by = new Map<string, FleetMachine>();
+  const seenMachineDates = new Set<string>();
   let rows = 0;
 
   for (const row of currentWindow) {
@@ -98,6 +99,12 @@ export function parseFleetCsv(text: string): Parsed {
       addRowError(`Row ${row.line}: skipped (machine ${row.id} has conflicting site or type values).`);
       continue;
     }
+    const machineDate = `${key}| ${row.date}`;
+    if (seenMachineDates.has(machineDate)) {
+      addRowError(`Row ${row.line}: skipped (duplicate record for machine ${row.id} on ${row.date}; use one daily total per machine).`);
+      continue;
+    }
+    seenMachineDates.add(machineDate);
     if (!machine) {
       machine = { id: row.id, site: row.site, type: row.type, days: [] };
       by.set(key, machine);
