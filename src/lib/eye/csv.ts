@@ -66,8 +66,9 @@ export function parseFleetCsv(text: string): Parsed {
 
     if (!id) { addRowError(`Row ${index + 2}: skipped (no machine_id).`); return; }
     if (timestamp === null) { addRowError(`Row ${index + 2}: skipped (date must be a real YYYY-MM-DD date).`); return; }
-    if (missingNumeric || ![eng, idle, litres, tonnes].every(Number.isFinite) || eng < 0 || idle < 0 || litres < 0 || tonnes < 0 || idle > eng || eng > 24) {
-      addRowError(`Row ${index + 2}: skipped (${idle > eng ? "idle hours above engine hours" : missingNumeric ? `missing ${missingNumeric}` : "number out of range"}).`);
+    if (missingNumeric) { addRowError(`Row ${index + 2}: skipped (missing ${missingNumeric}).`); return; }
+    if (![eng, idle, litres, tonnes].every(Number.isFinite) || eng < 0 || idle < 0 || litres < 0 || tonnes < 0 || idle > eng || eng > 24) {
+      addRowError(`Row ${index + 2}: skipped (${idle > eng ? "idle hours above engine hours" : "number out of range"}).`);
       return;
     }
 
