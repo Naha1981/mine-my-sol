@@ -12,10 +12,7 @@ describe("buildSignalsDemoUrl", () => {
 
   it("encodes token characters safely in a URL", () => {
     const url = new URL(
-      buildSignalsDemoUrl(
-        "https://minemysol.example",
-        "payload+with/slash.signature",
-      ),
+      buildSignalsDemoUrl("https://minemysol.example", "payload+with/slash.signature"),
     );
 
     expect(url.searchParams.get("t")).toBe("payload+with/slash.signature");
