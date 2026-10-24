@@ -1,14 +1,18 @@
-// Invitation acceptance for existing self-registered contractors (0006+0007) + 0005 integration.
+// Code-possession invitation acceptance for existing self-registered contractors (0006+0007 v2) + 0005 integration.
+// Threat model covered: project auto-confirms signup emails, so email alone is NOT ownership proof.
+// Attacker registering a victim's email can neither list (no invitee read policy) nor accept (no code).
 // Run: npm i --no-save @electric-sql/pglite && node supabase/tests/invitation-acceptance.test.mjs
 import { PGlite } from "@electric-sql/pglite";
 import fs from "node:fs";
 const db = new PGlite();
 const U1 = "00000000-0000-0000-0000-0000000000a1", // admin of buyer org OB1
-  UC = "00000000-0000-0000-0000-0000000000b1", // self-registered contractor (OC1), confirmed email
+  UC = "00000000-0000-0000-0000-0000000000b1", // self-registered contractor (OC1), the real contractor
+  UA = "00000000-0000-0000-0000-0000000000b3", // ATTACKER who registered the victim's email first? no - separate account with own email
   UU = "00000000-0000-0000-0000-0000000000b2", // contractor (OC2), UNCONFIRMED email
   OB1 = "11111111-1111-1111-1111-1111111111c1",
   OC1 = "22222222-2222-2222-2222-2222222222d1",
-  OC2 = "22222222-2222-2222-2222-2222222222d2";
+  OC2 = "22222222-2222-2222-2222-2222222222d2",
+  OC3 = "22222222-2222-2222-2222-2222222222d3";
 const read = (n) => fs.readFileSync(new URL(`../../drizzle/migrations/${n}`, import.meta.url), "utf8");
 
 await db.exec(`
@@ -24,7 +28,7 @@ create table public.user_roles(user_id uuid, role public.app_role);
 create table public.projects(id uuid primary key, buyer_org_id uuid);
 create table public.applications(id uuid primary key, project_id uuid, organization_id uuid, status text);
 create table public.project_invites(project_id uuid, organization_id uuid);
-create table public.invitations(id uuid primary key default gen_random_uuid(), email text, organization_name text, status public.invitation_status not null default 'pending', expires_at timestamptz, created_by uuid, accepted_org_id uuid, created_at timestamptz not null default now());
+create table public.invitations(id uuid primary key default gen_random_uuid(), code text not null unique default upper(substr(replace(gen_random_uuid()::text,'-',''),1,10)), email text, organization_name text, status public.invitation_status not null default 'pending', expires_at timestamptz, created_by uuid, accepted_org_id uuid, created_at timestamptz not null default now());
 create function public.has_role(_u uuid, _r public.app_role) returns boolean language sql stable security definer as $$ select exists(select 1 from public.user_roles where user_id=_u and role=_r) $$;
 create function public.is_admin() returns boolean language sql stable security definer as $$ select public.has_role(auth.uid(),'admin') $$;
 create function public.is_org_member(_o uuid) returns boolean language sql stable security definer as $$ select exists(select 1 from public.memberships m where m.user_id=auth.uid() and m.organization_id=_o) $$;
@@ -37,10 +41,11 @@ grant all on all tables in schema public to authenticated;
 insert into auth.users values
   ('${U1}','buyer@example.com', now()),
   ('${UC}','solo@example.com', now()),
+  ('${UA}','attacker@example.com', now()),
   ('${UU}','unconf@example.com', null);
-insert into public.organizations values ('${OB1}','Buyer One','buyer'),('${OC1}','Solo Contracting','contractor'),('${OC2}','Unconfirmed Contracting','contractor');
-insert into public.memberships values ('${U1}','${OB1}'),('${UC}','${OC1}'),('${UU}','${OC2}');
-insert into public.user_roles values ('${U1}','admin'),('${UC}','contractor'),('${UU}','contractor');
+insert into public.organizations values ('${OB1}','Buyer One','buyer'),('${OC1}','Solo Contracting','contractor'),('${OC2}','Unconfirmed Contracting','contractor'),('${OC3}','Attacker Ltd','contractor');
+insert into public.memberships values ('${U1}','${OB1}'),('${UC}','${OC1}'),('${UU}','${OC2}'),('${UA}','${OC3}');
+insert into public.user_roles values ('${U1}','admin'),('${UC}','contractor'),('${UU}','contractor'),('${UA}','contractor');
 `);
 await db.exec(read("0006_invitation_status_declined.sql"));
 await db.exec(read("0005_admin_can_org_accepted_invitations.sql"));
@@ -52,54 +57,49 @@ const ok = (n, c) => { c ? pass++ : fail++; console.log((c ? "PASS " : "FAIL ") 
 const as = async (uid, sql) => { await db.exec(`set role authenticated; select set_config('request.jwt.claim.sub','${uid}',false);`); try { return await db.query(sql); } finally { await db.exec("reset role"); } };
 const err = async (uid, sql) => { try { await as(uid, sql); return null; } catch (e) { return e.message; } };
 
-// Buyer creates invitation addressed to the self-registered contractor (client tries to smuggle fields).
-const inv = (await as(U1, `insert into public.invitations(email, organization_name, status, accepted_org_id, buyer_org_name) values ('solo@example.com','Solo Contracting','accepted','${OC1}','HACKED') returning id, status, accepted_org_id, buyer_org_name, created_by`)).rows[0];
+// Buyer creates invitation for the self-registered contractor (client tries to smuggle fields).
+const inv = (await as(U1, `insert into public.invitations(email, organization_name, status, accepted_org_id, buyer_org_name) values ('solo@example.com','Solo Contracting','accepted','${OC1}','HACKED') returning id, code, status, accepted_org_id, buyer_org_name, created_by`)).rows[0];
 ok("insert forced pending + null accepted_org_id (consent preserved)", inv.status === "pending" && inv.accepted_org_id === null);
 ok("buyer_org_name derived from membership, not client text", inv.buyer_org_name === "Buyer One");
 ok("created_by forced to caller", inv.created_by === U1);
+ok("code generated (10 chars)", /^[0-9A-F]{10}$/.test(inv.code));
 
-// Invitee read scoping (no enumeration).
-ok("invitee sees invitation addressed to own email", (await as(UC, `select count(*)::int c from public.invitations where id='${inv.id}'`)).rows[0].c === 1);
-ok("invitee does NOT see invitations addressed to others", (await as(UU, `select count(*)::int c from public.invitations where id='${inv.id}'`)).rows[0].c === 0);
+// No disclosure: non-creators cannot read invitations at all (no invitee-by-email policy).
+ok("contractor cannot read invitations table (no email disclosure)", (await as(UC, `select count(*)::int c from public.invitations`)).rows[0].c === 0);
+ok("attacker cannot read invitations table", (await as(UA, `select count(*)::int c from public.invitations`)).rows[0].c === 0);
 
-// Expired invitation cannot be accepted.
-const exp = (await as(U1, `insert into public.invitations(email, organization_name, expires_at) values ('solo@example.com','Solo Contracting', now() - interval '1 day') returning id`)).rows[0];
-ok("expired invitation rejected", ((await err(UC, `select public.respond_to_invitation('${exp.id}', true)`)) || "").includes("expired"));
+// Attacker without the code (even controlling the addressed email account scenario is moot without code).
+ok("wrong code rejected with uniform error", ((await err(UA, `select * from public.accept_invitation_code('DEADBEEF99')`)) || "").includes("Invalid or expired invitation code"));
+ok("attacker guessing the real code still blocked by email binding", ((await err(UA, `select * from public.accept_invitation_code('${inv.code}')`)) || "").includes("different email address"));
 
-// Cross-email accept denied (ownership binding to confirmed account email).
-ok("cross-email accept denied as not found", ((await err(UU, `select public.respond_to_invitation('${inv.id}', true)`)) || "").includes("not found") === false || true); // UU blocked earlier by unconfirmed email
-ok("unconfirmed email cannot respond at all", ((await err(UU, `select public.respond_to_invitation('${inv.id}', true)`)) || "").includes("Confirm your account email"));
+// Unconfirmed account cannot accept even with the correct code.
+ok("unconfirmed email cannot accept", ((await err(UU, `select * from public.accept_invitation_code('${inv.code}')`)) || "").includes("Confirm your account email"));
 
-// Buyer admin cannot accept contractor invitations (role isolation).
-const selfInv = (await as(U1, `insert into public.invitations(email, organization_name) values ('buyer@example.com','Buyer One') returning id`)).rows[0];
-ok("buyer org cannot accept a contractor invitation", ((await err(U1, `select public.respond_to_invitation('${selfInv.id}', true)`)) || "").includes("contractor organisation"));
+// Expired code: uniform error (no oracle).
+const exp = (await as(U1, `insert into public.invitations(email, organization_name, expires_at) values ('solo@example.com','Solo Contracting', now() - interval '1 day') returning code`)).rows[0];
+ok("expired code gives same uniform error", ((await err(UC, `select * from public.accept_invitation_code('${exp.code}')`)) || "").includes("Invalid or expired invitation code"));
+
+// Buyer admin cannot accept (role isolation), even for an invitation addressed to them.
+const selfInv = (await as(U1, `insert into public.invitations(email, organization_name) values ('buyer@example.com','Buyer One') returning code`)).rows[0];
+ok("buyer org cannot accept a contractor invitation", ((await err(U1, `select * from public.accept_invitation_code('${selfInv.code}')`)) || "").includes("contractor organisation"));
 
 // Admin cannot self-accept via direct update (revocation-only policy).
 const tamper = await err(U1, `update public.invitations set status='accepted', accepted_org_id='${OC1}' where id='${inv.id}' returning id`);
 ok("admin direct-update self-acceptance blocked", (tamper || "").includes("row-level security") && (await as(U1, `select status from public.invitations where id='${inv.id}'`)).rows[0].status === "pending");
 
-// Happy path: accept.
-const acc = (await as(UC, `select * from public.respond_to_invitation('${inv.id}', true)`)).rows[0];
+// Happy path: real contractor accepts with the out-of-band code.
+const acc = (await as(UC, `select * from public.accept_invitation_code('${inv.code}')`)).rows[0];
 ok("accept sets accepted + caller's contractor org", acc.status === "accepted" && acc.accepted_org_id === OC1);
 ok("0005 integration: buyer admin now sees the accepting contractor org", (await as(U1, `select public.admin_can_org('${OC1}') v`)).rows[0].v === true);
-const again = (await as(UC, `select * from public.respond_to_invitation('${inv.id}', true)`)).rows[0];
-ok("re-accept is idempotent", again.status === "accepted" && again.accepted_org_id === OC1);
-ok("decline after accept rejected", ((await err(UC, `select public.respond_to_invitation('${inv.id}', false)`)) || "").includes("no longer pending"));
+const again = (await as(UC, `select * from public.accept_invitation_code('${inv.code}')`)).rows[0];
+ok("re-accept with same code is idempotent", again.status === "accepted" && again.accepted_org_id === OC1);
+ok("accepted code gives uniform error to everyone else", ((await err(UA, `select * from public.accept_invitation_code('${inv.code}')`)) || "").includes("Invalid or expired invitation code"));
 
-// Revoke path: new invitation, buyer revokes, accept then fails (concurrent-revocation semantics).
-const inv2 = (await as(U1, `insert into public.invitations(email, organization_name) values ('solo@example.com','Solo Contracting') returning id`)).rows[0];
+// Revoke path: buyer revokes; the real contractor's accept then fails uniformly (concurrent-revocation semantics).
+const inv2 = (await as(U1, `insert into public.invitations(email, organization_name) values ('solo@example.com','Solo Contracting') returning id, code`)).rows[0];
 const revoked = await as(U1, `update public.invitations set status='revoked' where id='${inv2.id}' returning status`);
 ok("buyer can revoke a pending invitation", revoked.rows[0]?.status === "revoked");
-ok("accept after revoke rejected", ((await err(UC, `select public.respond_to_invitation('${inv2.id}', true)`)) || "").includes("no longer pending"));
-
-// Decline path: new invitation, contractor declines; final.
-const inv3 = (await as(U1, `insert into public.invitations(email, organization_name) values ('solo@example.com','Solo Contracting') returning id`)).rows[0];
-const dec = (await as(UC, `select * from public.respond_to_invitation('${inv3.id}', false)`)).rows[0];
-ok("decline recorded", dec.status === "declined");
-ok("accept after decline rejected", ((await err(UC, `select public.respond_to_invitation('${inv3.id}', true)`)) || "").includes("no longer pending"));
-const decAgain = (await as(UC, `select * from public.respond_to_invitation('${inv3.id}', false)`)).rows[0];
-ok("re-decline is idempotent", decAgain.status === "declined");
-ok("buyer cannot see contractor after decline", (await as(U1, `select public.admin_can_org('${OC2}') v`)).rows[0].v === false);
+ok("accept after revoke gives uniform error", ((await err(UC, `select * from public.accept_invitation_code('${inv2.code}')`)) || "").includes("Invalid or expired invitation code"));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

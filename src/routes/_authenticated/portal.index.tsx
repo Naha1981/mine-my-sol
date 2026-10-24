@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, Mail } from "lucide-react";
+import { AlertTriangle, KeyRound } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import { db } from "@/lib/db";
 import { useMe } from "@/lib/session";
 import { myDocsQuery } from "@/lib/portalData";
@@ -53,7 +55,7 @@ function Home() {
           <Button asChild size="sm" className="mt-3"><Link to="/portal/vault">Open vault</Link></Button>
         </section>
       )}
-      <PendingInvitations />
+      <InvitationCodeEntry />
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <section>
           <h2 className="mb-3 text-lg font-bold">Opportunities for you</h2>
@@ -76,52 +78,37 @@ function Home() {
   );
 }
 
-type PendingInvite = { id: string; organization_name: string; buyer_org_name: string | null; expires_at: string | null };
-
-function PendingInvitations() {
+function InvitationCodeEntry() {
   const qc = useQueryClient();
-  const invites = useQuery({
-    queryKey: ["portal", "pending-invitations"],
-    queryFn: async () => {
-      const { data, error } = await db.from("invitations").select("id,organization_name,buyer_org_name,expires_at").eq("status", "pending").order("created_at", { ascending: false });
+  const [code, setCode] = useState("");
+  const [done, setDone] = useState<string | null>(null);
+  const accept = useMutation({
+    mutationFn: async (rawCode: string) => {
+      const { data, error } = await db.rpc("accept_invitation_code" as never, { p_code: rawCode } as never);
       if (error) throw error;
-      const now = Date.now();
-      return (data as unknown as PendingInvite[]).filter((i) => !i.expires_at || new Date(i.expires_at).getTime() > now);
+      return (data as unknown as { buyer_org_name: string | null })?.buyer_org_name ?? null;
     },
-  });
-  const respond = useMutation({
-    mutationFn: async ({ id, accept }: { id: string; accept: boolean }) => {
-      const { error } = await db.rpc("respond_to_invitation" as never, { p_invitation_id: id, p_accept: accept } as never);
-      if (error) throw error;
-      return accept;
-    },
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ["portal", "pending-invitations"] });
+    onSuccess: (buyerName) => {
+      setDone(buyerName);
+      setCode("");
       qc.invalidateQueries({ queryKey: ["portal", "open-projects"] });
     },
   });
-  if (invites.isLoading || !invites.data?.length) return null;
+  if (done) return (
+    <section className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-4">
+      <p className="flex items-center gap-2 font-display font-semibold"><KeyRound className="size-4" /> Invitation accepted</p>
+      <p className="mt-1 text-sm text-muted-foreground">{done ?? "The buyer"} can now see your company and invite you to their projects.</p>
+    </section>
+  );
   return (
     <section className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-4">
-      <p className="flex items-center gap-2 font-display font-semibold"><Mail className="size-4" /> Invitations for you</p>
-      <p className="mt-1 text-sm text-muted-foreground">A buyer invited your company to work with them. Accept to let them see your company and invite you to their projects. Decline to refuse. Nothing is shared until you accept.</p>
-      <ul className="mt-3 space-y-2">
-        {invites.data.map((i) => (
-          <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border bg-card px-3 py-2 text-sm">
-            <span>
-              <span className="font-medium">{i.buyer_org_name ?? "A buyer"}</span>
-              <span className="text-muted-foreground"> invited </span>
-              <span className="font-medium">{i.organization_name}</span>
-              {i.expires_at && <span className="block text-xs text-muted-foreground">Expires {fmtDate(i.expires_at)}</span>}
-            </span>
-            <span className="flex gap-2">
-              <Button size="sm" disabled={respond.isPending} onClick={() => respond.mutate({ id: i.id, accept: true })}>Accept</Button>
-              <Button size="sm" variant="outline" disabled={respond.isPending} onClick={() => respond.mutate({ id: i.id, accept: false })}>Decline</Button>
-            </span>
-          </li>
-        ))}
-      </ul>
-      {respond.isError && <p className="mt-2 text-sm text-destructive">{(respond.error as Error).message}</p>}
+      <p className="flex items-center gap-2 font-display font-semibold"><KeyRound className="size-4" /> Have an invitation code?</p>
+      <p className="mt-1 text-sm text-muted-foreground">If a buyer sent your company an invitation code, enter it here to let them see your company and invite you to their projects. Nothing is shared until you accept.</p>
+      <form className="mt-3 flex flex-wrap items-center gap-2" onSubmit={(e) => { e.preventDefault(); if (code.trim()) accept.mutate(code); }}>
+        <Input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="e.g. 1A2B3C4D5E" autoCapitalize="characters" className="w-48 font-mono tracking-widest" maxLength={10} />
+        <Button type="submit" size="sm" disabled={accept.isPending || !code.trim()}>Accept invitation</Button>
+      </form>
+      {accept.isError && <p className="mt-2 text-sm text-destructive">{(accept.error as Error).message}</p>}
     </section>
   );
 }
