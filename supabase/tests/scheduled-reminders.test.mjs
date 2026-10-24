@@ -5,7 +5,7 @@ import { PGlite } from "@electric-sql/pglite";
 import fs from "node:fs";
 
 const m0009 = fs.readFileSync(new URL("../../drizzle/migrations/0009_scheduled_reminders.sql", import.meta.url), "utf8");
-const fnBody = m0009.match(/CREATE OR REPLACE FUNCTION public\.run_scheduled_reminders\(\)[\s\S]*?\$\$;/)[0];
+const fnBody = m0009.match(/CREATE OR REPLACE FUNCTION public\.run_scheduled_reminders\(_org uuid DEFAULT NULL\)[\s\S]*?\$\$;/)[0];
 
 const db = new PGlite();
 await db.exec(`
@@ -55,7 +55,7 @@ let pass = 0, fail = 0;
 const t = (name, ok) => { ok ? pass++ : fail++; console.log((ok ? "PASS " : "FAIL ") + name); };
 const n = (q, p) => db.query(q, p).then((r) => r.rows);
 
-const first = (await db.query("select public.run_scheduled_reminders() as n")).rows[0].n;
+const first = (await db.query("select public.run_scheduled_reminders(null) as n")).rows[0].n;
 const all = await n(`select user_id, kind, title, body, link from public.notifications order by user_id, kind`);
 
 t("expiry: both org members reminded about the expiring doc", all.filter((r) => r.kind === "expiry_expiring" && r.link.includes(D1)).map((r) => r.user_id).sort().join() === [U1, U2].sort().join());
@@ -69,11 +69,19 @@ t("deadline: closed project produces nothing", all.every((r) => r.link !== `/por
 t("deadline: org with a SUBMITTED application is not nagged", all.every((r) => !(r.kind === "deadline" && r.user_id === U3)));
 t("deadline body says the draft is not submitted", all.find((r) => r.kind === "deadline")?.body?.includes("has not been submitted"));
 
-const second = (await db.query("select public.run_scheduled_reminders() as n")).rows[0].n;
+const second = (await db.query("select public.run_scheduled_reminders(null) as n")).rows[0].n;
 t("idempotent: second run creates zero notifications", second === 0);
 const total = (await db.query("select count(*)::int c from public.notifications")).rows[0].c;
 t("idempotent: total unchanged after rerun", total === all.length);
 t("run count matches inserted rows", first === all.length);
+
+// QA-scoped run (the approved first live proof shape): only that org's members notified.
+await db.exec("delete from public.notifications");
+const scoped = (await db.query(`select public.run_scheduled_reminders('${OC}'::uuid) as n`)).rows[0].n;
+const sc = await n("select user_id, kind from public.notifications");
+t("scoped run: notifications created for the target org", scoped > 0 && sc.length === scoped);
+t("scoped run: only target-org members notified", sc.every((r) => r.user_id === U1 || r.user_id === U2));
+t("scoped run: other org gets nothing", sc.every((r) => r.user_id !== U3));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

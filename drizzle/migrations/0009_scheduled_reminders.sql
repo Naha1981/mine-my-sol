@@ -11,15 +11,18 @@
 -- convention (kind + link per user), so the job can run daily with retries and
 -- never double-notify.
 
-CREATE OR REPLACE FUNCTION public.run_scheduled_reminders()
+CREATE OR REPLACE FUNCTION public.run_scheduled_reminders(_org uuid DEFAULT NULL)
 RETURNS int LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE r record; m record; n int := 0; k text; ttl text; msg text;
 BEGIN
+  -- _org NULL = all tenants (the scheduled job). Passing an org scopes the run
+  -- to that tenant only - used for the first controlled live proof.
   -- 1. Document expiry: every member of the owning org, per document version.
   FOR r IN
     SELECT d.id, d.organization_id, d.title, d.expires_at, d.current_version
     FROM public.documents d JOIN public.organizations o ON o.id = d.organization_id
     WHERE o.status = 'active' AND d.expires_at IS NOT NULL AND d.expires_at <= current_date + 30
+      AND (_org IS NULL OR d.organization_id = _org)
   LOOP
     k := CASE WHEN r.expires_at < current_date THEN 'expired' ELSE 'expiring' END;
     ttl := CASE WHEN k = 'expired' THEN 'Document expired: ' || r.title ELSE 'Document expiring soon: ' || r.title END;
@@ -43,6 +46,7 @@ BEGIN
     JOIN public.organizations o ON o.id = a.organization_id AND o.status = 'active'
     WHERE p.status = 'open' AND p.closes_at IS NOT NULL
       AND p.closes_at >= now() AND p.closes_at <= now() + interval '7 days'
+      AND (_org IS NULL OR a.organization_id = _org)
   LOOP
     FOR m IN SELECT user_id FROM public.memberships WHERE organization_id = r.organization_id LOOP
       IF NOT EXISTS (SELECT 1 FROM public.notifications WHERE user_id = m.user_id AND kind = 'deadline' AND link = '/portal/projects/' || r.id::text) THEN
@@ -56,8 +60,8 @@ BEGIN
   END LOOP;
   RETURN n;
 END $$;
-REVOKE EXECUTE ON FUNCTION public.run_scheduled_reminders() FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.run_scheduled_reminders() TO service_role;
+REVOKE EXECUTE ON FUNCTION public.run_scheduled_reminders(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.run_scheduled_reminders(uuid) TO service_role;
 
 -- Scheduling: prefer pg_cron where the platform provides it (daily 06:17 SAST /
 -- 04:17 UTC). The DO block is a no-op with a NOTICE where pg_cron is absent;
