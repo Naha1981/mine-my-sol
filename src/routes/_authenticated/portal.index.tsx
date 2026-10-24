@@ -78,7 +78,7 @@ function Home() {
   );
 }
 
-function InvitationCodeEntry() {
+export function InvitationCodeEntry() {
   const qc = useQueryClient();
   const [code, setCode] = useState("");
   const [done, setDone] = useState<string | null>(null);
