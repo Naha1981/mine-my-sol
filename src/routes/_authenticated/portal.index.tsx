@@ -56,7 +56,7 @@ function Home() {
         </section>
       )}
       <InvitationCodeEntry />
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <section>
           <h2 className="mb-3 text-lg font-bold">Opportunities for you</h2>
           {!projects.data?.length ? <EmptyState title="Nothing open right now" body="You will be notified when MySol invites you to a project." /> : (
@@ -105,7 +105,7 @@ export function InvitationCodeEntry() {
       <p className="flex items-center gap-2 font-display font-semibold"><KeyRound className="size-4" /> Have an invitation code?</p>
       <p className="mt-1 text-sm text-muted-foreground">If a buyer sent your company an invitation code, enter it here to let them see your company and invite you to their projects. Nothing is shared until you accept.</p>
       <form className="mt-3 flex flex-wrap items-center gap-2" onSubmit={(e) => { e.preventDefault(); if (code.trim()) accept.mutate(code); }}>
-        <Input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="e.g. 1A2B3C4D5E" autoCapitalize="characters" className="w-48 font-mono tracking-widest" maxLength={10} />
+        <Input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="e.g. 1A2B3C4D5E6F7A8B" autoCapitalize="characters" className="w-48 font-mono tracking-widest" maxLength={16} />
         <Button type="submit" size="sm" disabled={accept.isPending || !code.trim()}>Accept invitation</Button>
       </form>
       {accept.isError && <p className="mt-2 text-sm text-destructive">{(accept.error as Error).message}</p>}
