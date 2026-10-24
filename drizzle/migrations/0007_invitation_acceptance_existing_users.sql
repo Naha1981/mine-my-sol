@@ -19,9 +19,13 @@
 -- covers only random bit positions; ~40 bits). New codes move to 64 bits from
 -- gen_random_bytes (pgcrypto, already enabled). Acceptance matches exact codes,
 -- so outstanding 10-char codes keep working until their 30-day expiry.
--- Consent: acceptance requires the caller to be the contractor org's OWNER
--- (earliest membership), not just any member - sharing the company with a buyer
--- is an owner-level decision.
+-- Consent: acceptance requires the caller to be the contractor org's FOUNDER,
+-- not just any member - sharing the company with a buyer is a founder-level
+-- decision. The schema has no per-org role/owner column (verified against
+-- 0000-0004): every contractor org is created together with its first
+-- membership in handle_new_user (the signup user), and later memberships can
+-- only be added by service_role, so the earliest membership identifies the
+-- founding account. Ordering is deterministic via (created_at, user_id).
 
 -- 1. Stronger code entropy for NEW invitations (backward compatible).
 ALTER TABLE public.invitations
@@ -91,13 +95,13 @@ BEGIN
      WHERE m.user_id = auth.uid() AND o.kind = 'contractor'
        AND NOT EXISTS (SELECT 1 FROM public.memberships older
                         WHERE older.organization_id = m.organization_id
-                          AND older.created_at < m.created_at)
+                          AND (older.created_at, older.user_id) < (m.created_at, m.user_id))
      LIMIT 1;
     IF inv.status = 'accepted' AND inv.accepted_org_id = v_org THEN
       RETURN inv;
     END IF;
     IF v_org IS NULL THEN
-      RAISE EXCEPTION 'Only the owner of a contractor organisation can accept a contractor invitation';
+      RAISE EXCEPTION 'Only the founder of a contractor organisation can accept a contractor invitation';
     END IF;
   END IF;
 

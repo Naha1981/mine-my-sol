@@ -9,11 +9,14 @@ const U1 = "00000000-0000-0000-0000-0000000000a1", // admin of buyer org OB1
   UC = "00000000-0000-0000-0000-0000000000b1", // self-registered contractor (OC1), the real contractor
   UA = "00000000-0000-0000-0000-0000000000b3", // attacker with own email + own contractor org
   UM = "00000000-0000-0000-0000-0000000000b4", // SECOND (non-owner) member of OC1, confirmed email
+  UF1 = "00000000-0000-0000-0000-0000000000b5", // founder of OC4 (lower user_id)
+  UF2 = "00000000-0000-0000-0000-0000000000b6", // non-founder of OC4 (same created_at as UF1)
   UU = "00000000-0000-0000-0000-0000000000b2", // contractor (OC2), UNCONFIRMED email
   OB1 = "11111111-1111-1111-1111-1111111111c1",
   OC1 = "22222222-2222-2222-2222-2222222222d1",
   OC2 = "22222222-2222-2222-2222-2222222222d2",
-  OC3 = "22222222-2222-2222-2222-2222222222d3";
+  OC3 = "22222222-2222-2222-2222-2222222222d3",
+  OC4 = "22222222-2222-2222-2222-2222222222d4";
 const read = (n) => fs.readFileSync(new URL(`../../drizzle/migrations/${n}`, import.meta.url), "utf8");
 
 await db.exec(`
@@ -45,15 +48,19 @@ insert into auth.users values
   ('${UC}','solo@example.com', now()),
   ('${UA}','attacker@example.com', now()),
   ('${UU}','unconf@example.com', null),
-  ('${UM}','member2@example.com', now());
-insert into public.organizations values ('${OB1}','Buyer One','buyer'),('${OC1}','Solo Contracting','contractor'),('${OC2}','Unconfirmed Contracting','contractor'),('${OC3}','Attacker Ltd','contractor');
+  ('${UM}','member2@example.com', now()),
+  ('${UF1}','founder1@example.com', now()),
+  ('${UF2}','founder2@example.com', now());
+insert into public.organizations values ('${OB1}','Buyer One','buyer'),('${OC1}','Solo Contracting','contractor'),('${OC2}','Unconfirmed Contracting','contractor'),('${OC3}','Attacker Ltd','contractor'),('${OC4}','Tie Org','contractor');
 insert into public.memberships values
   ('${U1}','${OB1}', now() - interval '2 days'),
   ('${UC}','${OC1}', now() - interval '2 days'),
   ('${UM}','${OC1}', now() - interval '1 day'),
   ('${UU}','${OC2}', now() - interval '2 days'),
-  ('${UA}','${OC3}', now() - interval '2 days');
-insert into public.user_roles values ('${U1}','admin'),('${UC}','contractor'),('${UU}','contractor'),('${UA}','contractor'),('${UM}','contractor');
+  ('${UA}','${OC3}', now() - interval '2 days'),
+  ('${UF1}','${OC4}', timestamptz '2026-01-01 00:00:00+00'),
+  ('${UF2}','${OC4}', timestamptz '2026-01-01 00:00:00+00');
+insert into public.user_roles values ('${U1}','admin'),('${UC}','contractor'),('${UU}','contractor'),('${UA}','contractor'),('${UM}','contractor'),('${UF1}','contractor'),('${UF2}','contractor');
 `);
 await db.exec(read("0006_invitation_status_declined.sql"));
 await db.exec(read("0005_admin_can_org_accepted_invitations.sql"));
@@ -116,7 +123,14 @@ ok("old 10-char codes still accepted (backward compatible, case-insensitive)", o
 
 // Owner-only consent: a non-owner member of the contractor org cannot accept, even with code + matching email.
 const mem = (await as(U1, `insert into public.invitations(email, organization_name) values ('member2@example.com','Solo Contracting') returning code`)).rows[0];
-ok("non-owner member cannot accept (owner consent)", ((await err(UM, `select * from public.accept_invitation_code('${mem.code}')`)) || "").includes("owner of a contractor organisation"));
+ok("non-owner member cannot accept (owner consent)", ((await err(UM, `select * from public.accept_invitation_code('${mem.code}')`)) || "").includes("founder of a contractor organisation"));
+
+// Deterministic founder ordering: identical created_at ties break on user_id.
+const tieInv = (await as(U1, `insert into public.invitations(email, organization_name) values ('founder2@example.com','Tie Org') returning code`)).rows[0];
+ok("identical-timestamp tie: higher user_id is not the founder", ((await err(UF2, `select * from public.accept_invitation_code('${tieInv.code}')`)) || "").includes("founder of a contractor organisation"));
+const tieInv2 = (await as(U1, `insert into public.invitations(email, organization_name) values ('founder1@example.com','Tie Org') returning code`)).rows[0];
+const tieAcc = (await as(UF1, `select * from public.accept_invitation_code('${tieInv2.code}')`)).rows[0];
+ok("identical-timestamp tie: lowest (created_at, user_id) member accepts as founder", tieAcc.status === "accepted" && tieAcc.accepted_org_id === OC4);
 
 // Entropy sanity: every position of freshly generated codes varies (no fixed UUID bits in the code space).
 const codes = (await db.query(`select upper(encode(public.gen_random_bytes(8),'hex')) c from generate_series(1,500)`)).rows.map(r => r.c);
