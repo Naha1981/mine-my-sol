@@ -11,7 +11,7 @@ import { Field, errMsg } from "@/components/app/ui-bits";
 import { meQuery } from "@/lib/session";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>) => ({ mode: s["mode"] === "register" ? ("register" as const) : ("signin" as const) }),
+  validateSearch: (s: Record<string, unknown>) => ({ mode: s["mode"] === "register" ? ("register" as const) : ("signin" as const), type: s["type"] === "buyer" ? ("buyer" as const) : ("contractor" as const) }),
   head: () => ({ meta: [{ title: "Sign in | MineMySol" }] }),
   component: AuthPage,
 });
@@ -27,11 +27,11 @@ const registerSchema = z.object({
 });
 
 function AuthPage() {
-  const { mode } = Route.useSearch();
+  const { mode, type } = Route.useSearch();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [form, setForm] = useState({ full_name: "", phone: "", company_name: "", website: "", email: "", invite_code: "", password: "" });
-  const [accountType, setAccountType] = useState<"contractor" | "buyer">("contractor");
+  const [accountType, setAccountType] = useState<"contractor" | "buyer">(type);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
