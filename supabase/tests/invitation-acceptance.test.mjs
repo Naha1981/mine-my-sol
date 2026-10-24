@@ -7,7 +7,8 @@ import fs from "node:fs";
 const db = new PGlite();
 const U1 = "00000000-0000-0000-0000-0000000000a1", // admin of buyer org OB1
   UC = "00000000-0000-0000-0000-0000000000b1", // self-registered contractor (OC1), the real contractor
-  UA = "00000000-0000-0000-0000-0000000000b3", // ATTACKER who registered the victim's email first? no - separate account with own email
+  UA = "00000000-0000-0000-0000-0000000000b3", // attacker with own email + own contractor org
+  UM = "00000000-0000-0000-0000-0000000000b4", // SECOND (non-owner) member of OC1, confirmed email
   UU = "00000000-0000-0000-0000-0000000000b2", // contractor (OC2), UNCONFIRMED email
   OB1 = "11111111-1111-1111-1111-1111111111c1",
   OC1 = "22222222-2222-2222-2222-2222222222d1",
@@ -23,7 +24,8 @@ create function auth.uid() returns uuid language sql stable as $$ select nullif(
 create type public.app_role as enum ('admin','contractor');
 create type public.invitation_status as enum ('pending','accepted','revoked');
 create table public.organizations(id uuid primary key, name text, kind text);
-create table public.memberships(user_id uuid, organization_id uuid);
+create table public.memberships(user_id uuid, organization_id uuid, created_at timestamptz not null default now());
+create function public.gen_random_bytes(n int) returns bytea language sql as $$ select decode(substr(md5(random()::text||clock_timestamp()::text||n::text),1,n*2),'hex') $$;
 create table public.user_roles(user_id uuid, role public.app_role);
 create table public.projects(id uuid primary key, buyer_org_id uuid);
 create table public.applications(id uuid primary key, project_id uuid, organization_id uuid, status text);
@@ -42,10 +44,16 @@ insert into auth.users values
   ('${U1}','buyer@example.com', now()),
   ('${UC}','solo@example.com', now()),
   ('${UA}','attacker@example.com', now()),
-  ('${UU}','unconf@example.com', null);
+  ('${UU}','unconf@example.com', null),
+  ('${UM}','member2@example.com', now());
 insert into public.organizations values ('${OB1}','Buyer One','buyer'),('${OC1}','Solo Contracting','contractor'),('${OC2}','Unconfirmed Contracting','contractor'),('${OC3}','Attacker Ltd','contractor');
-insert into public.memberships values ('${U1}','${OB1}'),('${UC}','${OC1}'),('${UU}','${OC2}'),('${UA}','${OC3}');
-insert into public.user_roles values ('${U1}','admin'),('${UC}','contractor'),('${UU}','contractor'),('${UA}','contractor');
+insert into public.memberships values
+  ('${U1}','${OB1}', now() - interval '2 days'),
+  ('${UC}','${OC1}', now() - interval '2 days'),
+  ('${UM}','${OC1}', now() - interval '1 day'),
+  ('${UU}','${OC2}', now() - interval '2 days'),
+  ('${UA}','${OC3}', now() - interval '2 days');
+insert into public.user_roles values ('${U1}','admin'),('${UC}','contractor'),('${UU}','contractor'),('${UA}','contractor'),('${UM}','contractor');
 `);
 await db.exec(read("0006_invitation_status_declined.sql"));
 await db.exec(read("0005_admin_can_org_accepted_invitations.sql"));
@@ -62,7 +70,7 @@ const inv = (await as(U1, `insert into public.invitations(email, organization_na
 ok("insert forced pending + null accepted_org_id (consent preserved)", inv.status === "pending" && inv.accepted_org_id === null);
 ok("buyer_org_name derived from membership, not client text", inv.buyer_org_name === "Buyer One");
 ok("created_by forced to caller", inv.created_by === U1);
-ok("code generated (10 chars)", /^[0-9A-F]{10}$/.test(inv.code));
+ok("new invitations get 64-bit codes (16 hex)", /^[0-9A-F]{16}$/.test(inv.code));
 
 // No disclosure: non-creators cannot read invitations at all (no invitee-by-email policy).
 ok("contractor cannot read invitations table (no email disclosure)", (await as(UC, `select count(*)::int c from public.invitations`)).rows[0].c === 0);
@@ -100,6 +108,21 @@ const inv2 = (await as(U1, `insert into public.invitations(email, organization_n
 const revoked = await as(U1, `update public.invitations set status='revoked' where id='${inv2.id}' returning status`);
 ok("buyer can revoke a pending invitation", revoked.rows[0]?.status === "revoked");
 ok("accept after revoke gives uniform error", ((await err(UC, `select * from public.accept_invitation_code('${inv2.code}')`)) || "").includes("Invalid or expired invitation code"));
+
+// Backward compatibility: an outstanding 10-char code (old default) still accepts.
+const old = (await as(U1, `insert into public.invitations(email, organization_name, code) values ('solo@example.com','Solo Contracting','A1B2C3D4E5') returning code`)).rows[0];
+const oldAcc = (await as(UC, `select * from public.accept_invitation_code('a1b2c3d4e5')`)).rows[0]; // case-insensitive
+ok("old 10-char codes still accepted (backward compatible, case-insensitive)", oldAcc.status === "accepted" && oldAcc.accepted_org_id === OC1);
+
+// Owner-only consent: a non-owner member of the contractor org cannot accept, even with code + matching email.
+const mem = (await as(U1, `insert into public.invitations(email, organization_name) values ('member2@example.com','Solo Contracting') returning code`)).rows[0];
+ok("non-owner member cannot accept (owner consent)", ((await err(UM, `select * from public.accept_invitation_code('${mem.code}')`)) || "").includes("owner of a contractor organisation"));
+
+// Entropy sanity: every position of freshly generated codes varies (no fixed UUID bits in the code space).
+const codes = (await db.query(`select upper(encode(public.gen_random_bytes(8),'hex')) c from generate_series(1,500)`)).rows.map(r => r.c);
+const varied = [...Array(16).keys()].every(i => new Set(codes.map(c => c[i])).size > 5);
+ok("generated codes vary in every position (no fixed bits)", varied && codes.every(c => /^[0-9A-F]{16}$/.test(c)));
+ok("codes are unique across 500 draws", new Set(codes).size === 500);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

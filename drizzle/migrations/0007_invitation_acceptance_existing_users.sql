@@ -14,8 +14,20 @@
 --
 -- accept_invitation_code() returns one uniform error for every lookup failure
 -- (wrong / expired / revoked / declined code) so the rpc is no oracle.
+--
+-- Entropy: existing codes are 10 hex chars sliced from one UUID v4 (the slice
+-- covers only random bit positions; ~40 bits). New codes move to 64 bits from
+-- gen_random_bytes (pgcrypto, already enabled). Acceptance matches exact codes,
+-- so outstanding 10-char codes keep working until their 30-day expiry.
+-- Consent: acceptance requires the caller to be the contractor org's OWNER
+-- (earliest membership), not just any member - sharing the company with a buyer
+-- is an owner-level decision.
 
--- 1. Trusted display name of the inviting buyer organisation (for the success
+-- 1. Stronger code entropy for NEW invitations (backward compatible).
+ALTER TABLE public.invitations
+  ALTER COLUMN code SET DEFAULT upper(encode(gen_random_bytes(8), 'hex'));
+
+-- 2. Trusted display name of the inviting buyer organisation (for the success
 --    confirmation and future audit display), derived server-side.
 ALTER TABLE public.invitations ADD COLUMN IF NOT EXISTS buyer_org_name text;
 
@@ -45,14 +57,14 @@ CREATE TRIGGER trg_invitations_buyer_org
   BEFORE INSERT ON public.invitations
   FOR EACH ROW EXECUTE FUNCTION public.invitations_derive_buyer_org();
 
--- 2. Admin updates are revocation-only: the creator may cancel a pending invite
+-- 3. Admin updates are revocation-only: the creator may cancel a pending invite
 --    but cannot mark anything accepted or set accepted_org_id directly.
 DROP POLICY IF EXISTS "inv: admin update" ON public.invitations;
 CREATE POLICY "inv: admin update" ON public.invitations FOR UPDATE TO authenticated
 USING (public.is_admin() AND created_by = auth.uid())
 WITH CHECK (public.is_admin() AND created_by = auth.uid() AND status = 'revoked' AND accepted_org_id IS NULL);
 
--- 3. Code-possession acceptance for existing users.
+-- 4. Code-possession acceptance for existing users.
 CREATE OR REPLACE FUNCTION public.accept_invitation_code(p_code text)
 RETURNS public.invitations LANGUAGE plpgsql SECURITY DEFINER SET search_path = 'public' AS $f$
 DECLARE
@@ -77,12 +89,15 @@ BEGIN
       FROM public.memberships m
       JOIN public.organizations o ON o.id = m.organization_id
      WHERE m.user_id = auth.uid() AND o.kind = 'contractor'
+       AND NOT EXISTS (SELECT 1 FROM public.memberships older
+                        WHERE older.organization_id = m.organization_id
+                          AND older.created_at < m.created_at)
      LIMIT 1;
     IF inv.status = 'accepted' AND inv.accepted_org_id = v_org THEN
       RETURN inv;
     END IF;
     IF v_org IS NULL THEN
-      RAISE EXCEPTION 'Only a contractor organisation can accept a contractor invitation';
+      RAISE EXCEPTION 'Only the owner of a contractor organisation can accept a contractor invitation';
     END IF;
   END IF;
 
