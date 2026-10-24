@@ -66,7 +66,7 @@ function Home() {
           <h2 className="mb-3 text-lg font-bold">Your applications</h2>
           {!apps.data?.length ? <EmptyState title="No applications yet" body="Open a project to see its checklist and start an application." /> : (
             <ul className="divide-y rounded-lg border bg-card">{apps.data.map((a: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
-              <li key={a.id}><Link to="/portal/applications/$applicationId" params={{ applicationId: a.id }} className="flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/50"><span className="truncate font-medium">{a.projects?.title}</span><StatusBadge status={a.status} /></Link></li>
+              <li key={a.id}><Link to="/portal/applications/$applicationId" params={{ applicationId: a.id }} className="flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/50"><span className="truncate font-medium">{a.projects?.title ?? "Opportunity unavailable"}</span><StatusBadge status={a.status} /></Link></li>
             ))}</ul>
           )}
         </section>

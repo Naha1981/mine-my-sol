@@ -6,6 +6,7 @@ import type { LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useMe } from "@/lib/session";
+import { useNotificationUpdates } from "@/lib/notification-updates";
 import { cn } from "@/lib/utils";
 
 export type NavItem = { to: LinkProps["to"]; label: string; icon: LucideIcon; exact?: boolean; mobile?: boolean };
@@ -32,14 +33,17 @@ export function useSignOut() {
 
 export function AppShell({ nav, children, notificationsTo, area }: { nav: NavItem[]; children: ReactNode; notificationsTo: LinkProps["to"]; area: string }) {
   const me = useMe();
+  useNotificationUpdates(me.userId);
   const signOut = useSignOut();
   const [open, setOpen] = useState(false);
   const unread = useQuery({
     queryKey: ["notifications", "unread"],
     queryFn: async () => {
-      const { count } = await supabase.from("notifications").select("id", { count: "exact", head: true }).is("read_at", null);
+      const { count, error } = await supabase.from("notifications").select("id", { count: "exact", head: true }).is("read_at", null);
+      if (error) throw error;
       return count ?? 0;
     },
+    refetchOnMount: "always",
     refetchInterval: 60_000,
   });
 
