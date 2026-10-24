@@ -14,7 +14,7 @@ import { daysUntil, expiryState } from "@/lib/readiness";
 
 export const Route = createFileRoute("/_authenticated/portal/")({ component: Home });
 
-function Home() {
+export function Home() {
   const me = useMe();
   const docs = useQuery(myDocsQuery);
   const projects = useQuery({

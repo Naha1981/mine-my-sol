@@ -1011,11 +1011,11 @@
         exports.useState = function(initialState) {
           return resolveDispatcher().useState(initialState);
         };
-        exports.useSyncExternalStore = function(subscribe2, getSnapshot2, getServerSnapshot2) {
+        exports.useSyncExternalStore = function(subscribe, getSnapshot, getServerSnapshot) {
           return resolveDispatcher().useSyncExternalStore(
-            subscribe2,
-            getSnapshot2,
-            getServerSnapshot2
+            subscribe,
+            getSnapshot,
+            getServerSnapshot
           );
         };
         exports.useTransition = function() {
@@ -1115,15 +1115,15 @@
         }
         function pop(heap) {
           if (0 === heap.length) return null;
-          var first = heap[0], last2 = heap.pop();
-          if (last2 !== first) {
-            heap[0] = last2;
+          var first = heap[0], last = heap.pop();
+          if (last !== first) {
+            heap[0] = last;
             a: for (var index = 0, length = heap.length, halfLength = length >>> 1; index < halfLength; ) {
               var leftIndex = 2 * (index + 1) - 1, left = heap[leftIndex], rightIndex = leftIndex + 1, right = heap[rightIndex];
-              if (0 > compare(left, last2))
-                rightIndex < length && 0 > compare(right, left) ? (heap[index] = right, heap[rightIndex] = last2, index = rightIndex) : (heap[index] = left, heap[leftIndex] = last2, index = leftIndex);
-              else if (rightIndex < length && 0 > compare(right, last2))
-                heap[index] = right, heap[rightIndex] = last2, index = rightIndex;
+              if (0 > compare(left, last))
+                rightIndex < length && 0 > compare(right, left) ? (heap[index] = right, heap[rightIndex] = last, index = rightIndex) : (heap[index] = left, heap[leftIndex] = last, index = leftIndex);
+              else if (rightIndex < length && 0 > compare(right, last))
+                heap[index] = right, heap[rightIndex] = last, index = rightIndex;
               else break a;
             }
           }
@@ -1364,7 +1364,7 @@
           return dispatcher;
         }
         "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-        var React14 = require_react(), Internals = {
+        var React13 = require_react(), Internals = {
           d: {
             f: noop3,
             r: function() {
@@ -1382,7 +1382,7 @@
           },
           p: 0,
           findDOMNode: null
-        }, REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable"), REACT_OPTIMISTIC_KEY = /* @__PURE__ */ Symbol.for("react.optimistic_key"), ReactSharedInternals = React14.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
+        }, REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable"), REACT_OPTIMISTIC_KEY = /* @__PURE__ */ Symbol.for("react.optimistic_key"), ReactSharedInternals = React13.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
         "function" === typeof Map && null != Map.prototype && "function" === typeof Map.prototype.forEach && "function" === typeof Set && null != Set.prototype && "function" === typeof Set.prototype.clear && "function" === typeof Set.prototype.forEach || console.error(
           "React depends on Map and Set built-in types. Make sure that you load a polyfill in older browsers. https://reactjs.org/link/react-polyfills"
         );
@@ -1842,17 +1842,17 @@
           );
           return result;
         }
-        function findFragmentInstanceOrTextInstanceSiblings(result, self2, child, state2) {
+        function findFragmentInstanceOrTextInstanceSiblings(result, self2, child, state3) {
           for (; null !== child; ) {
-            if (child === self2) state2.foundSelf = true;
+            if (child === self2) state3.foundSelf = true;
             else if (5 === child.tag || 27 === child.tag || 6 === child.tag) {
-              if (state2.foundSelf) return result[1] = child, true;
+              if (state3.foundSelf) return result[1] = child, true;
               result[0] = child;
             } else if ((22 !== child.tag || null === child.memoizedState) && findFragmentInstanceOrTextInstanceSiblings(
               result,
               self2,
               child.child,
-              state2
+              state3
             ))
               return true;
             child = child.sibling;
@@ -3068,7 +3068,7 @@
           node.defaultValue !== "" + value && (node.defaultValue = "" + value);
         }
         function validateOptionProps(element, props) {
-          null == props.value && ("object" === typeof props.children && null !== props.children ? React14.Children.forEach(props.children, function(child) {
+          null == props.value && ("object" === typeof props.children && null !== props.children ? React13.Children.forEach(props.children, function(child) {
             null == child || "string" === typeof child || "number" === typeof child || "bigint" === typeof child || didWarnInvalidChild || (didWarnInvalidChild = true, console.error(
               "Cannot infer the option value of complex children. Pass a `value` prop or use a plain string as children to <option>."
             ));
@@ -7118,8 +7118,8 @@
         function findFirstSuspended(row) {
           for (var node = row; null !== node; ) {
             if (13 === node.tag) {
-              var state2 = node.memoizedState;
-              if (null !== state2 && (state2 = state2.dehydrated, null === state2 || isSuspenseInstancePending(state2) || isSuspenseInstanceFallback(state2)))
+              var state3 = node.memoizedState;
+              if (null !== state3 && (state3 = state3.dehydrated, null === state3 || isSuspenseInstancePending(state3) || isSuspenseInstanceFallback(state3)))
                 return node;
             } else if (19 === node.tag && "independent" !== node.memoizedProps.revealOrder) {
               if (0 !== (node.flags & 128)) return node;
@@ -7421,8 +7421,8 @@
           memoCache.index++;
           return updateQueue;
         }
-        function basicStateReducer(state2, action) {
-          return "function" === typeof action ? action(state2) : action;
+        function basicStateReducer(state3, action) {
+          return "function" === typeof action ? action(state3) : action;
         }
         function mountReducer(reducer, initialArg, init) {
           var hook = mountWorkInProgressHook();
@@ -7557,34 +7557,34 @@
           }
           return [newState, dispatch];
         }
-        function mountSyncExternalStore(subscribe2, getSnapshot2, getServerSnapshot2) {
+        function mountSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
           var fiber = currentlyRenderingFiber, hook = mountWorkInProgressHook();
           if (isHydrating) {
-            if (void 0 === getServerSnapshot2)
+            if (void 0 === getServerSnapshot)
               throw Error(
                 "Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering."
               );
-            var nextSnapshot = getServerSnapshot2();
-            didWarnUncachedGetSnapshot || nextSnapshot === getServerSnapshot2() || (console.error(
+            var nextSnapshot = getServerSnapshot();
+            didWarnUncachedGetSnapshot || nextSnapshot === getServerSnapshot() || (console.error(
               "The result of getServerSnapshot should be cached to avoid an infinite loop"
             ), didWarnUncachedGetSnapshot = true);
           } else {
-            nextSnapshot = getSnapshot2();
-            didWarnUncachedGetSnapshot || (getServerSnapshot2 = getSnapshot2(), objectIs(nextSnapshot, getServerSnapshot2) || (console.error(
+            nextSnapshot = getSnapshot();
+            didWarnUncachedGetSnapshot || (getServerSnapshot = getSnapshot(), objectIs(nextSnapshot, getServerSnapshot) || (console.error(
               "The result of getSnapshot should be cached to avoid an infinite loop"
             ), didWarnUncachedGetSnapshot = true));
             if (null === workInProgressRoot)
               throw Error(
                 "Expected a work-in-progress root. This is a bug in React. Please file an issue."
               );
-            0 !== (workInProgressRootRenderLanes & 127) || pushStoreConsistencyCheck(fiber, getSnapshot2, nextSnapshot);
+            0 !== (workInProgressRootRenderLanes & 127) || pushStoreConsistencyCheck(fiber, getSnapshot, nextSnapshot);
           }
           hook.memoizedState = nextSnapshot;
-          getServerSnapshot2 = { value: nextSnapshot, getSnapshot: getSnapshot2 };
-          hook.queue = getServerSnapshot2;
+          getServerSnapshot = { value: nextSnapshot, getSnapshot };
+          hook.queue = getServerSnapshot;
           mountEffect(
-            subscribeToStore.bind(null, fiber, getServerSnapshot2, subscribe2),
-            [subscribe2]
+            subscribeToStore.bind(null, fiber, getServerSnapshot, subscribe),
+            [subscribe]
           );
           fiber.flags |= 2048;
           pushSimpleEffect(
@@ -7593,72 +7593,72 @@
             updateStoreInstance.bind(
               null,
               fiber,
-              getServerSnapshot2,
+              getServerSnapshot,
               nextSnapshot,
-              getSnapshot2
+              getSnapshot
             ),
             null
           );
           return nextSnapshot;
         }
-        function updateSyncExternalStore(subscribe2, getSnapshot2, getServerSnapshot2) {
+        function updateSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
           var fiber = currentlyRenderingFiber, hook = updateWorkInProgressHook(), isHydrating$jscomp$0 = isHydrating;
           if (isHydrating$jscomp$0) {
-            if (void 0 === getServerSnapshot2)
+            if (void 0 === getServerSnapshot)
               throw Error(
                 "Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering."
               );
-            getServerSnapshot2 = getServerSnapshot2();
-          } else if (getServerSnapshot2 = getSnapshot2(), !didWarnUncachedGetSnapshot) {
-            var cachedSnapshot = getSnapshot2();
-            objectIs(getServerSnapshot2, cachedSnapshot) || (console.error(
+            getServerSnapshot = getServerSnapshot();
+          } else if (getServerSnapshot = getSnapshot(), !didWarnUncachedGetSnapshot) {
+            var cachedSnapshot = getSnapshot();
+            objectIs(getServerSnapshot, cachedSnapshot) || (console.error(
               "The result of getSnapshot should be cached to avoid an infinite loop"
             ), didWarnUncachedGetSnapshot = true);
           }
           if (cachedSnapshot = !objectIs(
             (currentHook || hook).memoizedState,
-            getServerSnapshot2
+            getServerSnapshot
           ))
-            hook.memoizedState = getServerSnapshot2, didReceiveUpdate = true;
+            hook.memoizedState = getServerSnapshot, didReceiveUpdate = true;
           hook = hook.queue;
-          var create = subscribeToStore.bind(null, fiber, hook, subscribe2);
-          updateEffectImpl(2048, Passive, create, [subscribe2]);
-          subscribe2 = hook.getSnapshot !== getSnapshot2 || cachedSnapshot || null !== workInProgressHook && (workInProgressHook.memoizedState.tag & HasEffect) !== NoFlags;
+          var create = subscribeToStore.bind(null, fiber, hook, subscribe);
+          updateEffectImpl(2048, Passive, create, [subscribe]);
+          subscribe = hook.getSnapshot !== getSnapshot || cachedSnapshot || null !== workInProgressHook && (workInProgressHook.memoizedState.tag & HasEffect) !== NoFlags;
           pushSimpleEffect(
-            subscribe2 ? HasEffect | Passive : Passive,
+            subscribe ? HasEffect | Passive : Passive,
             { destroy: void 0 },
             updateStoreInstance.bind(
               null,
               fiber,
               hook,
-              getServerSnapshot2,
-              getSnapshot2
+              getServerSnapshot,
+              getSnapshot
             ),
             null
           );
-          if (subscribe2) {
+          if (subscribe) {
             fiber.flags |= 2048;
             if (null === workInProgressRoot)
               throw Error(
                 "Expected a work-in-progress root. This is a bug in React. Please file an issue."
               );
-            isHydrating$jscomp$0 || 0 !== (renderLanes & 127) || pushStoreConsistencyCheck(fiber, getSnapshot2, getServerSnapshot2);
+            isHydrating$jscomp$0 || 0 !== (renderLanes & 127) || pushStoreConsistencyCheck(fiber, getSnapshot, getServerSnapshot);
           }
-          return getServerSnapshot2;
+          return getServerSnapshot;
         }
-        function pushStoreConsistencyCheck(fiber, getSnapshot2, renderedSnapshot) {
+        function pushStoreConsistencyCheck(fiber, getSnapshot, renderedSnapshot) {
           fiber.flags |= 16384;
-          fiber = { getSnapshot: getSnapshot2, value: renderedSnapshot };
-          getSnapshot2 = currentlyRenderingFiber.updateQueue;
-          null === getSnapshot2 ? (getSnapshot2 = createFunctionComponentUpdateQueue(), currentlyRenderingFiber.updateQueue = getSnapshot2, getSnapshot2.stores = [fiber]) : (renderedSnapshot = getSnapshot2.stores, null === renderedSnapshot ? getSnapshot2.stores = [fiber] : renderedSnapshot.push(fiber));
+          fiber = { getSnapshot, value: renderedSnapshot };
+          getSnapshot = currentlyRenderingFiber.updateQueue;
+          null === getSnapshot ? (getSnapshot = createFunctionComponentUpdateQueue(), currentlyRenderingFiber.updateQueue = getSnapshot, getSnapshot.stores = [fiber]) : (renderedSnapshot = getSnapshot.stores, null === renderedSnapshot ? getSnapshot.stores = [fiber] : renderedSnapshot.push(fiber));
         }
-        function updateStoreInstance(fiber, inst, nextSnapshot, getSnapshot2) {
+        function updateStoreInstance(fiber, inst, nextSnapshot, getSnapshot) {
           inst.value = nextSnapshot;
-          inst.getSnapshot = getSnapshot2;
+          inst.getSnapshot = getSnapshot;
           checkIfSnapshotChanged(inst) && forceStoreRerender(fiber);
         }
-        function subscribeToStore(fiber, inst, subscribe2) {
-          return subscribe2(function() {
+        function subscribeToStore(fiber, inst, subscribe) {
+          return subscribe(function() {
             checkIfSnapshotChanged(inst) && (startUpdateTimerByLane(2, "updateSyncExternalStore()", fiber), forceStoreRerender(fiber));
           });
         }
@@ -7817,13 +7817,13 @@
           null !== actionNode && (nextState = actionNode.next, nextState === actionNode ? actionQueue.pending = null : (nextState = nextState.next, actionNode.next = nextState, runActionStateAction(actionQueue, nextState)));
         }
         function onActionError(actionQueue, actionNode, error) {
-          var last2 = actionQueue.pending;
+          var last = actionQueue.pending;
           actionQueue.pending = null;
-          if (null !== last2) {
-            last2 = last2.next;
+          if (null !== last) {
+            last = last.next;
             do
               actionNode.status = "rejected", actionNode.reason = error, notifyActionListeners(actionNode), actionNode = actionNode.next;
-            while (actionNode !== last2);
+            while (actionNode !== last);
           }
           actionQueue.action = null;
         }
@@ -7930,12 +7930,12 @@
           stateHook = updateReducer(basicStateReducer)[0];
           if ("object" === typeof currentStateHook && null !== currentStateHook && "function" === typeof currentStateHook.then)
             try {
-              var state2 = useThenable(currentStateHook);
+              var state3 = useThenable(currentStateHook);
             } catch (x) {
               if (x === SuspenseException) throw SuspenseActionException;
               throw x;
             }
-          else state2 = currentStateHook;
+          else state3 = currentStateHook;
           currentStateHook = updateWorkInProgressHook();
           var actionQueue = currentStateHook.queue, dispatch = actionQueue.dispatch;
           action !== currentStateHook.memoizedState && (currentlyRenderingFiber.flags |= 2048, pushSimpleEffect(
@@ -7944,7 +7944,7 @@
             actionStateActionEffect.bind(null, actionQueue, action),
             null
           ));
-          return [state2, dispatch, stateHook];
+          return [state3, dispatch, stateHook];
         }
         function actionStateActionEffect(actionQueue, action) {
           actionQueue.action = action;
@@ -9098,11 +9098,11 @@
         function updateClassComponent(current2, workInProgress2, Component, nextProps, renderLanes2) {
           switch (shouldErrorImpl(workInProgress2)) {
             case false:
-              var _instance = workInProgress2.stateNode, state2 = new workInProgress2.type(
+              var _instance = workInProgress2.stateNode, state3 = new workInProgress2.type(
                 workInProgress2.memoizedProps,
                 _instance.context
               ).state;
-              _instance.updater.enqueueSetState(_instance, state2, null);
+              _instance.updater.enqueueSetState(_instance, state3, null);
               break;
             case true:
               workInProgress2.flags |= 128;
@@ -9110,15 +9110,15 @@
               _instance = Error("Simulated error coming from DevTools");
               var lane = renderLanes2 & -renderLanes2;
               workInProgress2.lanes |= lane;
-              state2 = workInProgressRoot;
-              if (null === state2)
+              state3 = workInProgressRoot;
+              if (null === state3)
                 throw Error(
                   "Expected a work-in-progress root. This is a bug in React. Please file an issue."
                 );
               lane = createClassErrorUpdate(lane);
               initializeClassErrorUpdate(
                 lane,
-                state2,
+                state3,
                 workInProgress2,
                 createCapturedValueAtFiber(_instance, workInProgress2)
               );
@@ -9126,84 +9126,84 @@
           }
           prepareToReadContext(workInProgress2);
           if (null === workInProgress2.stateNode) {
-            state2 = emptyContextObject;
+            state3 = emptyContextObject;
             _instance = Component.contextType;
             "contextType" in Component && null !== _instance && (void 0 === _instance || _instance.$$typeof !== REACT_CONTEXT_TYPE) && !didWarnAboutInvalidateContextType.has(Component) && (didWarnAboutInvalidateContextType.add(Component), lane = void 0 === _instance ? " However, it is set to undefined. This can be caused by a typo or by mixing up named and default imports. This can also happen due to a circular dependency, so try moving the createContext() call to a separate file." : "object" !== typeof _instance ? " However, it is set to a " + typeof _instance + "." : _instance.$$typeof === REACT_CONSUMER_TYPE ? " Did you accidentally pass the Context.Consumer instead?" : " However, it is set to an object with keys {" + Object.keys(_instance).join(", ") + "}.", console.error(
               "%s defines an invalid contextType. contextType should point to the Context object returned by React.createContext().%s",
               getComponentNameFromType(Component) || "Component",
               lane
             ));
-            "object" === typeof _instance && null !== _instance && (state2 = readContext(_instance));
-            _instance = new Component(nextProps, state2);
+            "object" === typeof _instance && null !== _instance && (state3 = readContext(_instance));
+            _instance = new Component(nextProps, state3);
             if (workInProgress2.mode & StrictLegacyMode) {
               setIsStrictModeForDevtools(true);
               try {
-                _instance = new Component(nextProps, state2);
+                _instance = new Component(nextProps, state3);
               } finally {
                 setIsStrictModeForDevtools(false);
               }
             }
-            state2 = workInProgress2.memoizedState = null !== _instance.state && void 0 !== _instance.state ? _instance.state : null;
+            state3 = workInProgress2.memoizedState = null !== _instance.state && void 0 !== _instance.state ? _instance.state : null;
             _instance.updater = classComponentUpdater;
             workInProgress2.stateNode = _instance;
             _instance._reactInternals = workInProgress2;
             _instance._reactInternalInstance = fakeInternalInstance;
-            "function" === typeof Component.getDerivedStateFromProps && null === state2 && (state2 = getComponentNameFromType(Component) || "Component", didWarnAboutUninitializedState.has(state2) || (didWarnAboutUninitializedState.add(state2), console.error(
+            "function" === typeof Component.getDerivedStateFromProps && null === state3 && (state3 = getComponentNameFromType(Component) || "Component", didWarnAboutUninitializedState.has(state3) || (didWarnAboutUninitializedState.add(state3), console.error(
               "`%s` uses `getDerivedStateFromProps` but its initial state is %s. This is not recommended. Instead, define the initial state by assigning an object to `this.state` in the constructor of `%s`. This ensures that `getDerivedStateFromProps` arguments have a consistent shape.",
-              state2,
+              state3,
               null === _instance.state ? "null" : "undefined",
-              state2
+              state3
             )));
             if ("function" === typeof Component.getDerivedStateFromProps || "function" === typeof _instance.getSnapshotBeforeUpdate) {
-              var foundWillUpdateName = lane = state2 = null;
-              "function" === typeof _instance.componentWillMount && true !== _instance.componentWillMount.__suppressDeprecationWarning ? state2 = "componentWillMount" : "function" === typeof _instance.UNSAFE_componentWillMount && (state2 = "UNSAFE_componentWillMount");
+              var foundWillUpdateName = lane = state3 = null;
+              "function" === typeof _instance.componentWillMount && true !== _instance.componentWillMount.__suppressDeprecationWarning ? state3 = "componentWillMount" : "function" === typeof _instance.UNSAFE_componentWillMount && (state3 = "UNSAFE_componentWillMount");
               "function" === typeof _instance.componentWillReceiveProps && true !== _instance.componentWillReceiveProps.__suppressDeprecationWarning ? lane = "componentWillReceiveProps" : "function" === typeof _instance.UNSAFE_componentWillReceiveProps && (lane = "UNSAFE_componentWillReceiveProps");
               "function" === typeof _instance.componentWillUpdate && true !== _instance.componentWillUpdate.__suppressDeprecationWarning ? foundWillUpdateName = "componentWillUpdate" : "function" === typeof _instance.UNSAFE_componentWillUpdate && (foundWillUpdateName = "UNSAFE_componentWillUpdate");
-              if (null !== state2 || null !== lane || null !== foundWillUpdateName) {
+              if (null !== state3 || null !== lane || null !== foundWillUpdateName) {
                 _instance = getComponentNameFromType(Component) || "Component";
                 var newApiName = "function" === typeof Component.getDerivedStateFromProps ? "getDerivedStateFromProps()" : "getSnapshotBeforeUpdate()";
                 didWarnAboutLegacyLifecyclesAndDerivedState.has(_instance) || (didWarnAboutLegacyLifecyclesAndDerivedState.add(_instance), console.error(
                   "Unsafe legacy lifecycles will not be called for components using new component APIs.\n\n%s uses %s but also contains the following legacy lifecycles:%s%s%s\n\nThe above lifecycles should be removed. Learn more about this warning here:\nhttps://react.dev/link/unsafe-component-lifecycles",
                   _instance,
                   newApiName,
-                  null !== state2 ? "\n  " + state2 : "",
+                  null !== state3 ? "\n  " + state3 : "",
                   null !== lane ? "\n  " + lane : "",
                   null !== foundWillUpdateName ? "\n  " + foundWillUpdateName : ""
                 ));
               }
             }
             _instance = workInProgress2.stateNode;
-            state2 = getComponentNameFromType(Component) || "Component";
+            state3 = getComponentNameFromType(Component) || "Component";
             _instance.render || (Component.prototype && "function" === typeof Component.prototype.render ? console.error(
               "No `render` method found on the %s instance: did you accidentally return an object from the constructor?",
-              state2
+              state3
             ) : console.error(
               "No `render` method found on the %s instance: you may have forgotten to define `render`.",
-              state2
+              state3
             ));
             !_instance.getInitialState || _instance.getInitialState.isReactClassApproved || _instance.state || console.error(
               "getInitialState was defined on %s, a plain JavaScript class. This is only supported for classes created using React.createClass. Did you mean to define a state property instead?",
-              state2
+              state3
             );
             _instance.getDefaultProps && !_instance.getDefaultProps.isReactClassApproved && console.error(
               "getDefaultProps was defined on %s, a plain JavaScript class. This is only supported for classes created using React.createClass. Use a static property to define defaultProps instead.",
-              state2
+              state3
             );
             _instance.contextType && console.error(
               "contextType was defined as an instance property on %s. Use a static property to define contextType instead.",
-              state2
+              state3
             );
             Component.childContextTypes && !didWarnAboutChildContextTypes.has(Component) && (didWarnAboutChildContextTypes.add(Component), console.error(
               "%s uses the legacy childContextTypes API which was removed in React 19. Use React.createContext() instead. (https://react.dev/link/legacy-context)",
-              state2
+              state3
             ));
             Component.contextTypes && !didWarnAboutContextTypes$1.has(Component) && (didWarnAboutContextTypes$1.add(Component), console.error(
               "%s uses the legacy contextTypes API which was removed in React 19. Use React.createContext() with static contextType instead. (https://react.dev/link/legacy-context)",
-              state2
+              state3
             ));
             "function" === typeof _instance.componentShouldUpdate && console.error(
               "%s has a method called componentShouldUpdate(). Did you mean shouldComponentUpdate()? The name is phrased as a question because the function is expected to return a value.",
-              state2
+              state3
             );
             Component.prototype && Component.prototype.isPureReactComponent && "undefined" !== typeof _instance.shouldComponentUpdate && console.error(
               "%s has a method called shouldComponentUpdate(). shouldComponentUpdate should not be used when extending React.PureComponent. Please extend React.Component if shouldComponentUpdate is used.",
@@ -9211,29 +9211,29 @@
             );
             "function" === typeof _instance.componentDidUnmount && console.error(
               "%s has a method called componentDidUnmount(). But there is no such lifecycle method. Did you mean componentWillUnmount()?",
-              state2
+              state3
             );
             "function" === typeof _instance.componentDidReceiveProps && console.error(
               "%s has a method called componentDidReceiveProps(). But there is no such lifecycle method. If you meant to update the state in response to changing props, use componentWillReceiveProps(). If you meant to fetch data or run side-effects or mutations after React has updated the UI, use componentDidUpdate().",
-              state2
+              state3
             );
             "function" === typeof _instance.componentWillRecieveProps && console.error(
               "%s has a method called componentWillRecieveProps(). Did you mean componentWillReceiveProps()?",
-              state2
+              state3
             );
             "function" === typeof _instance.UNSAFE_componentWillRecieveProps && console.error(
               "%s has a method called UNSAFE_componentWillRecieveProps(). Did you mean UNSAFE_componentWillReceiveProps()?",
-              state2
+              state3
             );
             lane = _instance.props !== nextProps;
             void 0 !== _instance.props && lane && console.error(
               "When calling super() in `%s`, make sure to pass up the same props that your component's constructor was passed.",
-              state2
+              state3
             );
             _instance.defaultProps && console.error(
               "Setting defaultProps as an instance property on %s is not supported and will be ignored. Instead, define defaultProps as a static property on %s.",
-              state2,
-              state2
+              state3,
+              state3
             );
             "function" !== typeof _instance.getSnapshotBeforeUpdate || "function" === typeof _instance.componentDidUpdate || didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate.has(Component) || (didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate.add(Component), console.error(
               "%s: getSnapshotBeforeUpdate() should be used with componentDidUpdate(). This component defines getSnapshotBeforeUpdate() only.",
@@ -9241,31 +9241,31 @@
             ));
             "function" === typeof _instance.getDerivedStateFromProps && console.error(
               "%s: getDerivedStateFromProps() is defined as an instance method and will be ignored. Instead, declare it as a static method.",
-              state2
+              state3
             );
             "function" === typeof _instance.getDerivedStateFromError && console.error(
               "%s: getDerivedStateFromError() is defined as an instance method and will be ignored. Instead, declare it as a static method.",
-              state2
+              state3
             );
             "function" === typeof Component.getSnapshotBeforeUpdate && console.error(
               "%s: getSnapshotBeforeUpdate() is defined as a static method and will be ignored. Instead, declare it as an instance method.",
-              state2
+              state3
             );
-            (lane = _instance.state) && ("object" !== typeof lane || isArrayImpl(lane)) && console.error("%s.state: must be set to an object or null", state2);
+            (lane = _instance.state) && ("object" !== typeof lane || isArrayImpl(lane)) && console.error("%s.state: must be set to an object or null", state3);
             "function" === typeof _instance.getChildContext && "object" !== typeof Component.childContextTypes && console.error(
               "%s.getChildContext(): childContextTypes must be defined in order to use getChildContext().",
-              state2
+              state3
             );
             _instance = workInProgress2.stateNode;
             _instance.props = nextProps;
             _instance.state = workInProgress2.memoizedState;
             _instance.refs = {};
             initializeUpdateQueue(workInProgress2);
-            state2 = Component.contextType;
-            _instance.context = "object" === typeof state2 && null !== state2 ? readContext(state2) : emptyContextObject;
-            _instance.state === nextProps && (state2 = getComponentNameFromType(Component) || "Component", didWarnAboutDirectlyAssigningPropsToState.has(state2) || (didWarnAboutDirectlyAssigningPropsToState.add(state2), console.error(
+            state3 = Component.contextType;
+            _instance.context = "object" === typeof state3 && null !== state3 ? readContext(state3) : emptyContextObject;
+            _instance.state === nextProps && (state3 = getComponentNameFromType(Component) || "Component", didWarnAboutDirectlyAssigningPropsToState.has(state3) || (didWarnAboutDirectlyAssigningPropsToState.add(state3), console.error(
               "%s: It is not recommended to assign props directly to state because updates to props won't be reflected in state. In most cases, it is better to use props directly.",
-              state2
+              state3
             )));
             workInProgress2.mode & StrictLegacyMode && ReactStrictModeWarnings.recordLegacyContextWarning(
               workInProgress2,
@@ -9276,14 +9276,14 @@
               _instance
             );
             _instance.state = workInProgress2.memoizedState;
-            state2 = Component.getDerivedStateFromProps;
-            "function" === typeof state2 && (applyDerivedStateFromProps(
+            state3 = Component.getDerivedStateFromProps;
+            "function" === typeof state3 && (applyDerivedStateFromProps(
               workInProgress2,
               Component,
-              state2,
+              state3,
               nextProps
             ), _instance.state = workInProgress2.memoizedState);
-            "function" === typeof Component.getDerivedStateFromProps || "function" === typeof _instance.getSnapshotBeforeUpdate || "function" !== typeof _instance.UNSAFE_componentWillMount && "function" !== typeof _instance.componentWillMount || (state2 = _instance.state, "function" === typeof _instance.componentWillMount && _instance.componentWillMount(), "function" === typeof _instance.UNSAFE_componentWillMount && _instance.UNSAFE_componentWillMount(), state2 !== _instance.state && (console.error(
+            "function" === typeof Component.getDerivedStateFromProps || "function" === typeof _instance.getSnapshotBeforeUpdate || "function" !== typeof _instance.UNSAFE_componentWillMount && "function" !== typeof _instance.componentWillMount || (state3 = _instance.state, "function" === typeof _instance.componentWillMount && _instance.componentWillMount(), "function" === typeof _instance.UNSAFE_componentWillMount && _instance.UNSAFE_componentWillMount(), state3 !== _instance.state && (console.error(
               "%s.componentWillMount(): Assigning directly to this.state is deprecated (except inside a component's constructor). Use setState instead.",
               getComponentNameFromFiber(workInProgress2) || "Component"
             ), classComponentUpdater.enqueueReplaceState(
@@ -9301,16 +9301,16 @@
             _instance.props = lane;
             var oldContext = _instance.context;
             foundWillUpdateName = Component.contextType;
-            state2 = emptyContextObject;
-            "object" === typeof foundWillUpdateName && null !== foundWillUpdateName && (state2 = readContext(foundWillUpdateName));
+            state3 = emptyContextObject;
+            "object" === typeof foundWillUpdateName && null !== foundWillUpdateName && (state3 = readContext(foundWillUpdateName));
             newApiName = Component.getDerivedStateFromProps;
             foundWillUpdateName = "function" === typeof newApiName || "function" === typeof _instance.getSnapshotBeforeUpdate;
             unresolvedOldProps = workInProgress2.pendingProps !== unresolvedOldProps;
-            foundWillUpdateName || "function" !== typeof _instance.UNSAFE_componentWillReceiveProps && "function" !== typeof _instance.componentWillReceiveProps || (unresolvedOldProps || oldContext !== state2) && callComponentWillReceiveProps(
+            foundWillUpdateName || "function" !== typeof _instance.UNSAFE_componentWillReceiveProps && "function" !== typeof _instance.componentWillReceiveProps || (unresolvedOldProps || oldContext !== state3) && callComponentWillReceiveProps(
               workInProgress2,
               _instance,
               nextProps,
-              state2
+              state3
             );
             hasForceUpdate = false;
             var oldState = workInProgress2.memoizedState;
@@ -9330,13 +9330,13 @@
               nextProps,
               oldState,
               oldContext,
-              state2
-            )) ? (foundWillUpdateName || "function" !== typeof _instance.UNSAFE_componentWillMount && "function" !== typeof _instance.componentWillMount || ("function" === typeof _instance.componentWillMount && _instance.componentWillMount(), "function" === typeof _instance.UNSAFE_componentWillMount && _instance.UNSAFE_componentWillMount()), "function" === typeof _instance.componentDidMount && (workInProgress2.flags |= 4194308), (workInProgress2.mode & StrictEffectsMode) !== NoMode && (workInProgress2.flags |= 268435456)) : ("function" === typeof _instance.componentDidMount && (workInProgress2.flags |= 4194308), (workInProgress2.mode & StrictEffectsMode) !== NoMode && (workInProgress2.flags |= 268435456), workInProgress2.memoizedProps = nextProps, workInProgress2.memoizedState = oldContext), _instance.props = nextProps, _instance.state = oldContext, _instance.context = state2, _instance = lane) : ("function" === typeof _instance.componentDidMount && (workInProgress2.flags |= 4194308), (workInProgress2.mode & StrictEffectsMode) !== NoMode && (workInProgress2.flags |= 268435456), _instance = false);
+              state3
+            )) ? (foundWillUpdateName || "function" !== typeof _instance.UNSAFE_componentWillMount && "function" !== typeof _instance.componentWillMount || ("function" === typeof _instance.componentWillMount && _instance.componentWillMount(), "function" === typeof _instance.UNSAFE_componentWillMount && _instance.UNSAFE_componentWillMount()), "function" === typeof _instance.componentDidMount && (workInProgress2.flags |= 4194308), (workInProgress2.mode & StrictEffectsMode) !== NoMode && (workInProgress2.flags |= 268435456)) : ("function" === typeof _instance.componentDidMount && (workInProgress2.flags |= 4194308), (workInProgress2.mode & StrictEffectsMode) !== NoMode && (workInProgress2.flags |= 268435456), workInProgress2.memoizedProps = nextProps, workInProgress2.memoizedState = oldContext), _instance.props = nextProps, _instance.state = oldContext, _instance.context = state3, _instance = lane) : ("function" === typeof _instance.componentDidMount && (workInProgress2.flags |= 4194308), (workInProgress2.mode & StrictEffectsMode) !== NoMode && (workInProgress2.flags |= 268435456), _instance = false);
           } else {
             _instance = workInProgress2.stateNode;
             cloneUpdateQueue(current2, workInProgress2);
-            state2 = workInProgress2.memoizedProps;
-            foundWillUpdateName = resolveClassComponentProps(Component, state2);
+            state3 = workInProgress2.memoizedProps;
+            foundWillUpdateName = resolveClassComponentProps(Component, state3);
             _instance.props = foundWillUpdateName;
             newApiName = workInProgress2.pendingProps;
             oldState = _instance.context;
@@ -9344,7 +9344,7 @@
             lane = emptyContextObject;
             "object" === typeof oldContext && null !== oldContext && (lane = readContext(oldContext));
             unresolvedOldProps = Component.getDerivedStateFromProps;
-            (oldContext = "function" === typeof unresolvedOldProps || "function" === typeof _instance.getSnapshotBeforeUpdate) || "function" !== typeof _instance.UNSAFE_componentWillReceiveProps && "function" !== typeof _instance.componentWillReceiveProps || (state2 !== newApiName || oldState !== lane) && callComponentWillReceiveProps(
+            (oldContext = "function" === typeof unresolvedOldProps || "function" === typeof _instance.getSnapshotBeforeUpdate) || "function" !== typeof _instance.UNSAFE_componentWillReceiveProps && "function" !== typeof _instance.componentWillReceiveProps || (state3 !== newApiName || oldState !== lane) && callComponentWillReceiveProps(
               workInProgress2,
               _instance,
               nextProps,
@@ -9356,7 +9356,7 @@
             processUpdateQueue(workInProgress2, nextProps, _instance, renderLanes2);
             suspendIfUpdateReadFromEntangledAsyncAction();
             var newState = workInProgress2.memoizedState;
-            state2 !== newApiName || oldState !== newState || hasForceUpdate || null !== current2 && null !== current2.dependencies && checkIfContextChanged(current2.dependencies) ? ("function" === typeof unresolvedOldProps && (applyDerivedStateFromProps(
+            state3 !== newApiName || oldState !== newState || hasForceUpdate || null !== current2 && null !== current2.dependencies && checkIfContextChanged(current2.dependencies) ? ("function" === typeof unresolvedOldProps && (applyDerivedStateFromProps(
               workInProgress2,
               Component,
               unresolvedOldProps,
@@ -9373,15 +9373,15 @@
               nextProps,
               newState,
               lane
-            )), "function" === typeof _instance.componentDidUpdate && (workInProgress2.flags |= 4), "function" === typeof _instance.getSnapshotBeforeUpdate && (workInProgress2.flags |= 1024)) : ("function" !== typeof _instance.componentDidUpdate || state2 === current2.memoizedProps && oldState === current2.memoizedState || (workInProgress2.flags |= 4), "function" !== typeof _instance.getSnapshotBeforeUpdate || state2 === current2.memoizedProps && oldState === current2.memoizedState || (workInProgress2.flags |= 1024), workInProgress2.memoizedProps = nextProps, workInProgress2.memoizedState = newState), _instance.props = nextProps, _instance.state = newState, _instance.context = lane, _instance = foundWillUpdateName) : ("function" !== typeof _instance.componentDidUpdate || state2 === current2.memoizedProps && oldState === current2.memoizedState || (workInProgress2.flags |= 4), "function" !== typeof _instance.getSnapshotBeforeUpdate || state2 === current2.memoizedProps && oldState === current2.memoizedState || (workInProgress2.flags |= 1024), _instance = false);
+            )), "function" === typeof _instance.componentDidUpdate && (workInProgress2.flags |= 4), "function" === typeof _instance.getSnapshotBeforeUpdate && (workInProgress2.flags |= 1024)) : ("function" !== typeof _instance.componentDidUpdate || state3 === current2.memoizedProps && oldState === current2.memoizedState || (workInProgress2.flags |= 4), "function" !== typeof _instance.getSnapshotBeforeUpdate || state3 === current2.memoizedProps && oldState === current2.memoizedState || (workInProgress2.flags |= 1024), workInProgress2.memoizedProps = nextProps, workInProgress2.memoizedState = newState), _instance.props = nextProps, _instance.state = newState, _instance.context = lane, _instance = foundWillUpdateName) : ("function" !== typeof _instance.componentDidUpdate || state3 === current2.memoizedProps && oldState === current2.memoizedState || (workInProgress2.flags |= 4), "function" !== typeof _instance.getSnapshotBeforeUpdate || state3 === current2.memoizedProps && oldState === current2.memoizedState || (workInProgress2.flags |= 1024), _instance = false);
           }
           lane = _instance;
           markRef(current2, workInProgress2);
-          state2 = 0 !== (workInProgress2.flags & 128);
-          if (lane || state2) {
+          state3 = 0 !== (workInProgress2.flags & 128);
+          if (lane || state3) {
             lane = workInProgress2.stateNode;
             setCurrentFiber(workInProgress2);
-            if (state2 && "function" !== typeof Component.getDerivedStateFromError)
+            if (state3 && "function" !== typeof Component.getDerivedStateFromError)
               Component = null, profilerStartTime = -1;
             else if (Component = callRenderInDEV(lane), workInProgress2.mode & StrictLegacyMode) {
               setIsStrictModeForDevtools(true);
@@ -9392,7 +9392,7 @@
               }
             }
             workInProgress2.flags |= 1;
-            null !== current2 && state2 ? (workInProgress2.child = reconcileChildFibers(
+            null !== current2 && state3 ? (workInProgress2.child = reconcileChildFibers(
               workInProgress2,
               current2.child,
               null,
@@ -11602,9 +11602,9 @@
         }
         function commitEnterViewTransitions(placement, gesture) {
           if (30 === placement.tag) {
-            var state2 = placement.stateNode, props = placement.memoizedProps, name = getViewTransitionName(props, state2), className = getViewTransitionClassName(
+            var state3 = placement.stateNode, props = placement.memoizedProps, name = getViewTransitionName(props, state3), className = getViewTransitionClassName(
               props.default,
-              state2.paired ? props.share : props.enter
+              state3.paired ? props.share : props.enter
             );
             "none" !== className ? applyViewTransitionToHostInstances(
               placement,
@@ -11612,7 +11612,7 @@
               className,
               null,
               false
-            ) ? (commitAppearingPairViewTransitions(placement), state2.paired || gesture || scheduleViewTransitionEvent(placement, props.onEnter)) : restoreViewTransitionOnHostInstances(placement.child, false) : commitAppearingPairViewTransitions(placement);
+            ) ? (commitAppearingPairViewTransitions(placement), state3.paired || gesture || scheduleViewTransitionEvent(placement, props.onEnter)) : restoreViewTransitionOnHostInstances(placement.child, false) : commitAppearingPairViewTransitions(placement);
           } else if (0 !== (placement.subtreeFlags & 33554432))
             for (placement = placement.child; null !== placement; )
               commitEnterViewTransitions(placement, gesture), placement = placement.sibling;
@@ -11765,17 +11765,17 @@
         function measureNestedViewTransitions(changedParent, gesture) {
           for (changedParent = changedParent.child; null !== changedParent; ) {
             if (30 === changedParent.tag) {
-              var props = changedParent.memoizedProps, state2 = changedParent.stateNode, name = getViewTransitionName(props, state2), className = getViewTransitionClassName(props.default, props.update);
+              var props = changedParent.memoizedProps, state3 = changedParent.stateNode, name = getViewTransitionName(props, state3), className = getViewTransitionClassName(props.default, props.update);
               if (gesture) {
-                state2 = state2.clones;
-                var previousMeasurements = null === state2 ? null : state2.map(measureClonedInstance);
+                state3 = state3.clones;
+                var previousMeasurements = null === state3 ? null : state3.map(measureClonedInstance);
               } else
                 previousMeasurements = changedParent.memoizedState, changedParent.memoizedState = null;
-              state2 = changedParent;
+              state3 = changedParent;
               var child = changedParent.child, newName = name;
               viewTransitionHostInstanceIdx = 0;
               className = measureViewTransitionHostInstancesRecursive(
-                state2,
+                state3,
                 child,
                 newName,
                 name,
@@ -12985,9 +12985,9 @@
                 viewTransitionContextChanged = false;
                 recursivelyTraverseAfterMutationEffects(root2, finishedWork);
                 viewTransitionContextChanged && (finishedWork.flags |= 4);
-                var props = finishedWork.memoizedProps, state2 = finishedWork.stateNode;
-                root2 = getViewTransitionName(props, state2);
-                state2 = getViewTransitionName(current2.memoizedProps, state2);
+                var props = finishedWork.memoizedProps, state3 = finishedWork.stateNode;
+                root2 = getViewTransitionName(props, state3);
+                state3 = getViewTransitionName(current2.memoizedProps, state3);
                 var className = getViewTransitionClassName(
                   props.default,
                   props.update
@@ -12996,7 +12996,7 @@
                   finishedWork,
                   current2,
                   root2,
-                  state2,
+                  state3,
                   className,
                   props,
                   true
@@ -13746,10 +13746,10 @@
               break;
             case 30:
               if (0 !== (fiber.flags & suspenseyCommitFlag) && (previousHoistableRoot = fiber.memoizedProps.name, null != previousHoistableRoot && "auto" !== previousHoistableRoot)) {
-                var state2 = fiber.stateNode;
-                state2.paired = null;
+                var state3 = fiber.stateNode;
+                state3.paired = null;
                 null === appearingViewTransitions && (appearingViewTransitions = /* @__PURE__ */ new Map());
-                appearingViewTransitions.set(previousHoistableRoot, state2);
+                appearingViewTransitions.set(previousHoistableRoot, state3);
               }
               recursivelyAccumulateSuspenseyCommit(
                 fiber,
@@ -13990,9 +13990,9 @@
         }
         function scheduleViewTransitionEvent(fiber, callback) {
           if (null != callback) {
-            var state2 = fiber.stateNode, instance = state2.ref;
-            null === instance && (instance = state2.ref = createViewTransitionInstance(
-              getViewTransitionName(fiber.memoizedProps, state2)
+            var state3 = fiber.stateNode, instance = state3.ref;
+            null === instance && (instance = state3.ref = createViewTransitionInstance(
+              getViewTransitionName(fiber.memoizedProps, state3)
             ));
             null === pendingViewTransitionEvents && (pendingViewTransitionEvents = []);
             pendingViewTransitionEvents.push(callback.bind(null, instance));
@@ -14375,10 +14375,10 @@
             var tag = node.tag;
             if ((0 === tag || 11 === tag || 15 === tag) && node.flags & 16384 && (tag = node.updateQueue, null !== tag && (tag = tag.stores, null !== tag)))
               for (var i = 0; i < tag.length; i++) {
-                var check = tag[i], getSnapshot2 = check.getSnapshot;
+                var check = tag[i], getSnapshot = check.getSnapshot;
                 check = check.value;
                 try {
-                  if (!objectIs(getSnapshot2(), check)) return false;
+                  if (!objectIs(getSnapshot(), check)) return false;
                 } catch (error) {
                   return false;
                 }
@@ -19257,22 +19257,22 @@
             precedence: null
           });
         }
-        function preloadStylesheet(ownerDocument, key, preloadProps, state2) {
+        function preloadStylesheet(ownerDocument, key, preloadProps, state3) {
           if (key = ownerDocument.querySelector(
             'link[rel="preload"][as="style"][' + key + "]"
           )) {
             if (true !== key[internalLoadPendingKey]) {
-              state2.loading = Loaded;
+              state3.loading = Loaded;
               return;
             }
           } else
             key = ownerDocument.createElement("link"), key[internalLoadPendingKey] = true, key.onload = key.onerror = clearPendingLoadOnNode.bind(null, key), setInitialProperties(key, "link", preloadProps), markNodeAsHoistable(key), ownerDocument.head.appendChild(key);
-          state2.preload = key;
+          state3.preload = key;
           key.addEventListener("load", function() {
-            return state2.loading |= Loaded;
+            return state3.loading |= Loaded;
           });
           key.addEventListener("error", function() {
-            return state2.loading |= Errored;
+            return state3.loading |= Errored;
           });
         }
         function getScriptKey(src) {
@@ -19351,10 +19351,10 @@
         function insertStylesheet(instance, precedence, root2) {
           for (var nodes = root2.querySelectorAll(
             'link[rel="stylesheet"][data-precedence],style[data-precedence]'
-          ), last2 = nodes.length ? nodes[nodes.length - 1] : null, prior = last2, i = 0; i < nodes.length; i++) {
+          ), last = nodes.length ? nodes[nodes.length - 1] : null, prior = last, i = 0; i < nodes.length; i++) {
             var node = nodes[i];
             if (node.dataset.precedence === precedence) prior = node;
-            else if (prior !== last2) break;
+            else if (prior !== last) break;
           }
           prior ? prior.parentNode.insertBefore(instance, prior.nextSibling) : (precedence = 9 === root2.nodeType ? root2.head : root2, precedence.insertBefore(instance, precedence.firstChild));
         }
@@ -19481,10 +19481,10 @@
         function estimateImageBytes(instance) {
           return (instance.width || 100) * (instance.height || 100) * ("number" === typeof devicePixelRatio ? devicePixelRatio : 1) * 0.25;
         }
-        function suspendInstance(state2, instance) {
-          "function" === typeof instance.decode && (state2.imgCount++, instance.complete || (state2.imgBytes += estimateImageBytes(instance), state2.suspenseyImages.push(instance)), state2 = onUnsuspendImg.bind(state2), instance.decode().then(state2, state2));
+        function suspendInstance(state3, instance) {
+          "function" === typeof instance.decode && (state3.imgCount++, instance.complete || (state3.imgBytes += estimateImageBytes(instance), state3.suspenseyImages.push(instance)), state3 = onUnsuspendImg.bind(state3), instance.decode().then(state3, state3));
         }
-        function suspendResource(state2, hoistableRoot, resource, props) {
+        function suspendResource(state3, hoistableRoot, resource, props) {
           if ("stylesheet" === resource.type && ("string" !== typeof props.media || false !== matchMedia(props.media).matches) && (resource.state.loading & Inserted) === NotLoaded) {
             if (null === resource.instance) {
               var key = getStyleKey(props.href), instance = hoistableRoot.querySelector(
@@ -19492,7 +19492,7 @@
               );
               if (instance) {
                 hoistableRoot = instance._p;
-                null !== hoistableRoot && "object" === typeof hoistableRoot && "function" === typeof hoistableRoot.then && (state2.count++, state2 = onUnsuspend.bind(state2), hoistableRoot.then(state2, state2));
+                null !== hoistableRoot && "object" === typeof hoistableRoot && "function" === typeof hoistableRoot.then && (state3.count++, state3 = onUnsuspend.bind(state3), hoistableRoot.then(state3, state3));
                 resource.state.loading |= Inserted;
                 resource.instance = instance;
                 markNodeAsHoistable(instance);
@@ -19511,49 +19511,49 @@
               setInitialProperties(instance, "link", props);
               resource.instance = instance;
             }
-            null === state2.stylesheets && (state2.stylesheets = /* @__PURE__ */ new Map());
-            state2.stylesheets.set(resource, hoistableRoot);
-            (hoistableRoot = resource.state.preload) && (resource.state.loading & Settled) === NotLoaded && (state2.count++, resource = onUnsuspend.bind(state2), hoistableRoot.addEventListener("load", resource), hoistableRoot.addEventListener("error", resource));
+            null === state3.stylesheets && (state3.stylesheets = /* @__PURE__ */ new Map());
+            state3.stylesheets.set(resource, hoistableRoot);
+            (hoistableRoot = resource.state.preload) && (resource.state.loading & Settled) === NotLoaded && (state3.count++, resource = onUnsuspend.bind(state3), hoistableRoot.addEventListener("load", resource), hoistableRoot.addEventListener("error", resource));
           }
         }
-        function waitForCommitToBeReady(state2, timeoutOffset) {
-          state2.stylesheets && 0 === state2.count && insertSuspendedStylesheets(state2, state2.stylesheets);
-          return 0 < state2.count || 0 < state2.imgCount ? function(commit) {
+        function waitForCommitToBeReady(state3, timeoutOffset) {
+          state3.stylesheets && 0 === state3.count && insertSuspendedStylesheets(state3, state3.stylesheets);
+          return 0 < state3.count || 0 < state3.imgCount ? function(commit) {
             var stylesheetTimer = setTimeout(function() {
-              state2.stylesheets && insertSuspendedStylesheets(state2, state2.stylesheets);
-              if (state2.unsuspend) {
-                var unsuspend = state2.unsuspend;
-                state2.unsuspend = null;
+              state3.stylesheets && insertSuspendedStylesheets(state3, state3.stylesheets);
+              if (state3.unsuspend) {
+                var unsuspend = state3.unsuspend;
+                state3.unsuspend = null;
                 unsuspend();
               }
             }, SUSPENSEY_STYLESHEET_TIMEOUT + timeoutOffset);
-            0 < state2.imgBytes && 0 === estimatedBytesWithinLimit && (estimatedBytesWithinLimit = 125 * estimateBandwidth() * SUSPENSEY_IMAGE_TIME_ESTIMATE);
+            0 < state3.imgBytes && 0 === estimatedBytesWithinLimit && (estimatedBytesWithinLimit = 125 * estimateBandwidth() * SUSPENSEY_IMAGE_TIME_ESTIMATE);
             var imgTimer = setTimeout(
               function() {
-                state2.waitingForImages = false;
-                if (0 === state2.count && (state2.stylesheets && insertSuspendedStylesheets(state2, state2.stylesheets), state2.unsuspend)) {
-                  var unsuspend = state2.unsuspend;
-                  state2.unsuspend = null;
+                state3.waitingForImages = false;
+                if (0 === state3.count && (state3.stylesheets && insertSuspendedStylesheets(state3, state3.stylesheets), state3.unsuspend)) {
+                  var unsuspend = state3.unsuspend;
+                  state3.unsuspend = null;
                   unsuspend();
                 }
               },
-              (state2.imgBytes > estimatedBytesWithinLimit ? 50 : SUSPENSEY_IMAGE_TIMEOUT) + timeoutOffset
+              (state3.imgBytes > estimatedBytesWithinLimit ? 50 : SUSPENSEY_IMAGE_TIMEOUT) + timeoutOffset
             );
-            state2.unsuspend = commit;
+            state3.unsuspend = commit;
             return function() {
-              state2.unsuspend = null;
+              state3.unsuspend = null;
               clearTimeout(stylesheetTimer);
               clearTimeout(imgTimer);
             };
           } : null;
         }
-        function checkIfFullyUnsuspended(state2) {
-          if (0 === state2.count && (0 === state2.imgCount || !state2.waitingForImages)) {
-            if (state2.stylesheets)
-              insertSuspendedStylesheets(state2, state2.stylesheets);
-            else if (state2.unsuspend) {
-              var unsuspend = state2.unsuspend;
-              state2.unsuspend = null;
+        function checkIfFullyUnsuspended(state3) {
+          if (0 === state3.count && (0 === state3.imgCount || !state3.waitingForImages)) {
+            if (state3.stylesheets)
+              insertSuspendedStylesheets(state3, state3.stylesheets);
+            else if (state3.unsuspend) {
+              var unsuspend = state3.unsuspend;
+              state3.unsuspend = null;
               unsuspend();
             }
           }
@@ -19566,14 +19566,14 @@
           this.imgCount--;
           checkIfFullyUnsuspended(this);
         }
-        function insertSuspendedStylesheets(state2, resources) {
-          state2.stylesheets = null;
-          null !== state2.unsuspend && (state2.count++, precedencesByRoot = /* @__PURE__ */ new Map(), resources.forEach(insertStylesheetIntoRoot, state2), precedencesByRoot = null, onUnsuspend.call(state2));
+        function insertSuspendedStylesheets(state3, resources) {
+          state3.stylesheets = null;
+          null !== state3.unsuspend && (state3.count++, precedencesByRoot = /* @__PURE__ */ new Map(), resources.forEach(insertStylesheetIntoRoot, state3), precedencesByRoot = null, onUnsuspend.call(state3));
         }
         function insertStylesheetIntoRoot(root2, resource) {
           if (!(resource.state.loading & Inserted)) {
             var precedences = precedencesByRoot.get(root2);
-            if (precedences) var last2 = precedences.get(LAST_PRECEDENCE);
+            if (precedences) var last = precedences.get(LAST_PRECEDENCE);
             else {
               precedences = /* @__PURE__ */ new Map();
               precedencesByRoot.set(root2, precedences);
@@ -19582,19 +19582,19 @@
               ), i = 0; i < nodes.length; i++) {
                 var node = nodes[i];
                 if ("LINK" === node.nodeName || "not all" !== node.getAttribute("media"))
-                  precedences.set(node.dataset.precedence, node), last2 = node;
+                  precedences.set(node.dataset.precedence, node), last = node;
               }
-              last2 && precedences.set(LAST_PRECEDENCE, last2);
+              last && precedences.set(LAST_PRECEDENCE, last);
             }
             nodes = resource.instance;
             node = nodes.getAttribute("data-precedence");
-            i = precedences.get(node) || last2;
-            i === last2 && precedences.set(LAST_PRECEDENCE, nodes);
+            i = precedences.get(node) || last;
+            i === last && precedences.set(LAST_PRECEDENCE, nodes);
             precedences.set(node, nodes);
             this.count++;
-            last2 = onUnsuspend.bind(this);
-            nodes.addEventListener("load", last2);
-            nodes.addEventListener("error", last2);
+            last = onUnsuspend.bind(this);
+            nodes.addEventListener("load", last);
+            nodes.addEventListener("error", last);
             i ? i.parentNode.insertBefore(nodes, i.nextSibling) : (root2 = 9 === root2.nodeType ? root2.head : root2, root2.insertBefore(nodes, root2.firstChild));
             resource.state.loading |= Inserted;
           }
@@ -20216,11 +20216,11 @@
           ));
         }
         "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-        var Scheduler = require_scheduler(), React14 = require_react(), ReactDOM = require_react_dom(), searchTarget = null, searchBoundary = null, assign = Object.assign, REACT_LEGACY_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.element"), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE2 = /* @__PURE__ */ Symbol.for("react.lazy");
+        var Scheduler = require_scheduler(), React13 = require_react(), ReactDOM = require_react_dom(), searchTarget = null, searchBoundary = null, assign = Object.assign, REACT_LEGACY_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.element"), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE2 = /* @__PURE__ */ Symbol.for("react.lazy");
         /* @__PURE__ */ Symbol.for("react.scope");
         var REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden");
         /* @__PURE__ */ Symbol.for("react.tracing_marker");
-        var REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), isArrayImpl = Array.isArray, ReactSharedInternals = React14.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, ReactDOMSharedInternals = ReactDOM.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, NotPending = Object.freeze({
+        var REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), isArrayImpl = Array.isArray, ReactSharedInternals = React13.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, ReactDOMSharedInternals = ReactDOM.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, NotPending = Object.freeze({
           pending: false,
           data: null,
           method: null,
@@ -21800,13 +21800,13 @@
             mountHookTypesDev();
             return mountTransition();
           },
-          useSyncExternalStore: function(subscribe2, getSnapshot2, getServerSnapshot2) {
+          useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
             currentHookNameInDev = "useSyncExternalStore";
             mountHookTypesDev();
             return mountSyncExternalStore(
-              subscribe2,
-              getSnapshot2,
-              getServerSnapshot2
+              subscribe,
+              getSnapshot,
+              getServerSnapshot
             );
           },
           useId: function() {
@@ -21930,13 +21930,13 @@
             updateHookTypesDev();
             return mountTransition();
           },
-          useSyncExternalStore: function(subscribe2, getSnapshot2, getServerSnapshot2) {
+          useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
             currentHookNameInDev = "useSyncExternalStore";
             updateHookTypesDev();
             return mountSyncExternalStore(
-              subscribe2,
-              getSnapshot2,
-              getServerSnapshot2
+              subscribe,
+              getSnapshot,
+              getServerSnapshot
             );
           },
           useId: function() {
@@ -22060,13 +22060,13 @@
             updateHookTypesDev();
             return updateTransition();
           },
-          useSyncExternalStore: function(subscribe2, getSnapshot2, getServerSnapshot2) {
+          useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
             currentHookNameInDev = "useSyncExternalStore";
             updateHookTypesDev();
             return updateSyncExternalStore(
-              subscribe2,
-              getSnapshot2,
-              getServerSnapshot2
+              subscribe,
+              getSnapshot,
+              getServerSnapshot
             );
           },
           useId: function() {
@@ -22190,13 +22190,13 @@
             updateHookTypesDev();
             return rerenderTransition();
           },
-          useSyncExternalStore: function(subscribe2, getSnapshot2, getServerSnapshot2) {
+          useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
             currentHookNameInDev = "useSyncExternalStore";
             updateHookTypesDev();
             return updateSyncExternalStore(
-              subscribe2,
-              getSnapshot2,
-              getServerSnapshot2
+              subscribe,
+              getSnapshot,
+              getServerSnapshot
             );
           },
           useId: function() {
@@ -22337,14 +22337,14 @@
             mountHookTypesDev();
             return mountTransition();
           },
-          useSyncExternalStore: function(subscribe2, getSnapshot2, getServerSnapshot2) {
+          useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
             currentHookNameInDev = "useSyncExternalStore";
             warnInvalidHookAccess();
             mountHookTypesDev();
             return mountSyncExternalStore(
-              subscribe2,
-              getSnapshot2,
-              getServerSnapshot2
+              subscribe,
+              getSnapshot,
+              getServerSnapshot
             );
           },
           useId: function() {
@@ -22492,14 +22492,14 @@
             updateHookTypesDev();
             return updateTransition();
           },
-          useSyncExternalStore: function(subscribe2, getSnapshot2, getServerSnapshot2) {
+          useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
             currentHookNameInDev = "useSyncExternalStore";
             warnInvalidHookAccess();
             updateHookTypesDev();
             return updateSyncExternalStore(
-              subscribe2,
-              getSnapshot2,
-              getServerSnapshot2
+              subscribe,
+              getSnapshot,
+              getServerSnapshot
             );
           },
           useId: function() {
@@ -22647,14 +22647,14 @@
             updateHookTypesDev();
             return rerenderTransition();
           },
-          useSyncExternalStore: function(subscribe2, getSnapshot2, getServerSnapshot2) {
+          useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
             currentHookNameInDev = "useSyncExternalStore";
             warnInvalidHookAccess();
             updateHookTypesDev();
             return updateSyncExternalStore(
-              subscribe2,
-              getSnapshot2,
-              getServerSnapshot2
+              subscribe,
+              getSnapshot,
+              getServerSnapshot
             );
           },
           useId: function() {
@@ -23252,11 +23252,11 @@
               precedence = precedence || "default";
               var resource = styles.get(key);
               if (!resource) {
-                var state2 = { loading: NotLoaded, preload: null };
+                var state3 = { loading: NotLoaded, preload: null };
                 if (resource = ownerDocument.querySelector(
                   getStylesheetSelectorFromKey(key)
                 ))
-                  state2.loading = Loaded | Inserted;
+                  state3.loading = Loaded | Inserted;
                 else {
                   href = assign(
                     {
@@ -23275,19 +23275,19 @@
                     link.onerror = reject;
                   });
                   link.addEventListener("load", function() {
-                    state2.loading |= Loaded;
+                    state3.loading |= Loaded;
                   });
                   link.addEventListener("error", function() {
-                    state2.loading |= Errored;
+                    state3.loading |= Errored;
                   });
-                  state2.loading |= Inserted;
+                  state3.loading |= Inserted;
                   insertStylesheet(resource, precedence, ownerDocument);
                 }
                 resource = {
                   type: "stylesheet",
                   instance: resource,
                   count: 1,
-                  state: state2
+                  state: state3
                 };
                 styles.set(key, resource);
               }
@@ -23412,7 +23412,7 @@
           }
         };
         (function() {
-          var isomorphicReactPackageVersion = React14.version;
+          var isomorphicReactPackageVersion = React13.version;
           if ("19.3.1" !== isomorphicReactPackageVersion)
             throw Error(
               'Incompatible React versions: The "react" and "react-dom" packages must have the exact same version. Instead got:\n  - react:      ' + (isomorphicReactPackageVersion + "\n  - react-dom:  19.3.1\nLearn more: https://react.dev/warnings/version-mismatch")
@@ -23768,18 +23768,18 @@
         function isValidElement2(object) {
           return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
         }
-        var React14 = require_react(), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE2 = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), ReactSharedInternals = React14.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
+        var React13 = require_react(), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE2 = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), ReactSharedInternals = React13.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
           return null;
         };
-        React14 = {
+        React13 = {
           react_stack_bottom_frame: function(callStackForError) {
             return callStackForError();
           }
         };
         var specialPropKeyWarningShown;
         var didWarnAboutElementRef = {};
-        var unknownOwnerDebugStack = React14.react_stack_bottom_frame.bind(
-          React14,
+        var unknownOwnerDebugStack = React13.react_stack_bottom_frame.bind(
+          React13,
           UnknownOwner
         )();
         var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
@@ -23835,163 +23835,8 @@
     }
   });
 
-  // node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js
-  var require_use_sync_external_store_shim_development = __commonJS({
-    "node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js"(exports) {
-      "use strict";
-      (function() {
-        function is(x, y) {
-          return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
-        }
-        function useSyncExternalStore$2(subscribe2, getSnapshot2) {
-          didWarnOld18Alpha || void 0 === React14.startTransition || (didWarnOld18Alpha = true, console.error(
-            "You are using an outdated, pre-release alpha of React 18 that does not support useSyncExternalStore. The use-sync-external-store shim will not work correctly. Upgrade to a newer pre-release."
-          ));
-          var value = getSnapshot2();
-          if (!didWarnUncachedGetSnapshot) {
-            var cachedValue = getSnapshot2();
-            objectIs(value, cachedValue) || (console.error(
-              "The result of getSnapshot should be cached to avoid an infinite loop"
-            ), didWarnUncachedGetSnapshot = true);
-          }
-          cachedValue = useState5({
-            inst: { value, getSnapshot: getSnapshot2 }
-          });
-          var inst = cachedValue[0].inst, forceUpdate = cachedValue[1];
-          useLayoutEffect(
-            function() {
-              inst.value = value;
-              inst.getSnapshot = getSnapshot2;
-              checkIfSnapshotChanged(inst) && forceUpdate({ inst });
-            },
-            [subscribe2, value, getSnapshot2]
-          );
-          useEffect6(
-            function() {
-              checkIfSnapshotChanged(inst) && forceUpdate({ inst });
-              return subscribe2(function() {
-                checkIfSnapshotChanged(inst) && forceUpdate({ inst });
-              });
-            },
-            [subscribe2]
-          );
-          useDebugValue(value);
-          return value;
-        }
-        function checkIfSnapshotChanged(inst) {
-          var latestGetSnapshot = inst.getSnapshot;
-          inst = inst.value;
-          try {
-            var nextValue = latestGetSnapshot();
-            return !objectIs(inst, nextValue);
-          } catch (error) {
-            return true;
-          }
-        }
-        function useSyncExternalStore$1(subscribe2, getSnapshot2) {
-          return getSnapshot2();
-        }
-        "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-        var React14 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState5 = React14.useState, useEffect6 = React14.useEffect, useLayoutEffect = React14.useLayoutEffect, useDebugValue = React14.useDebugValue, didWarnOld18Alpha = false, didWarnUncachedGetSnapshot = false, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
-        exports.useSyncExternalStore = void 0 !== React14.useSyncExternalStore ? React14.useSyncExternalStore : shim;
-        "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
-      })();
-    }
-  });
-
-  // node_modules/use-sync-external-store/shim/index.js
-  var require_shim = __commonJS({
-    "node_modules/use-sync-external-store/shim/index.js"(exports, module) {
-      "use strict";
-      if (false) {
-        module.exports = null;
-      } else {
-        module.exports = require_use_sync_external_store_shim_development();
-      }
-    }
-  });
-
-  // node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js
-  var require_with_selector_development = __commonJS({
-    "node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js"(exports) {
-      "use strict";
-      (function() {
-        function is(x, y) {
-          return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
-        }
-        "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-        var React14 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore3 = shim.useSyncExternalStore, useRef4 = React14.useRef, useEffect6 = React14.useEffect, useMemo2 = React14.useMemo, useDebugValue = React14.useDebugValue;
-        exports.useSyncExternalStoreWithSelector = function(subscribe2, getSnapshot2, getServerSnapshot2, selector, isEqual) {
-          var instRef = useRef4(null);
-          if (null === instRef.current) {
-            var inst = { hasValue: false, value: null };
-            instRef.current = inst;
-          } else inst = instRef.current;
-          instRef = useMemo2(
-            function() {
-              function memoizedSelector(nextSnapshot) {
-                if (!hasMemo) {
-                  hasMemo = true;
-                  memoizedSnapshot = nextSnapshot;
-                  nextSnapshot = selector(nextSnapshot);
-                  if (void 0 !== isEqual && inst.hasValue) {
-                    var currentSelection = inst.value;
-                    if (isEqual(currentSelection, nextSnapshot))
-                      return memoizedSelection = currentSelection;
-                  }
-                  return memoizedSelection = nextSnapshot;
-                }
-                currentSelection = memoizedSelection;
-                if (objectIs(memoizedSnapshot, nextSnapshot))
-                  return currentSelection;
-                var nextSelection = selector(nextSnapshot);
-                if (void 0 !== isEqual && isEqual(currentSelection, nextSelection))
-                  return memoizedSnapshot = nextSnapshot, currentSelection;
-                memoizedSnapshot = nextSnapshot;
-                return memoizedSelection = nextSelection;
-              }
-              var hasMemo = false, memoizedSnapshot, memoizedSelection, maybeGetServerSnapshot = void 0 === getServerSnapshot2 ? null : getServerSnapshot2;
-              return [
-                function() {
-                  return memoizedSelector(getSnapshot2());
-                },
-                null === maybeGetServerSnapshot ? void 0 : function() {
-                  return memoizedSelector(maybeGetServerSnapshot());
-                }
-              ];
-            },
-            [getSnapshot2, getServerSnapshot2, selector, isEqual]
-          );
-          var value = useSyncExternalStore3(subscribe2, instRef[0], instRef[1]);
-          useEffect6(
-            function() {
-              inst.hasValue = true;
-              inst.value = value;
-            },
-            [value]
-          );
-          useDebugValue(value);
-          return value;
-        };
-        "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
-      })();
-    }
-  });
-
-  // node_modules/use-sync-external-store/shim/with-selector.js
-  var require_with_selector = __commonJS({
-    "node_modules/use-sync-external-store/shim/with-selector.js"(exports, module) {
-      "use strict";
-      if (false) {
-        module.exports = null;
-      } else {
-        module.exports = require_with_selector_development();
-      }
-    }
-  });
-
   // fixture/invitation-card-entry.tsx
-  var import_react7 = __toESM(require_react(), 1);
+  var import_react5 = __toESM(require_react(), 1);
   var import_client2 = __toESM(require_client(), 1);
 
   // node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js
@@ -25022,10 +24867,10 @@
     * user manually trigger a loading/error state or edit the cached data.
     * @param state - The partial state to merge into the query's state.
     */
-    setState(state2) {
+    setState(state3) {
       this.#dispatch({
         type: "setState",
-        state: state2
+        state: state3
       });
     }
     /**
@@ -25374,35 +25219,35 @@
       }
     }
     #dispatch(action) {
-      const reducer = (state2) => {
+      const reducer = (state3) => {
         switch (action.type) {
           case "failed":
             return {
-              ...state2,
+              ...state3,
               fetchFailureCount: action.failureCount,
               fetchFailureReason: action.error
             };
           case "pause":
             return {
-              ...state2,
+              ...state3,
               fetchStatus: "paused"
             };
           case "continue":
             return {
-              ...state2,
+              ...state3,
               fetchStatus: "fetching"
             };
           case "fetch":
             return {
-              ...state2,
-              ...fetchState(state2.data, this.options),
+              ...state3,
+              ...fetchState(state3.data, this.options),
               fetchMeta: action.meta ?? null
             };
           case "success":
             const newState = {
-              ...state2,
+              ...state3,
               ...successState(action.data, action.dataUpdatedAt),
-              dataUpdateCount: state2.dataUpdateCount + 1,
+              dataUpdateCount: state3.dataUpdateCount + 1,
               ...!action.manual && {
                 fetchStatus: "idle",
                 fetchFailureCount: 0,
@@ -25414,11 +25259,11 @@
           case "error":
             const error = action.error;
             return {
-              ...state2,
+              ...state3,
               error,
-              errorUpdateCount: state2.errorUpdateCount + 1,
+              errorUpdateCount: state3.errorUpdateCount + 1,
               errorUpdatedAt: Date.now(),
-              fetchFailureCount: state2.fetchFailureCount + 1,
+              fetchFailureCount: state3.fetchFailureCount + 1,
               fetchFailureReason: error,
               fetchStatus: "idle",
               status: "error",
@@ -25426,12 +25271,12 @@
             };
           case "invalidate":
             return {
-              ...state2,
+              ...state3,
               isInvalidated: true
             };
           case "setState":
             return {
-              ...state2,
+              ...state3,
               ...action.state
             };
         }
@@ -25790,8 +25635,8 @@
       const prevResultState = this.#currentResultState;
       const prevResultOptions = this.#currentResultOptions;
       const queryInitialState = query !== prevQuery ? query.state : this.#currentQueryInitialState;
-      const { state: state2 } = query;
-      let newState = { ...state2 };
+      const { state: state3 } = query;
+      let newState = { ...state3 };
       let isPlaceholderData = false;
       let data;
       if (options._optimisticResults) {
@@ -25800,7 +25645,7 @@
         const fetchOptionally = mounted && shouldFetchOptionally(query, prevQuery, options, prevOptions);
         if (fetchOnMount || fetchOptionally) newState = {
           ...newState,
-          ...fetchState(state2.data, query.options)
+          ...fetchState(state3.data, query.options)
         };
         if (options._optimisticResults === "isRestoring") newState.fetchStatus = "idle";
       }
@@ -26162,27 +26007,27 @@
       }
     }
     #dispatch(action) {
-      const reducer = (state2) => {
+      const reducer = (state3) => {
         switch (action.type) {
           case "failed":
             return {
-              ...state2,
+              ...state3,
               failureCount: action.failureCount,
               failureReason: action.error
             };
           case "pause":
             return {
-              ...state2,
+              ...state3,
               isPaused: true
             };
           case "continue":
             return {
-              ...state2,
+              ...state3,
               isPaused: false
             };
           case "pending":
             return {
-              ...state2,
+              ...state3,
               context: action.context,
               data: void 0,
               failureCount: 0,
@@ -26195,7 +26040,7 @@
             };
           case "success":
             return {
-              ...state2,
+              ...state3,
               data: action.data,
               failureCount: 0,
               failureReason: null,
@@ -26205,10 +26050,10 @@
             };
           case "error":
             return {
-              ...state2,
+              ...state3,
               data: void 0,
               error: action.error,
-              failureCount: state2.failureCount + 1,
+              failureCount: state3.failureCount + 1,
               failureReason: action.error,
               isPaused: false,
               status: "error"
@@ -26263,13 +26108,13 @@
     * @param state - The initial state of the mutation, e.g. when restoring a dehydrated mutation.
     * @returns The new mutation, already added to the cache.
     */
-    build(client, options, state2) {
+    build(client, options, state3) {
       const mutation = new Mutation({
         client,
         mutationCache: this,
         mutationId: ++this.#mutationId,
         options: client.defaultMutationOptions(options),
-        state: state2
+        state: state3
       });
       this.add(mutation);
       return mutation;
@@ -26571,13 +26416,13 @@
       return this.#currentMutation.execute(variables);
     }
     #updateResult() {
-      const state2 = this.#currentMutation?.state ?? getDefaultState2();
+      const state3 = this.#currentMutation?.state ?? getDefaultState2();
       this.#currentResult = {
-        ...state2,
-        isPending: state2.status === "pending",
-        isSuccess: state2.status === "success",
-        isError: state2.status === "error",
-        isIdle: state2.status === "idle",
+        ...state3,
+        isPending: state3.status === "pending",
+        isSuccess: state3.status === "success",
+        isError: state3.status === "error",
+        isIdle: state3.status === "idle",
         mutate: this.mutate,
         reset: this.reset
       };
@@ -26653,7 +26498,7 @@
     * })
     * ```
     */
-    build(client, options, state2) {
+    build(client, options, state3) {
       const queryKey = options.queryKey;
       const queryHash = options.queryHash ?? hashQueryKeyByOptions(queryKey, options);
       let query = this.get(queryHash);
@@ -26663,7 +26508,7 @@
           queryKey,
           queryHash,
           options: client.defaultQueryOptions(options),
-          state: state2,
+          state: state3,
           defaultOptions: client.getQueryDefaults(queryKey)
         });
         this.add(query);
@@ -26983,8 +26828,8 @@
     * ```
     */
     getQueriesData(filters) {
-      return this.#queryCache.findAll(filters).map(({ queryKey, state: state2 }) => {
-        return [queryKey, state2.data];
+      return this.#queryCache.findAll(filters).map(({ queryKey, state: state3 }) => {
+        return [queryKey, state3.data];
       });
     }
     /**
@@ -27694,744 +27539,13 @@
     };
   }
 
-  // node_modules/@tanstack/router-core/dist/esm/isServer/client.js
-  var isServer3 = false;
-
-  // node_modules/@tanstack/router-core/dist/esm/utils.js
-  function last(arr) {
-    return arr[arr.length - 1];
-  }
-  function functionalUpdate2(updater, previous) {
-    if (typeof updater === "function") return updater(previous);
-    return updater;
-  }
-  var hasOwn2 = Object.prototype.hasOwnProperty;
-  var createNull = () => /* @__PURE__ */ Object.create(null);
-  function replaceEqualDeep2(prev, next, _nullProto, _depth = 0) {
-    if (isServer3) return next;
-    if (prev === next) return prev;
-    if (_depth++ > 500) return next;
-    const array = Array.isArray(prev) && Array.isArray(next);
-    if (!array && !(isPlainObject2(prev) && isPlainObject2(next))) return next;
-    const prevKeys = Object.keys(prev);
-    const previousCount = prevKeys.length;
-    const nextKeys = Object.keys(next);
-    const length = nextKeys.length;
-    if (array ? previousCount !== prev.length || length !== next.length || previousCount && last(prevKeys) !== `${previousCount - 1}` || length && last(nextKeys) !== `${length - 1}` : previousCount !== Object.getOwnPropertyNames(prev).length || length !== Object.getOwnPropertyNames(next).length || Object.getOwnPropertySymbols(next).length) return next;
-    let i = 0;
-    let child;
-    let previous;
-    let key;
-    if (array) {
-      for (; i < length; i++) {
-        key = i;
-        previous = prev[key];
-        child = next[key];
-        child = previous === child ? previous : typeof previous === "object" ? replaceEqualDeep2(previous, child, _nullProto, _depth) : child;
-        if (child !== previous) break;
-      }
-      if (i === length && previousCount === length) return prev;
-    } else {
-      let equal = previousCount === length;
-      let unchanged = true;
-      for (; i < length; i++) {
-        key = nextKeys[i];
-        previous = prev[key];
-        const incoming = next[key];
-        child = previous === incoming ? previous : typeof previous === "object" ? replaceEqualDeep2(previous, incoming, _nullProto, _depth) : incoming;
-        equal &&= child === previous && (prevKeys[i] === key || hasOwn2.call(prev, key));
-        unchanged &&= Object.is(child, incoming);
-        prevKeys[i] = child;
-      }
-      if (equal) return Object.getOwnPropertySymbols(prev).length ? next : prev;
-      if (unchanged) return next;
-    }
-    const copy = array ? nextKeys.fill(0) : _nullProto ? createNull() : {};
-    for (let j = 0; j < length; j++) {
-      key = array ? j : nextKeys[j];
-      if (array) {
-        previous = prev[key];
-        if (j > i) {
-          child = next[key];
-          child = previous === child ? previous : typeof previous === "object" ? replaceEqualDeep2(previous, child, _nullProto, _depth) : child;
-        }
-        copy[key] = j < i ? previous : child;
-      } else copy[key] = prevKeys[j];
-    }
-    return copy;
-  }
-  function isPlainObject2(o) {
-    if (!o || typeof o !== "object") return false;
-    return (Object.getPrototypeOf(o)?.constructor ?? Object) === Object;
-  }
-  function deepEqual(a, b, partial, explicitUndefined) {
-    if (a === b) return true;
-    if (Array.isArray(a) && Array.isArray(b)) {
-      if (a.length !== b.length) return false;
-      for (let i = 0, l = a.length; i < l; i++) {
-        const av = a[i];
-        const bv = b[i];
-        if (av !== bv && !deepEqual(av, bv, partial, explicitUndefined)) return false;
-      }
-      return true;
-    }
-    if (isPlainObject2(a) && isPlainObject2(b)) {
-      if (partial) {
-        for (const k in b) if (explicitUndefined || b[k] !== void 0) {
-          if (!deepEqual(a[k], b[k], partial, explicitUndefined)) return false;
-        }
-        return true;
-      }
-      let aCount = 0;
-      if (explicitUndefined) aCount = Object.keys(a).length;
-      else for (const k in a) if (a[k] !== void 0) aCount++;
-      for (const k in b) if (explicitUndefined || b[k] !== void 0) {
-        if (aCount-- === 0 || !deepEqual(a[k], b[k], partial, explicitUndefined)) return false;
-      }
-      return aCount === 0;
-    }
-    return false;
-  }
-  function getUrlScheme(url) {
-    if (url[0] === "/") return;
-    if (!url.includes(":")) return;
-    return /^[\x00-\x20]*([a-z][a-z\d+.\t\n\r-]*:)/i.exec(url)?.[1]?.replace(/[\t\n\r]/g, "").toLowerCase();
-  }
-  var protocolRelativePrefixRegex = /^[\x00-\x20]*[\\/][\t\n\r]*[\\/]/;
-  function isDangerousProtocol(url, allowlist) {
-    if (!url) return false;
-    if (protocolRelativePrefixRegex.test(url)) return true;
-    const scheme = getUrlScheme(url);
-    return scheme ? !allowlist.has(scheme) : false;
-  }
-
-  // node_modules/@tanstack/router-core/dist/esm/invariant.js
-  function invariant() {
-    throw new Error("Invariant failed");
-  }
-
-  // node_modules/@tanstack/router-core/dist/esm/path.js
-  function cleanPath(path) {
-    return path.replace(/\/{2,}/g, "/");
-  }
-  function trimPathLeft(path) {
-    return path === "/" ? path : path.replace(/^\/+/, "");
-  }
-  function trimPathRight(path) {
-    const len = path.length;
-    return len > 1 && path[len - 1] === "/" ? path.replace(/\/+$/, "") : path;
-  }
-  function removeTrailingSlash(value, basepath) {
-    if (value?.endsWith("/") && value !== "/" && value !== `${basepath}/`) return value.slice(0, -1);
-    return value;
-  }
-
-  // node_modules/@tanstack/router-core/dist/esm/root.js
-  var rootRouteId = "__root__";
-
-  // node_modules/@tanstack/router-core/dist/esm/redirect.js
-  function redirect(opts) {
-    opts.statusCode = opts.statusCode || opts.code || 307;
-    const headers = new Headers(opts.headers);
-    if (opts.href && headers.get("Location") === null) headers.set("Location", opts.href);
-    const response = new Response(null, {
-      status: opts.statusCode,
-      headers
-    });
-    response.options = opts;
-    if (opts.throw) throw response;
-    return response;
-  }
-
-  // node_modules/@tanstack/router-core/dist/esm/link.js
-  var preloadWarning = "Error preloading route! \u261D\uFE0F";
-
-  // node_modules/@tanstack/router-core/dist/esm/route.js
-  var BaseRoute = class {
-    get to() {
-      return this._to;
-    }
-    get id() {
-      return this._id;
-    }
-    get path() {
-      return this._path;
-    }
-    get fullPath() {
-      return this._fullPath;
-    }
-    constructor(options) {
-      this.init = (originalIndex) => {
-        this.originalIndex = originalIndex;
-        this._branch = void 0;
-        const options2 = this.options;
-        const isRoot = !options2?.path && !options2?.id;
-        this.parentRoute = this.options.getParentRoute?.();
-        if (isRoot) this._path = rootRouteId;
-        else if (!this.parentRoute) {
-          if (true) throw new Error(`Invariant failed: Child Route instances must pass a 'getParentRoute: () => ParentRoute' option that returns a Route instance.`);
-          invariant();
-        }
-        let path = isRoot ? rootRouteId : options2?.path;
-        if (path && path !== "/") path = trimPathLeft(path);
-        const customId = options2?.id || path;
-        const id = isRoot ? rootRouteId : cleanPath((this.parentRoute.id === "__root__" ? "" : this.parentRoute.id) + "/" + (customId ?? ""));
-        if (path === "__root__") path = "/";
-        const fullPath = id === "__root__" ? "/" : path === void 0 ? this.parentRoute.fullPath : cleanPath(this.parentRoute.fullPath + "/" + path);
-        this._path = path;
-        this._id = id;
-        this._fullPath = fullPath;
-        this._to = trimPathRight(fullPath);
-      };
-      this.addChildren = (children) => {
-        return this._addFileChildren(children);
-      };
-      this._addFileChildren = (children) => {
-        if (Array.isArray(children)) this.children = children;
-        if (typeof children === "object" && children !== null) this.children = Object.values(children);
-        return this;
-      };
-      this._addFileTypes = () => {
-        return this;
-      };
-      this.updateLoader = (options2) => {
-        Object.assign(this.options, options2);
-        return this;
-      };
-      this.update = (options2) => {
-        Object.assign(this.options, options2);
-        return this;
-      };
-      this.lazy = (lazyFn) => {
-        this.lazyFn = lazyFn;
-        return this;
-      };
-      this.redirect = (opts) => redirect({
-        from: this.fullPath,
-        ...opts
-      });
-      this.options = options || {};
-      this.isRoot = !options?.getParentRoute;
-      if (options?.id && options?.path) throw new Error(`Route cannot have both an 'id' and a 'path' option.`);
-    }
-  };
-
-  // node_modules/@tanstack/react-router/dist/esm/ClientOnly.js
+  // fixture/router-mock.ts
   var import_react = __toESM(require_react(), 1);
-  var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
-  var getSnapshot = () => true;
-  var getServerSnapshot = () => false;
-  function useHydrated(enabled = true) {
-    return import_react.default.useSyncExternalStore(subscribe, getSnapshot, enabled ? getServerSnapshot : getSnapshot);
-  }
-  function subscribe() {
-    return () => {
-    };
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/routerContext.js
-  var React$1 = __toESM(require_react(), 1);
-  var routerContext = React$1.createContext(null);
-
-  // node_modules/@tanstack/react-router/dist/esm/useRouter.js
-  var React$12 = __toESM(require_react(), 1);
-  function useRouter(opts) {
-    const value = React$12.useContext(routerContext);
-    if (!value) warnMissingRouter(opts);
-    return value;
-  }
-  function warnMissingRouter(opts) {
-    if (opts?.warn ?? true) console.warn("Warning: useRouter must be used inside a <RouterProvider> component!");
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/matchContext.js
-  var React$13 = __toESM(require_react(), 1);
-  var matchContext = React$13.createContext(void 0);
-  var dummyMatchContext = React$13.createContext(void 0);
-
-  // node_modules/@tanstack/react-router/dist/esm/useMatch.js
-  var React$14 = __toESM(require_react(), 1);
-
-  // node_modules/@tanstack/react-store/dist/useSelector.js
-  var import_react2 = __toESM(require_react(), 1);
-  var import_with_selector = __toESM(require_with_selector(), 1);
-  function defaultCompare(a, b) {
-    return a === b;
-  }
-  function useSelector(source, selector = (s) => s, options) {
-    const compare = options?.compare ?? defaultCompare;
-    const subscribe2 = (0, import_react2.useCallback)((handleStoreChange) => {
-      const { unsubscribe } = source.subscribe(handleStoreChange);
-      return unsubscribe;
-    }, [source]);
-    const getSnapshot2 = (0, import_react2.useCallback)(() => source.get(), [source]);
-    return (0, import_with_selector.useSyncExternalStoreWithSelector)(subscribe2, getSnapshot2, getSnapshot2, selector, compare);
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/useMatch.js
-  var dummyMatch = {};
-  function useStructuralSharing(opts, router) {
-    const previousResult = React$14.useRef();
-    return (slice) => {
-      const selected = opts?.select ? opts.select(slice) : slice;
-      if (opts?.structuralSharing ?? router.options.defaultStructuralSharing) return previousResult.current = replaceEqualDeep2(previousResult.current, selected);
-      return selected;
-    };
-  }
-  function useMatch(opts) {
-    const router = useRouter();
-    const nearestRouteId = React$14.useContext(opts.from ? dummyMatchContext : matchContext);
-    const routeId = opts.from ?? nearestRouteId;
-    const matchStore = router.stores.getMatchStore(routeId);
-    if (isServer3 ?? router.isServer) {
-      const match2 = matchStore.get();
-      if (!match2) {
-        if (opts.shouldThrow ?? true) {
-          if (true) throw new Error(`Invariant failed: Could not find ${opts.from ? `an active match from "${opts.from}"` : "a nearest match!"}`);
-          invariant();
-        }
-        return;
-      }
-      return opts.select ? opts.select(match2) : match2;
-    }
-    const selector = useStructuralSharing(opts, router);
-    const matchSelection = useSelector(matchStore, (match2) => match2 ? selector(match2) : dummyMatch);
-    if (matchSelection !== dummyMatch) return matchSelection;
-    if (opts.shouldThrow ?? true) {
-      if (true) throw new Error(`Invariant failed: Could not find ${opts.from ? `an active match from "${opts.from}"` : "a nearest match!"}`);
-      invariant();
-    }
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/useLoaderData.js
-  function useLoaderData(opts) {
-    return useMatch({
-      from: opts.from,
-      strict: opts.strict,
-      structuralSharing: opts.structuralSharing,
-      select: (match2) => {
-        return opts.select ? opts.select(match2.loaderData) : match2.loaderData;
-      }
-    });
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/useLoaderDeps.js
-  function useLoaderDeps(opts) {
-    const { select, ...rest } = opts;
-    return useMatch({
-      ...rest,
-      select: (match2) => {
-        return select ? select(match2.loaderDeps) : match2.loaderDeps;
-      }
-    });
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/useParams.js
-  function useParams(opts) {
-    return useMatch({
-      from: opts.from,
-      shouldThrow: opts.shouldThrow,
-      structuralSharing: opts.structuralSharing,
-      strict: opts.strict,
-      select: (match2) => {
-        const params = opts.strict === false ? match2.params : match2._strictParams;
-        return opts.select ? opts.select(params) : params;
-      }
-    });
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/useSearch.js
-  function useSearch(opts) {
-    return useMatch({
-      from: opts.from,
-      strict: opts.strict,
-      shouldThrow: opts.shouldThrow,
-      structuralSharing: opts.structuralSharing,
-      select: (match2) => {
-        return opts.select ? opts.select(match2.search) : match2.search;
-      }
-    });
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/useNavigate.js
-  var React$15 = __toESM(require_react(), 1);
-  function useNavigate(_defaultOpts) {
-    const router = useRouter();
-    return React$15.useCallback((options) => {
-      return router.navigate({
-        ...options,
-        from: options.from ?? _defaultOpts?.from
-      });
-    }, [_defaultOpts?.from, router]);
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/useRouteContext.js
-  function useRouteContext(opts) {
-    return useMatch({
-      ...opts,
-      select: (match2) => opts.select ? opts.select(match2.context) : match2.context
-    });
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/link.js
-  var React$16 = __toESM(require_react(), 1);
-  var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
-  function useStableValues(...values) {
-    const ref = React$16.useRef(values);
-    const stable = ref.current;
-    values.forEach((value, index) => {
-      if (!deepEqual(stable[index], value, false, true)) stable[index] = value;
-    });
-    return ref.current;
-  }
-  function preloadLink(router, options) {
-    router.preloadRoute(options).catch((err) => {
-      console.warn(err);
-      console.warn(preloadWarning);
-    });
-  }
-  var LINK_SELECTOR_OPTIONS = { compare: (a, b) => a[0] === b[0] && a[1] === b[1] };
-  function resolveExternalLink(to, protocolAllowlist) {
-    const scheme = typeof to === "string" && getUrlScheme(to);
-    if (!scheme) return;
-    if (!protocolAllowlist.has(scheme)) {
-      if (true) console.warn(`Blocked Link with dangerous protocol: ${to}`);
-      return null;
-    }
-    return to;
-  }
-  function resolveIsActive(location2, next, activeOptions, basepath, isHydrated) {
-    const currentPath = removeTrailingSlash(location2.pathname, basepath);
-    const nextPath = removeTrailingSlash(next.pathname, basepath);
-    if (activeOptions?.exact ? currentPath !== nextPath : !(currentPath.startsWith(nextPath) && (currentPath.length === nextPath.length || currentPath[nextPath.length] === "/"))) return false;
-    if (activeOptions?.includeSearch ?? true) {
-      if (!deepEqual(location2.search, next.search, !activeOptions?.exact, activeOptions?.explicitUndefined)) return false;
-    }
-    if (activeOptions?.includeHash) return isHydrated && location2.hash === next.hash;
-    return true;
-  }
-  function useLinkProps(options, forwardedRef, host) {
-    const router = useRouter();
-    if (isServer3 ?? router.isServer) return getServerLinkProps(router, options, forwardedRef, host);
-    const innerRef = React$16.useRef(null);
-    const mergedRef = React$16.useCallback((element) => {
-      innerRef.current = element;
-      if (typeof forwardedRef === "function") return forwardedRef(element);
-      if (forwardedRef) forwardedRef.current = element;
-    }, [forwardedRef]);
-    const { activeOptions, to, preload: userPreload, preloadDelay: userPreloadDelay, hashScrollIntoView, replace, startTransition, resetScroll, viewTransition, ignoreBlocker, disabled, target, onClick, onBlur, onFocus, onMouseEnter, onMouseLeave, onTouchStart } = options;
-    const isHydrated = useHydrated(!!activeOptions?.includeHash);
-    const [stableSearch, stableParams, stableActiveOptions] = useStableValues(options.search, options.params, activeOptions);
-    const [_options, dest] = React$16.useMemo(() => [options, { ...options }], [
-      router,
-      options.from,
-      options._fromLocation,
-      options.hash,
-      options.to,
-      stableSearch,
-      stableParams,
-      options.state,
-      options.mask,
-      options.unsafeRelative
-    ]);
-    const selectLinkState = React$16.useMemo(() => {
-      const directExternalLink = resolveExternalLink(to, router.protocolAllowlist);
-      if (directExternalLink !== void 0) {
-        const state2 = [directExternalLink ?? void 0];
-        return () => state2;
-      }
-      let inactive;
-      let active;
-      return (location2) => {
-        if (!_options._fromLocation) dest._fromLocation = location2;
-        const next = router.buildLocation(dest);
-        const href2 = getHrefOption(next, router, disabled);
-        if (!inactive || inactive[0] !== href2) {
-          inactive = [href2, !(disabled || href2 && !getUrlScheme(href2)) && void 0];
-          active = [href2, true];
-        }
-        return inactive[1] !== void 0 && resolveIsActive(location2, next, stableActiveOptions, router.basepath, isHydrated) ? active : inactive;
-      };
-    }, [
-      stableActiveOptions,
-      disabled,
-      isHydrated,
-      _options,
-      dest,
-      router,
-      to
-    ]);
-    const [href, isActive] = useSelector(router.stores.location, selectLinkState, LINK_SELECTOR_OPTIONS);
-    const externalLink = isActive === void 0 && href;
-    const linkDisabled = disabled || href === void 0;
-    const hasRenderFetched = React$16.useRef(false);
-    const preload = options.reloadDocument || externalLink || linkDisabled ? false : userPreload ?? router.options.defaultPreload;
-    const preloadDelay = userPreloadDelay ?? router.options.defaultPreloadDelay ?? 0;
-    const enqueuePreload = React$16.useCallback((e) => {
-      const isIntersecting = e?.isIntersecting;
-      if (!(isIntersecting ?? preload === "intent")) {
-        if (isIntersecting === false) cancelPreload(innerRef);
-        return;
-      }
-      if (!preloadDelay) {
-        preloadLink(router, _options);
-        return;
-      }
-      if (timeoutMap.has(innerRef)) return;
-      timeoutMap.set(innerRef, setTimeout(() => {
-        timeoutMap.delete(innerRef);
-        preloadLink(router, _options);
-      }, preloadDelay));
-    }, [
-      router,
-      _options,
-      innerRef,
-      preload,
-      preloadDelay
-    ]);
-    React$16.useEffect(() => {
-      if (!preload) return;
-      if (preload === "render" && !hasRenderFetched.current) {
-        hasRenderFetched.current = true;
-        preloadLink(router, _options);
-      }
-      let active = true;
-      let observer;
-      if (preload === "viewport" && innerRef.current && typeof IntersectionObserver === "function") {
-        observer = new IntersectionObserver((entries) => {
-          if (active) enqueuePreload(entries.pop());
-        }, { rootMargin: "100px" });
-        observer.observe(innerRef.current);
-      }
-      return () => {
-        active = false;
-        observer?.disconnect();
-        cancelPreload(innerRef);
-      };
-    }, [
-      router,
-      _options,
-      preload,
-      enqueuePreload,
-      innerRef
-    ]);
-    const props = collectElementProps(options, host);
-    props.ref = forwardedRef ? mergedRef : innerRef;
-    if (externalLink) {
-      props.href = externalLink;
-      return props;
-    }
-    const handleClick = (e) => {
-      const effectiveTarget = target ?? e.currentTarget.getAttribute("target");
-      if (!linkDisabled && !(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) && !e.defaultPrevented && (!effectiveTarget || effectiveTarget === "_self") && e.button === 0) {
-        e.preventDefault();
-        router.navigate({
-          ..._options,
-          replace,
-          resetScroll,
-          hashScrollIntoView,
-          startTransition,
-          viewTransition,
-          ignoreBlocker
-        });
-      }
-    };
-    const handleTouchStart = () => {
-      if (preload === "intent") preloadLink(router, _options);
-    };
-    const handleLeave = () => {
-      if (preload === "intent") cancelPreload(innerRef);
-    };
-    props.onClick = composeHandlers(onClick, handleClick);
-    props.onBlur = composeHandlers(onBlur, handleLeave);
-    props.onFocus = composeHandlers(onFocus, enqueuePreload);
-    props.onMouseEnter = composeHandlers(onMouseEnter, enqueuePreload);
-    props.onMouseLeave = composeHandlers(onMouseLeave, handleLeave);
-    props.onTouchStart = composeHandlers(onTouchStart, handleTouchStart);
-    return applyLinkState(props, options, isActive, href, linkDisabled, host);
-  }
-  var STATIC_EMPTY_OBJECT = {};
-  var STATIC_ACTIVE_OBJECT = { className: "active" };
-  var ROUTER_OPTION_KEYS = /* @__PURE__ */ new Set([
-    "to",
-    "params",
-    "search",
-    "hash",
-    "state",
-    "mask",
-    "from",
-    "unsafeRelative",
-    "_fromLocation",
-    "reloadDocument",
-    "preload",
-    "preloadDelay",
-    "preloadIntentProximity",
-    "hashScrollIntoView",
-    "replace",
-    "startTransition",
-    "resetScroll",
-    "viewTransition",
-    "ignoreBlocker",
-    "activeProps",
-    "inactiveProps",
-    "activeOptions",
-    "_asChild"
-  ]);
-  function collectElementProps(options, host) {
-    const props = {};
-    for (const key in options) {
-      if (ROUTER_OPTION_KEYS.has(key) || key === "type" && host !== void 0 || key === "disabled" && host === "a") continue;
-      props[key] = options[key];
-    }
-    return props;
-  }
-  function applyLinkState(props, options, isActive, href, linkDisabled, host) {
-    const { activeProps, inactiveProps, className, style, target } = options;
-    const stateProps = functionalUpdate2(isActive ? activeProps : inactiveProps, {}) ?? (isActive ? STATIC_ACTIVE_OBJECT : STATIC_EMPTY_OBJECT);
-    Object.assign(props, stateProps);
-    props.href = href;
-    if (host !== "a") props.disabled = linkDisabled;
-    props.target = target;
-    const stateStyle = stateProps.style;
-    if (style || stateStyle) props.style = style && stateStyle ? {
-      ...style,
-      ...stateStyle
-    } : style || stateStyle;
-    const stateClassName = stateProps.className;
-    if (className || stateClassName) props.className = className ? stateClassName ? `${className} ${stateClassName}` : className : stateClassName;
-    if (linkDisabled) {
-      props.role = "link";
-      props["aria-disabled"] = true;
-    }
-    if (isActive) {
-      props["data-status"] = "active";
-      props["aria-current"] = "page";
-    }
-    return props;
-  }
-  function getServerLinkProps(router, options, forwardedRef, host) {
-    const { to, disabled, activeOptions } = options;
-    const directExternalLink = resolveExternalLink(to, router.protocolAllowlist);
-    const next = directExternalLink === void 0 ? router.buildLocation(options) : void 0;
-    const hrefOption = next ? getHrefOption(next, router, disabled) : directExternalLink ?? void 0;
-    const linkDisabled = disabled || !hrefOption;
-    const externalLink = directExternalLink ?? (hrefOption && getUrlScheme(hrefOption) ? hrefOption : void 0);
-    const props = collectElementProps(options, host);
-    props.ref = forwardedRef;
-    if (externalLink) {
-      props.href = externalLink;
-      return props;
-    }
-    return applyLinkState(props, options, !!next && !(!disabled && !hrefOption) && resolveIsActive(router.stores.location.get(), next, activeOptions, router.basepath, false), hrefOption, linkDisabled, host);
-  }
-  var timeoutMap = /* @__PURE__ */ new WeakMap();
-  var cancelPreload = (eventTarget) => {
-    clearTimeout(timeoutMap.get(eventTarget));
-    timeoutMap.delete(eventTarget);
-  };
-  var composeHandlers = (first, second) => {
-    if (!first) return second;
-    return (event) => event.defaultPrevented || (first(event), event.defaultPrevented || second(event));
-  };
-  function getHrefOption(next, router, disabled) {
-    if (disabled) return;
-    const location2 = next.maskedLocation ?? next;
-    const href = location2.external ? location2.publicHref : router.history.createHref(location2.publicHref) || "/";
-    if ((location2.external || href !== location2.publicHref) && isDangerousProtocol(href, router.protocolAllowlist)) {
-      if (true) console.warn(`Blocked Link with dangerous protocol: ${href}`);
-      return;
-    }
-    return href;
-  }
-  var Link = React$16.memo(React$16.forwardRef((props, ref) => {
-    const host = props._asChild || "a";
-    const linkProps = useLinkProps(props, ref, host);
-    const children = typeof props.children === "function" ? props.children({ isActive: linkProps["data-status"] === "active" }) : props.children;
-    return React$16.createElement(host, linkProps, children);
-  }), areLinkPropsEqual);
-  function areLinkPropsEqual(prev, next) {
-    let extraKeys = 0;
-    for (const key in next) {
-      extraKeys++;
-      if (prev[key] === next[key]) continue;
-      if (!ROUTER_OPTION_KEYS.has(key) || !deepEqual(prev[key], next[key], false, true)) return false;
-    }
-    for (const _key in prev) extraKeys--;
-    return extraKeys === 0;
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/route.js
-  var import_react3 = __toESM(require_react(), 1);
-  var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
-  var Route = class extends BaseRoute {
-    /**
-    * @deprecated Use the `createRoute` function instead.
-    */
-    constructor(options) {
-      super(options);
-      this.useMatch = (opts) => {
-        return useMatch({
-          ...opts,
-          from: this.id
-        });
-      };
-      this.useRouteContext = (opts) => {
-        return useRouteContext({
-          ...opts,
-          from: this.id
-        });
-      };
-      this.useSearch = (opts) => {
-        return useSearch({
-          ...opts,
-          from: this.id
-        });
-      };
-      this.useParams = (opts) => {
-        return useParams({
-          ...opts,
-          from: this.id
-        });
-      };
-      this.useLoaderDeps = (opts) => {
-        return useLoaderDeps({
-          ...opts,
-          from: this.id
-        });
-      };
-      this.useLoaderData = (opts) => {
-        return useLoaderData({
-          ...opts,
-          from: this.id
-        });
-      };
-      this.useNavigate = () => {
-        return useNavigate({ from: this.fullPath });
-      };
-      this.Link = import_react3.default.forwardRef((props, ref) => {
-        return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Link, {
-          ref,
-          from: this.fullPath,
-          ...props
-        });
-      });
-    }
-  };
-  function createRoute(options) {
-    return new Route(options);
-  }
-
-  // node_modules/@tanstack/react-router/dist/esm/fileRoute.js
-  function createFileRoute(path) {
-    return (options) => {
-      const route = createRoute(options);
-      route.isRoot = false;
-      return route;
-    };
-  }
+  var createFileRoute = (_path) => (opts) => opts;
+  var Link = ({ children, to, ...rest }) => import_react.default.createElement("a", { href: typeof to === "string" ? to : "#", ...rest }, children);
 
   // node_modules/lucide-react/dist/esm/createLucideIcon.js
-  var import_react5 = __toESM(require_react());
+  var import_react3 = __toESM(require_react());
 
   // node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.js
   var mergeClasses = (...classes) => classes.filter((className, index, array) => {
@@ -28454,7 +27568,7 @@
   };
 
   // node_modules/lucide-react/dist/esm/Icon.js
-  var import_react4 = __toESM(require_react());
+  var import_react2 = __toESM(require_react());
 
   // node_modules/lucide-react/dist/esm/defaultAttributes.js
   var defaultAttributes = {
@@ -28480,7 +27594,7 @@
   };
 
   // node_modules/lucide-react/dist/esm/Icon.js
-  var Icon = (0, import_react4.forwardRef)(
+  var Icon = (0, import_react2.forwardRef)(
     ({
       color = "currentColor",
       size = 24,
@@ -28490,7 +27604,7 @@
       children,
       iconNode,
       ...rest
-    }, ref) => (0, import_react4.createElement)(
+    }, ref) => (0, import_react2.createElement)(
       "svg",
       {
         ref,
@@ -28504,7 +27618,7 @@
         ...rest
       },
       [
-        ...iconNode.map(([tag, attrs]) => (0, import_react4.createElement)(tag, attrs)),
+        ...iconNode.map(([tag, attrs]) => (0, import_react2.createElement)(tag, attrs)),
         ...Array.isArray(children) ? children : [children]
       ]
     )
@@ -28512,8 +27626,8 @@
 
   // node_modules/lucide-react/dist/esm/createLucideIcon.js
   var createLucideIcon = (iconName, iconNode) => {
-    const Component = (0, import_react5.forwardRef)(
-      ({ className, ...props }, ref) => (0, import_react5.createElement)(Icon, {
+    const Component = (0, import_react3.forwardRef)(
+      ({ className, ...props }, ref) => (0, import_react3.createElement)(Icon, {
         ref,
         iconNode,
         className: mergeClasses(
@@ -28567,7 +27681,7 @@
   var TriangleAlert = createLucideIcon("triangle-alert", __iconNode4);
 
   // src/components/ui/input.tsx
-  var React9 = __toESM(require_react(), 1);
+  var React8 = __toESM(require_react(), 1);
 
   // node_modules/clsx/dist/clsx.mjs
   function r(e) {
@@ -31848,10 +30962,10 @@
   }
 
   // src/components/ui/input.tsx
-  var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
-  var Input = React9.forwardRef(
+  var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
+  var Input = React8.forwardRef(
     ({ className, type, ...props }, ref) => {
-      return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+      return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
         "input",
         {
           type,
@@ -31868,17 +30982,24 @@
   Input.displayName = "Input";
 
   // src/routes/_authenticated/portal.index.tsx
-  var import_react6 = __toESM(require_react(), 1);
+  var import_react4 = __toESM(require_react(), 1);
 
   // fixture/db-mock.ts
+  var state = () => new URLSearchParams(location.search).get("state") ?? window.__fixtureState ?? "form";
   var db = {
     rpc: async (name, args) => {
       window.__rpcCalls = [...window.__rpcCalls ?? [], { name, args }];
-      if ((new URLSearchParams(location.search).get("state") ?? window.__fixtureState) === "error") return { data: null, error: new Error("Invalid or expired invitation code") };
+      if (state() === "error") return { data: null, error: new Error("Invalid or expired invitation code") };
       return { data: { buyer_org_name: "NahaLabs QA TestCo" }, error: null };
     },
-    from: () => {
-      throw new Error("fixture: db.from not expected");
+    from: (table) => {
+      const rows = table === "projects" ? [] : table === "applications" ? [{ id: "a1", status: "awarded", updated_at: "2026-10-24T09:00:00Z", projects: { title: "QA Journey Test 24 Oct - Conveyor belt splicing" } }] : [];
+      const q = new Promise((res) => res({ data: rows, error: null }));
+      q.select = () => q;
+      q.eq = () => q;
+      q.order = () => q;
+      q.limit = () => q;
+      return q;
     }
   };
 
@@ -37482,17 +36603,17 @@ Suggested solution: ${env.workaround}`;
      * @returns {Record<string, PresenceState>}
      */
     static syncState(currentState, newState, onJoin, onLeave) {
-      let state2 = this.toNullProtoObj(this.clone(currentState));
+      let state3 = this.toNullProtoObj(this.clone(currentState));
       newState = this.toNullProtoObj(newState);
       let joins = /* @__PURE__ */ Object.create(null);
       let leaves = /* @__PURE__ */ Object.create(null);
-      this.map(state2, (key, presence) => {
+      this.map(state3, (key, presence) => {
         if (!newState[key]) {
           leaves[key] = presence;
         }
       });
       this.map(newState, (key, newPresence) => {
-        let currentPresence = state2[key];
+        let currentPresence = state3[key];
         if (currentPresence) {
           let newRefs = newPresence.metas.map((m) => m.phx_ref);
           let curRefs = currentPresence.metas.map((m) => m.phx_ref);
@@ -37510,7 +36631,7 @@ Suggested solution: ${env.workaround}`;
           joins[key] = newPresence;
         }
       });
-      return this.syncDiff(state2, { joins, leaves }, onJoin, onLeave);
+      return this.syncDiff(state3, { joins, leaves }, onJoin, onLeave);
     }
     /**
      *
@@ -37526,8 +36647,8 @@ Suggested solution: ${env.workaround}`;
      *
      * @returns {Record<string, PresenceState>}
      */
-    static syncDiff(state2, diff, onJoin, onLeave) {
-      state2 = this.toNullProtoObj(state2);
+    static syncDiff(state3, diff, onJoin, onLeave) {
+      state3 = this.toNullProtoObj(state3);
       let { joins, leaves } = this.clone(diff);
       if (!onJoin) {
         onJoin = function() {
@@ -37538,17 +36659,17 @@ Suggested solution: ${env.workaround}`;
         };
       }
       this.map(joins, (key, newPresence) => {
-        let currentPresence = state2[key];
-        state2[key] = this.clone(newPresence);
+        let currentPresence = state3[key];
+        state3[key] = this.clone(newPresence);
         if (currentPresence) {
-          let joinedRefs = state2[key].metas.map((m) => m.phx_ref);
+          let joinedRefs = state3[key].metas.map((m) => m.phx_ref);
           let curMetas = currentPresence.metas.filter((m) => joinedRefs.indexOf(m.phx_ref) < 0);
-          state2[key].metas.unshift(...curMetas);
+          state3[key].metas.unshift(...curMetas);
         }
         onJoin(key, currentPresence, newPresence);
       });
       this.map(leaves, (key, leftPresence) => {
-        let currentPresence = state2[key];
+        let currentPresence = state3[key];
         if (!currentPresence) {
           return;
         }
@@ -37558,10 +36679,10 @@ Suggested solution: ${env.workaround}`;
         });
         onLeave(key, currentPresence, leftPresence);
         if (currentPresence.metas.length === 0) {
-          delete state2[key];
+          delete state3[key];
         }
       });
-      return state2;
+      return state3;
     }
     /**
      * Returns the array of presences, with selected metadata.
@@ -38468,10 +37589,10 @@ Suggested solution: ${env.workaround}`;
      * })
      *
      */
-    static transformState(state2) {
-      state2 = cloneState(state2);
-      return Object.getOwnPropertyNames(state2).reduce((newState, key) => {
-        const presences = state2[key];
+    static transformState(state3) {
+      state3 = cloneState(state3);
+      return Object.getOwnPropertyNames(state3).reduce((newState, key) => {
+        const presences = state3[key];
         newState[key] = transformState(presences);
         return newState;
       }, {});
@@ -38507,8 +37628,8 @@ Suggested solution: ${env.workaround}`;
       return transformedPresence;
     });
   }
-  function cloneState(state2) {
-    return JSON.parse(JSON.stringify(state2));
+  function cloneState(state3) {
+    return JSON.parse(JSON.stringify(state3));
   }
   function phoenixPresenceOptions(opts) {
     return (opts === null || opts === void 0 ? void 0 : opts.events) && { events: opts.events };
@@ -38580,8 +37701,8 @@ Suggested solution: ${env.workaround}`;
     get state() {
       return this.channel.state;
     }
-    set state(state2) {
-      this.channel.state = state2;
+    set state(state3) {
+      this.channel.state = state3;
     }
     get joinedOnce() {
       return this.channel.joinedOnce;
@@ -38809,8 +37930,8 @@ Suggested solution: ${env.workaround}`;
     get state() {
       return this.channelAdapter.state;
     }
-    set state(state2) {
-      this.channelAdapter.state = state2;
+    set state(state3) {
+      this.channelAdapter.state = state3;
     }
     get joinedOnce() {
       return this.channelAdapter.joinedOnce;
@@ -40933,7 +40054,7 @@ Suggested solution: ${env.workaround}`;
     if (customFetch) return (...args) => customFetch(...args);
     return (...args) => fetch(...args);
   };
-  var isPlainObject3 = (value) => {
+  var isPlainObject2 = (value) => {
     if (typeof value !== "object" || value === null) return false;
     const prototype = Object.getPrototypeOf(value);
     return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
@@ -40990,7 +40111,7 @@ Suggested solution: ${env.workaround}`;
       headers: (options === null || options === void 0 ? void 0 : options.headers) || {}
     };
     if (method === "GET" || method === "HEAD" || !body) return _objectSpread22(_objectSpread22({}, params), parameters);
-    if (isPlainObject3(body)) {
+    if (isPlainObject2(body)) {
       var _contentType;
       const headers = (options === null || options === void 0 ? void 0 : options.headers) || {};
       let contentType;
@@ -41239,11 +40360,11 @@ Suggested solution: ${env.workaround}`;
           if ((typeof ReadableStream !== "undefined" && body instanceof ReadableStream || body && typeof body === "object" && "pipe" in body && typeof body.pipe === "function") && !options.duplex) options.duplex = "half";
         }
         if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers) for (const [key, value] of Object.entries(fileOptions.headers)) headers = setHeader(headers, key, value);
-        const cleanPath2 = _this._removeEmptyFolders(path);
-        const _path = _this._getFinalPath(cleanPath2);
+        const cleanPath = _this._removeEmptyFolders(path);
+        const _path = _this._getFinalPath(cleanPath);
         const data = await (method == "PUT" ? put : post)(_this.fetch, `${_this.url}/object/${_path}`, body, _objectSpread22({ headers }, (options === null || options === void 0 ? void 0 : options.duplex) ? { duplex: options.duplex } : {}));
         return {
-          path: cleanPath2,
+          path: cleanPath,
           id: data.Id,
           fullPath: data.Key
         };
@@ -41359,8 +40480,8 @@ Suggested solution: ${env.workaround}`;
     */
     async uploadToSignedUrl(path, token, fileBody, fileOptions) {
       var _this3 = this;
-      const cleanPath2 = _this3._removeEmptyFolders(path);
-      const _path = _this3._getFinalPath(cleanPath2);
+      const cleanPath = _this3._removeEmptyFolders(path);
+      const _path = _this3._getFinalPath(cleanPath);
       const url = new URL(_this3.url + `/object/upload/sign/${_path}`);
       url.searchParams.set("token", token);
       return _this3.handleOperation(async () => {
@@ -41379,7 +40500,7 @@ Suggested solution: ${env.workaround}`;
         }
         if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers) for (const [key, value] of Object.entries(fileOptions.headers)) headers = setHeader(headers, key, value);
         return {
-          path: cleanPath2,
+          path: cleanPath,
           fullPath: (await put(_this3.fetch, url.toString(), body, _objectSpread22({ headers }, (options === null || options === void 0 ? void 0 : options.duplex) ? { duplex: options.duplex } : {}))).Key
         };
       });
@@ -43975,33 +43096,33 @@ Suggested solution: ${env.workaround}`;
     }
     return charMap;
   })();
-  function byteToBase64URL(byte, state2, emit) {
+  function byteToBase64URL(byte, state3, emit) {
     if (byte !== null) {
-      state2.queue = state2.queue << 8 | byte;
-      state2.queuedBits += 8;
-      while (state2.queuedBits >= 6) {
-        const pos = state2.queue >> state2.queuedBits - 6 & 63;
+      state3.queue = state3.queue << 8 | byte;
+      state3.queuedBits += 8;
+      while (state3.queuedBits >= 6) {
+        const pos = state3.queue >> state3.queuedBits - 6 & 63;
         emit(TO_BASE64URL[pos]);
-        state2.queuedBits -= 6;
+        state3.queuedBits -= 6;
       }
-    } else if (state2.queuedBits > 0) {
-      state2.queue = state2.queue << 6 - state2.queuedBits;
-      state2.queuedBits = 6;
-      while (state2.queuedBits >= 6) {
-        const pos = state2.queue >> state2.queuedBits - 6 & 63;
+    } else if (state3.queuedBits > 0) {
+      state3.queue = state3.queue << 6 - state3.queuedBits;
+      state3.queuedBits = 6;
+      while (state3.queuedBits >= 6) {
+        const pos = state3.queue >> state3.queuedBits - 6 & 63;
         emit(TO_BASE64URL[pos]);
-        state2.queuedBits -= 6;
+        state3.queuedBits -= 6;
       }
     }
   }
-  function byteFromBase64URL(charCode, state2, emit) {
+  function byteFromBase64URL(charCode, state3, emit) {
     const bits = FROM_BASE64URL[charCode];
     if (bits > -1) {
-      state2.queue = state2.queue << 6 | bits;
-      state2.queuedBits += 6;
-      while (state2.queuedBits >= 8) {
-        emit(state2.queue >> state2.queuedBits - 8 & 255);
-        state2.queuedBits -= 8;
+      state3.queue = state3.queue << 6 | bits;
+      state3.queuedBits += 6;
+      while (state3.queuedBits >= 8) {
+        emit(state3.queue >> state3.queuedBits - 8 & 255);
+        state3.queuedBits -= 8;
       }
     } else if (bits === -2) {
       return;
@@ -44061,47 +43182,47 @@ Suggested solution: ${env.workaround}`;
       codepointToUTF8(codepoint, emit);
     }
   }
-  function stringFromUTF8(byte, state2, emit) {
-    if (state2.utf8seq === 0) {
+  function stringFromUTF8(byte, state3, emit) {
+    if (state3.utf8seq === 0) {
       if (byte <= 127) {
         emit(byte);
         return;
       }
       for (let leadingBit = 1; leadingBit < 6; leadingBit += 1) {
         if ((byte >> 7 - leadingBit & 1) === 0) {
-          state2.utf8seq = leadingBit;
+          state3.utf8seq = leadingBit;
           break;
         }
       }
-      if (state2.utf8seq === 2) {
-        state2.codepoint = byte & 31;
-      } else if (state2.utf8seq === 3) {
-        state2.codepoint = byte & 15;
-      } else if (state2.utf8seq === 4) {
-        state2.codepoint = byte & 7;
+      if (state3.utf8seq === 2) {
+        state3.codepoint = byte & 31;
+      } else if (state3.utf8seq === 3) {
+        state3.codepoint = byte & 15;
+      } else if (state3.utf8seq === 4) {
+        state3.codepoint = byte & 7;
       } else {
         throw new Error("Invalid UTF-8 sequence");
       }
-      state2.utf8seq -= 1;
-    } else if (state2.utf8seq > 0) {
+      state3.utf8seq -= 1;
+    } else if (state3.utf8seq > 0) {
       if (byte <= 127) {
         throw new Error("Invalid UTF-8 sequence");
       }
-      state2.codepoint = state2.codepoint << 6 | byte & 63;
-      state2.utf8seq -= 1;
-      if (state2.utf8seq === 0) {
-        emit(state2.codepoint);
+      state3.codepoint = state3.codepoint << 6 | byte & 63;
+      state3.utf8seq -= 1;
+      if (state3.utf8seq === 0) {
+        emit(state3.codepoint);
       }
     }
   }
   function base64UrlToUint8Array(str) {
     const result = [];
-    const state2 = { queue: 0, queuedBits: 0 };
+    const state3 = { queue: 0, queuedBits: 0 };
     const onByte = (byte) => {
       result.push(byte);
     };
     for (let i = 0; i < str.length; i += 1) {
-      byteFromBase64URL(str.charCodeAt(i), state2, onByte);
+      byteFromBase64URL(str.charCodeAt(i), state3, onByte);
     }
     return new Uint8Array(result);
   }
@@ -44112,12 +43233,12 @@ Suggested solution: ${env.workaround}`;
   }
   function bytesToBase64URL(bytes) {
     const result = [];
-    const state2 = { queue: 0, queuedBits: 0 };
+    const state3 = { queue: 0, queuedBits: 0 };
     const onChar = (char) => {
       result.push(char);
     };
-    bytes.forEach((byte) => byteToBase64URL(byte, state2, onChar));
-    byteToBase64URL(null, state2, onChar);
+    bytes.forEach((byte) => byteToBase64URL(byte, state3, onChar));
+    byteToBase64URL(null, state3, onChar);
     return result.join("");
   }
 
@@ -48776,9 +47897,9 @@ ${suffix}`;
       this._debug("#_acquireLock", "begin", acquireTimeout);
       try {
         if (this.lockAcquired) {
-          const last2 = this.pendingInLock.length ? this.pendingInLock[this.pendingInLock.length - 1] : Promise.resolve();
+          const last = this.pendingInLock.length ? this.pendingInLock[this.pendingInLock.length - 1] : Promise.resolve();
           const result = (async () => {
-            await last2;
+            await last;
             return await fn();
           })();
           this.pendingInLock.push((async () => {
@@ -52896,7 +52017,7 @@ ${suffix}`;
   }
 
   // src/components/app/ui-bits.tsx
-  var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+  var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
   var toneClass = {
     green: "bg-primary/10 text-primary border-primary/20",
     gold: "bg-gold/20 text-gold-foreground border-gold/40",
@@ -52905,7 +52026,7 @@ ${suffix}`;
     blue: "bg-secondary text-secondary-foreground border-border"
   };
   function Pill({ tone = "muted", children, icon }) {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: cn("inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium", toneClass[tone]), children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: cn("inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium", toneClass[tone]), children: [
       icon,
       children
     ] });
@@ -52928,55 +52049,55 @@ ${suffix}`;
     revoked: "muted"
   };
   function StatusBadge({ status }) {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Pill, { tone: statusTone[status] ?? "muted", children: humanize(status) });
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Pill, { tone: statusTone[status] ?? "muted", children: humanize(status) });
   }
   function ClosingBadge({ closesAt, status }) {
     if (status !== "open" || !closesAt) return null;
     const days = (new Date(closesAt).getTime() - Date.now()) / 864e5;
-    if (days < 0) return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Pill, { tone: "red", icon: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Clock, { className: "size-3" }), children: "Deadline passed" });
-    if (days <= 7) return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Pill, { tone: "gold", icon: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Clock, { className: "size-3" }), children: "Closing soon" });
+    if (days < 0) return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Pill, { tone: "red", icon: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Clock, { className: "size-3" }), children: "Deadline passed" });
+    if (days <= 7) return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Pill, { tone: "gold", icon: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Clock, { className: "size-3" }), children: "Closing soon" });
     return null;
   }
   function PageHeader({ title, description, actions }) {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("h1", { className: "text-2xl font-bold text-foreground sm:text-3xl", children: title }),
-        description && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: description })
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h1", { className: "text-2xl font-bold text-foreground sm:text-3xl", children: title }),
+        description && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: description })
       ] }),
-      actions && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "flex flex-wrap gap-2", children: actions })
+      actions && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "flex flex-wrap gap-2", children: actions })
     ] });
   }
   function EmptyState({ icon, title, body, action }) {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex flex-col items-center justify-center rounded-lg border border-dashed bg-card px-6 py-12 text-center", children: [
-      icon && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "mb-3 text-muted-foreground", children: icon }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "font-display font-semibold text-foreground", children: title }),
-      body && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-1 max-w-sm text-sm text-muted-foreground", children: body }),
-      action && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "mt-4", children: action })
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex flex-col items-center justify-center rounded-lg border border-dashed bg-card px-6 py-12 text-center", children: [
+      icon && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "mb-3 text-muted-foreground", children: icon }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { className: "font-display font-semibold text-foreground", children: title }),
+      body && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { className: "mt-1 max-w-sm text-sm text-muted-foreground", children: body }),
+      action && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "mt-4", children: action })
     ] });
   }
   function Loading({ label = "Loading\u2026" }) {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(LoaderCircle, { className: "size-4 animate-spin" }),
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(LoaderCircle, { className: "size-4 animate-spin" }),
       " ",
       label
     ] });
   }
   function StatCard({ label, value, hint, tone }) {
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: cn("rounded-lg border bg-card p-4", tone === "gold" && "border-gold/50", tone === "red" && "border-destructive/40"), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "text-xs font-medium uppercase tracking-wide text-muted-foreground", children: label }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-1 font-display text-3xl font-bold text-foreground", children: value }),
-      hint && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-1 text-xs text-muted-foreground", children: hint })
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: cn("rounded-lg border bg-card p-4", tone === "gold" && "border-gold/50", tone === "red" && "border-destructive/40"), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { className: "text-xs font-medium uppercase tracking-wide text-muted-foreground", children: label }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { className: "mt-1 font-display text-3xl font-bold text-foreground", children: value }),
+      hint && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { className: "mt-1 text-xs text-muted-foreground", children: hint })
     ] });
   }
 
   // src/components/ui/button.tsx
-  var React12 = __toESM(require_react(), 1);
-
-  // node_modules/@radix-ui/react-slot/dist/index.mjs
   var React11 = __toESM(require_react(), 1);
 
-  // node_modules/@radix-ui/react-compose-refs/dist/index.mjs
+  // node_modules/@radix-ui/react-slot/dist/index.mjs
   var React10 = __toESM(require_react(), 1);
+
+  // node_modules/@radix-ui/react-compose-refs/dist/index.mjs
+  var React9 = __toESM(require_react(), 1);
   var __defProp2 = Object.defineProperty;
   var __name = (target, value) => __defProp2(target, "name", { value, configurable: true });
   function setRef(ref, value) {
@@ -53013,7 +52134,7 @@ ${suffix}`;
   }
   __name(composeRefs, "composeRefs");
   function useComposedRefs(...refs) {
-    return React10.useCallback(composeRefs(...refs), refs);
+    return React9.useCallback(composeRefs(...refs), refs);
   }
   __name(useComposedRefs, "useComposedRefs");
 
@@ -53022,13 +52143,13 @@ ${suffix}`;
   var __name2 = (target, value) => __defProp3(target, "name", { value, configurable: true });
   // @__NO_SIDE_EFFECTS__
   function createSlot(ownerName) {
-    const Slot2 = React11.forwardRef((props, forwardedRef) => {
+    const Slot2 = React10.forwardRef((props, forwardedRef) => {
       let { children, ...slotProps } = props;
       let slottableElement = null;
       let hasSlottable = false;
       const newChildren = [];
       children = useUnwrappedLazy(children);
-      React11.Children.forEach(children, (maybeSlottable) => {
+      React10.Children.forEach(children, (maybeSlottable) => {
         if (isSlottable(maybeSlottable)) {
           hasSlottable = true;
           const slottable = maybeSlottable;
@@ -53043,13 +52164,13 @@ ${suffix}`;
         }
       });
       if (slottableElement) {
-        slottableElement = React11.cloneElement(slottableElement, void 0, newChildren);
+        slottableElement = React10.cloneElement(slottableElement, void 0, newChildren);
       } else if (
         // A `Slottable` was found but it didn't resolve to a single element (e.g.
         // it wrapped multiple elements, text, or a render-prop `child` that
         // wasn't an element). Don't fall back to treating the `Slottable` wrapper
         // itself as the slot target — throw a descriptive error below instead.
-        !hasSlottable && React11.Children.count(children) === 1 && React11.isValidElement(children)
+        !hasSlottable && React10.Children.count(children) === 1 && React10.isValidElement(children)
       ) {
         slottableElement = children;
       }
@@ -53064,10 +52185,10 @@ ${suffix}`;
         return children;
       }
       const mergedProps = mergeProps(slotProps, slottableElement.props ?? {});
-      if (slottableElement.type !== React11.Fragment) {
+      if (slottableElement.type !== React10.Fragment) {
         mergedProps.ref = forwardedRef ? composedRef : slottableElementRef;
       }
-      return React11.cloneElement(slottableElement, mergedProps);
+      return React10.cloneElement(slottableElement, mergedProps);
     });
     Slot2.displayName = `${ownerName}.Slot`;
     return Slot2;
@@ -53085,10 +52206,10 @@ ${suffix}`;
   __name2(createSlottable, "createSlottable");
   var getSlottableElementFromSlottable = /* @__PURE__ */ __name2((slottable, child) => {
     if ("child" in slottable.props) {
-      if (!React11.isValidElement(child)) return null;
-      return React11.cloneElement(child, void 0, slottable.props.children(child.props.children));
+      if (!React10.isValidElement(child)) return null;
+      return React10.cloneElement(child, void 0, slottable.props.children(child.props.children));
     }
-    return React11.isValidElement(child) ? child : null;
+    return React10.isValidElement(child) ? child : null;
   }, "getSlottableElementFromSlottable");
   function mergeProps(slotProps, childProps) {
     const overrideProps = { ...childProps };
@@ -53132,7 +52253,7 @@ ${suffix}`;
   }
   __name2(getElementRef, "getElementRef");
   function isSlottable(child) {
-    return React11.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
+    return React10.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
   }
   __name2(isSlottable, "isSlottable");
   var REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
@@ -53169,7 +52290,7 @@ ${suffix}`;
   var createSlottableError = /* @__PURE__ */ __name2((ownerName) => {
     return `${ownerName} failed to slot onto its \`Slottable\`. Expected \`Slottable\` to receive a single React element child.`;
   }, "createSlottableError");
-  var use = React11[" use ".trim().toString()];
+  var use = React10[" use ".trim().toString()];
 
   // node_modules/class-variance-authority/dist/index.mjs
   var falsyToString = (value) => typeof value === "boolean" ? `${value}` : value === 0 ? "0" : value;
@@ -53214,7 +52335,7 @@ ${suffix}`;
   };
 
   // src/components/ui/button.tsx
-  var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
+  var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
   var buttonVariants = cva(
     "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
     {
@@ -53240,10 +52361,10 @@ ${suffix}`;
       }
     }
   );
-  var Button = React12.forwardRef(
+  var Button = React11.forwardRef(
     ({ className, variant, size, asChild = false, ...props }, ref) => {
       const Comp = asChild ? Slot : "button";
-      return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Comp, { className: cn(buttonVariants({ variant, size, className })), ref, ...props });
+      return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Comp, { className: cn(buttonVariants({ variant, size, className })), ref, ...props });
     }
   );
   Button.displayName = "Button";
@@ -54841,8 +53962,8 @@ ${suffix}`;
   }
 
   // src/routes/_authenticated/portal.index.tsx
-  var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
-  var Route2 = createFileRoute("/_authenticated/portal/")({ component: Home });
+  var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
+  var Route = createFileRoute("/_authenticated/portal/")({ component: Home });
   function Home() {
     const me = useMe();
     const docs = useQuery(myDocsQuery);
@@ -54862,29 +53983,29 @@ ${suffix}`;
         return data;
       }
     });
-    if (docs.isLoading || projects.isLoading || apps.isLoading) return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Loading, {});
+    if (docs.isLoading || projects.isLoading || apps.isLoading) return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Loading, {});
     const attention = (docs.data ?? []).filter((d) => d.current_version > 0 && ["expired", "expiring"].includes(expiryState(d.expires_at)));
     const openDrafts = (apps.data ?? []).filter((a) => a.status === "draft");
-    return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_jsx_runtime9.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PageHeader, { title: `Welcome${me.fullName ? `, ${me.fullName.split(" ")[0]}` : ""}`, description: me.org?.name }),
-      me.org?.status === "suspended" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mb-4 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive", children: "Your company account is suspended. Contact MySol to restore access." }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "grid grid-cols-2 gap-3 lg:grid-cols-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(StatCard, { label: "Open opportunities", value: projects.data?.length ?? 0 }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(StatCard, { label: "Documents in vault", value: (docs.data ?? []).filter((d) => d.current_version > 0).length }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(StatCard, { label: "Need attention", value: attention.length, tone: attention.length ? "gold" : void 0, hint: "Expired or expiring" }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(StatCard, { label: "Drafts in progress", value: openDrafts.length })
+    return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(PageHeader, { title: `Welcome${me.fullName ? `, ${me.fullName.split(" ")[0]}` : ""}`, description: me.org?.name }),
+      me.org?.status === "suspended" && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mb-4 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive", children: "Your company account is suspended. Contact MySol to restore access." }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "grid grid-cols-2 gap-3 lg:grid-cols-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(StatCard, { label: "Open opportunities", value: projects.data?.length ?? 0 }),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(StatCard, { label: "Documents in vault", value: (docs.data ?? []).filter((d) => d.current_version > 0).length }),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(StatCard, { label: "Need attention", value: attention.length, tone: attention.length ? "gold" : void 0, hint: "Expired or expiring" }),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(StatCard, { label: "Drafts in progress", value: openDrafts.length })
       ] }),
-      !!attention.length && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mt-6 rounded-lg border border-gold/50 bg-gold/10 p-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "flex items-center gap-2 font-display font-semibold", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(TriangleAlert, { className: "size-4" }),
+      !!attention.length && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("section", { className: "mt-6 rounded-lg border border-gold/50 bg-gold/10 p-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "flex items-center gap-2 font-display font-semibold", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(TriangleAlert, { className: "size-4" }),
           " Documents that need attention"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("ul", { className: "mt-2 space-y-1 text-sm", children: attention.map((d) => {
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "mt-2 space-y-1 text-sm", children: attention.map((d) => {
           const n = daysUntil(d.expires_at);
-          return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("li", { children: [
+          return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("li", { children: [
             d.title,
             " ",
-            /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("span", { className: "text-muted-foreground", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "text-muted-foreground", children: [
               "(",
               categoryLabel(d.category),
               ")"
@@ -54893,30 +54014,30 @@ ${suffix}`;
             n < 0 ? `expired ${fmtDate(d.expires_at)}` : `expires in ${n} day${n === 1 ? "" : "s"}`
           ] }, d.id);
         }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Button, { asChild: true, size: "sm", className: "mt-3", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Link, { to: "/portal/vault", children: "Open vault" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Button, { asChild: true, size: "sm", className: "mt-3", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Link, { to: "/portal/vault", children: "Open vault" }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(InvitationCodeEntry, {}),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("h2", { className: "mb-3 text-lg font-bold", children: "Opportunities for you" }),
-          !projects.data?.length ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(EmptyState, { title: "Nothing open right now", body: "You will be notified when MySol invites you to a project." }) : /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("ul", { className: "divide-y rounded-lg border bg-card", children: projects.data.map((p) => /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(Link, { to: "/portal/projects/$projectId", params: { projectId: p.id }, className: "flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/50", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("span", { className: "min-w-0", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "block truncate font-medium", children: p.title }),
-              /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("span", { className: "text-xs text-muted-foreground", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(InvitationCodeEntry, {}),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("section", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("h2", { className: "mb-3 text-lg font-bold", children: "Opportunities for you" }),
+          !projects.data?.length ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(EmptyState, { title: "Nothing open right now", body: "You will be notified when MySol invites you to a project." }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "divide-y rounded-lg border bg-card", children: projects.data.map((p) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(Link, { to: "/portal/projects/$projectId", params: { projectId: p.id }, className: "flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/50", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "block truncate font-medium", children: p.title }),
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { className: "text-xs text-muted-foreground", children: [
                 "Closes ",
                 fmtDate(p.closes_at)
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ClosingBadge, { closesAt: p.closes_at, status: p.status })
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ClosingBadge, { closesAt: p.closes_at, status: p.status })
           ] }) }, p.id)) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("h2", { className: "mb-3 text-lg font-bold", children: "Your applications" }),
-          !apps.data?.length ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(EmptyState, { title: "No applications yet", body: "Open a project to see its checklist and start an application." }) : /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("ul", { className: "divide-y rounded-lg border bg-card", children: apps.data.map((a) => (
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("section", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("h2", { className: "mb-3 text-lg font-bold", children: "Your applications" }),
+          !apps.data?.length ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(EmptyState, { title: "No applications yet", body: "Open a project to see its checklist and start an application." }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("ul", { className: "divide-y rounded-lg border bg-card", children: apps.data.map((a) => (
             // eslint-disable-line @typescript-eslint/no-explicit-any
-            /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(Link, { to: "/portal/applications/$applicationId", params: { applicationId: a.id }, className: "flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/50", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "truncate font-medium", children: a.projects?.title ?? "Opportunity unavailable" }),
-              /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(StatusBadge, { status: a.status })
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(Link, { to: "/portal/applications/$applicationId", params: { applicationId: a.id }, className: "flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/50", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "truncate font-medium", children: a.projects?.title ?? "Opportunity unavailable" }),
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(StatusBadge, { status: a.status })
             ] }) }, a.id)
           )) })
         ] })
@@ -54925,8 +54046,8 @@ ${suffix}`;
   }
   function InvitationCodeEntry() {
     const qc2 = useQueryClient();
-    const [code, setCode] = (0, import_react6.useState)("");
-    const [done, setDone] = (0, import_react6.useState)(null);
+    const [code, setCode] = (0, import_react4.useState)("");
+    const [done, setDone] = (0, import_react4.useState)(null);
     const accept = useMutation({
       mutationFn: async (rawCode) => {
         const { data, error } = await db.rpc("accept_invitation_code", { p_code: rawCode });
@@ -54939,54 +54060,54 @@ ${suffix}`;
         qc2.invalidateQueries({ queryKey: ["portal", "open-projects"] });
       }
     });
-    if (done) return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mt-6 rounded-lg border border-primary/30 bg-primary/5 p-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "flex items-center gap-2 font-display font-semibold", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(KeyRound, { className: "size-4" }),
+    if (done) return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("section", { className: "mt-6 rounded-lg border border-primary/30 bg-primary/5 p-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "flex items-center gap-2 font-display font-semibold", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(KeyRound, { className: "size-4" }),
         " Invitation accepted"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "mt-1 text-sm text-muted-foreground", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "mt-1 text-sm text-muted-foreground", children: [
         done ?? "The buyer",
         " can now see your company and invite you to their projects."
       ] })
     ] });
-    return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mt-6 rounded-lg border border-primary/30 bg-primary/5 p-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "flex items-center gap-2 font-display font-semibold", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(KeyRound, { className: "size-4" }),
+    return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("section", { className: "mt-6 rounded-lg border border-primary/30 bg-primary/5 p-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "flex items-center gap-2 font-display font-semibold", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(KeyRound, { className: "size-4" }),
         " Have an invitation code?"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "If a buyer sent your company an invitation code, enter it here to let them see your company and invite you to their projects. Nothing is shared until you accept." }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("form", { className: "mt-3 flex flex-wrap items-center gap-2", onSubmit: (e) => {
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "If a buyer sent your company an invitation code, enter it here to let them see your company and invite you to their projects. Nothing is shared until you accept." }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("form", { className: "mt-3 flex flex-wrap items-center gap-2", onSubmit: (e) => {
         e.preventDefault();
         if (code.trim()) accept.mutate(code);
       }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Input, { value: code, onChange: (e) => setCode(e.target.value.toUpperCase()), placeholder: "e.g. 1A2B3C4D5E6F7A8B", autoCapitalize: "characters", className: "w-48 font-mono tracking-widest", maxLength: 16 }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Button, { type: "submit", size: "sm", disabled: accept.isPending || !code.trim(), children: "Accept invitation" })
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Input, { value: code, onChange: (e) => setCode(e.target.value.toUpperCase()), placeholder: "e.g. 1A2B3C4D5E6F7A8B", autoCapitalize: "characters", className: "w-48 font-mono tracking-widest", maxLength: 16 }),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Button, { type: "submit", size: "sm", disabled: accept.isPending || !code.trim(), children: "Accept invitation" })
       ] }),
-      accept.isError && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mt-2 text-sm text-destructive", children: accept.error.message })
+      accept.isError && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-2 text-sm text-destructive", children: accept.error.message })
     ] });
   }
 
   // fixture/invitation-card-entry.tsx
-  var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
+  var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
   var qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  var state = new URLSearchParams(location.search).get("state") ?? window.__fixtureState ?? "form";
+  var state2 = new URLSearchParams(location.search).get("state") ?? window.__fixtureState ?? "form";
   function Harness() {
-    const [accepted, setAccepted] = import_react7.default.useState(false);
-    return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { style: { maxWidth: 900, margin: "24px auto", padding: 16 }, children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(QueryClientProvider, { client: qc, children: [
-      state === "success" || accepted ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(SuccessView, {}) : /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(InvitationCodeEntry, {}),
-      state === "error" && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(ErrorView, {})
+    const [accepted, setAccepted] = import_react5.default.useState(false);
+    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { style: { maxWidth: 900, margin: "24px auto", padding: 16 }, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(QueryClientProvider, { client: qc, children: [
+      state2 === "success" || accepted ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(SuccessView, {}) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(InvitationCodeEntry, {}),
+      state2 === "error" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ErrorView, {})
     ] }) });
   }
   function SuccessView() {
-    return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("section", { className: "mt-6 rounded-lg border border-primary/30 bg-primary/5 p-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("p", { style: { fontWeight: 600 }, children: "Invitation accepted" }),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("p", { style: { fontSize: 14, opacity: 0.7 }, children: "NahaLabs QA TestCo can now see your company and invite you to their projects." })
+    return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("section", { className: "mt-6 rounded-lg border border-primary/30 bg-primary/5 p-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { style: { fontWeight: 600 }, children: "Invitation accepted" }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { style: { fontSize: 14, opacity: 0.7 }, children: "NahaLabs QA TestCo can now see your company and invite you to their projects." })
     ] });
   }
   function ErrorView() {
-    return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("p", { style: { marginTop: 8, fontSize: 14, color: "crimson" }, children: "Invalid or expired invitation code" });
+    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { style: { marginTop: 8, fontSize: 14, color: "crimson" }, children: "Invalid or expired invitation code" });
   }
-  (0, import_client2.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Harness, {}));
+  (0, import_client2.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Harness, {}));
 })();
 /*! Bundled license information:
 
@@ -55038,28 +54159,6 @@ react/cjs/react-jsx-runtime.development.js:
   (**
    * @license React
    * react-jsx-runtime.development.js
-   *
-   * Copyright (c) Meta Platforms, Inc. and affiliates.
-   *
-   * This source code is licensed under the MIT license found in the
-   * LICENSE file in the root directory of this source tree.
-   *)
-
-use-sync-external-store/cjs/use-sync-external-store-shim.development.js:
-  (**
-   * @license React
-   * use-sync-external-store-shim.development.js
-   *
-   * Copyright (c) Meta Platforms, Inc. and affiliates.
-   *
-   * This source code is licensed under the MIT license found in the
-   * LICENSE file in the root directory of this source tree.
-   *)
-
-use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js:
-  (**
-   * @license React
-   * use-sync-external-store-shim/with-selector.development.js
    *
    * Copyright (c) Meta Platforms, Inc. and affiliates.
    *
