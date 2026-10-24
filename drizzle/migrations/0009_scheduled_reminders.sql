@@ -63,16 +63,10 @@ END $$;
 REVOKE EXECUTE ON FUNCTION public.run_scheduled_reminders(uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.run_scheduled_reminders(uuid) TO service_role;
 
--- Scheduling: prefer pg_cron where the platform provides it (daily 06:17 SAST /
--- 04:17 UTC). The DO block is a no-op with a NOTICE where pg_cron is absent;
--- on such platforms schedule an equivalent daily service-role call (Supabase
--- scheduled Edge Function or external cron) invoking:
+-- Scheduling: deliberately NOT installed here. This migration ships the inert
+-- function only. A durable daily run (create extension pg_cron + cron.schedule
+-- '17 4 * * *' = 06:17 SAST, or an equivalent platform scheduler calling
 --   select public.run_scheduled_reminders();
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
-    PERFORM cron.schedule('run-scheduled-reminders', '17 4 * * *', 'select public.run_scheduled_reminders()');
-  ELSE
-    RAISE NOTICE 'pg_cron not available - schedule select public.run_scheduled_reminders() via the platform scheduler';
-  END IF;
-END $$;
+-- creates standing in-app notifications for every tenant's users and requires
+-- separate explicit owner approval naming audience and effect. Until then the
+-- function is invoked only manually, scoped: run_scheduled_reminders('<org>').
