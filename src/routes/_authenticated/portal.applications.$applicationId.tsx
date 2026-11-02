@@ -60,6 +60,13 @@ function ApplicationPage() {
   if (q.isLoading || docs.isLoading) return <Loading />;
   if (q.isError || !q.data) return <EmptyState title="Application not found" />;
   const { a, reqs, ad } = q.data;
+  if (!a.projects) return (
+    <>
+      <PageHeader title="Opportunity unavailable" description="Your application is saved, but this opportunity is no longer available to your company." />
+      <p className="mb-4 text-sm text-muted-foreground">Contact the buyer if you need access again. Your saved application has not been changed.</p>
+      <Button asChild variant="outline"><Link to="/portal/applications">Back to applications</Link></Button>
+    </>
+  );
   const isDraft = a.status === "draft";
   const attachments: Record<string, string> = {};
   ad.forEach((x: any) => { if (x.document_versions?.document_id) attachments[x.requirement_id] = x.document_versions.document_id; }); // eslint-disable-line @typescript-eslint/no-explicit-any

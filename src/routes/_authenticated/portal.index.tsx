@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AlertTriangle, KeyRound } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import { db } from "@/lib/db";
 import { useMe } from "@/lib/session";
 import { myDocsQuery } from "@/lib/portalData";
@@ -12,7 +14,7 @@ import { daysUntil, expiryState } from "@/lib/readiness";
 
 export const Route = createFileRoute("/_authenticated/portal/")({ component: Home });
 
-function Home() {
+export function Home() {
   const me = useMe();
   const docs = useQuery(myDocsQuery);
   const projects = useQuery({
@@ -53,7 +55,8 @@ function Home() {
           <Button asChild size="sm" className="mt-3"><Link to="/portal/vault">Open vault</Link></Button>
         </section>
       )}
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      <InvitationCodeEntry />
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <section>
           <h2 className="mb-3 text-lg font-bold">Opportunities for you</h2>
           {!projects.data?.length ? <EmptyState title="Nothing open right now" body="You will be notified when MySol invites you to a project." /> : (
@@ -66,11 +69,46 @@ function Home() {
           <h2 className="mb-3 text-lg font-bold">Your applications</h2>
           {!apps.data?.length ? <EmptyState title="No applications yet" body="Open a project to see its checklist and start an application." /> : (
             <ul className="divide-y rounded-lg border bg-card">{apps.data.map((a: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
-              <li key={a.id}><Link to="/portal/applications/$applicationId" params={{ applicationId: a.id }} className="flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/50"><span className="truncate font-medium">{a.projects?.title}</span><StatusBadge status={a.status} /></Link></li>
+              <li key={a.id}><Link to="/portal/applications/$applicationId" params={{ applicationId: a.id }} className="flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/50"><span className="truncate font-medium">{a.projects?.title ?? "Opportunity unavailable"}</span><StatusBadge status={a.status} /></Link></li>
             ))}</ul>
           )}
         </section>
       </div>
     </>
+  );
+}
+
+export function InvitationCodeEntry() {
+  const qc = useQueryClient();
+  const [code, setCode] = useState("");
+  const [done, setDone] = useState<string | null>(null);
+  const accept = useMutation({
+    mutationFn: async (rawCode: string) => {
+      const { data, error } = await db.rpc("accept_invitation_code" as never, { p_code: rawCode } as never);
+      if (error) throw error;
+      return (data as unknown as { buyer_org_name: string | null })?.buyer_org_name ?? null;
+    },
+    onSuccess: (buyerName) => {
+      setDone(buyerName);
+      setCode("");
+      qc.invalidateQueries({ queryKey: ["portal", "open-projects"] });
+    },
+  });
+  if (done) return (
+    <section className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-4">
+      <p className="flex items-center gap-2 font-display font-semibold"><KeyRound className="size-4" /> Invitation accepted</p>
+      <p className="mt-1 text-sm text-muted-foreground">{done ?? "The buyer"} can now see your company and invite you to their projects.</p>
+    </section>
+  );
+  return (
+    <section className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-4">
+      <p className="flex items-center gap-2 font-display font-semibold"><KeyRound className="size-4" /> Have an invitation code?</p>
+      <p className="mt-1 text-sm text-muted-foreground">If a buyer sent your company an invitation code, enter it here to let them see your company and invite you to their projects. Nothing is shared until you accept.</p>
+      <form className="mt-3 flex flex-wrap items-center gap-2" onSubmit={(e) => { e.preventDefault(); if (code.trim()) accept.mutate(code); }}>
+        <Input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="e.g. 1A2B3C4D5E6F7A8B" autoCapitalize="characters" className="w-48 font-mono tracking-widest" maxLength={16} />
+        <Button type="submit" size="sm" disabled={accept.isPending || !code.trim()}>Accept invitation</Button>
+      </form>
+      {accept.isError && <p className="mt-2 text-sm text-destructive">{(accept.error as Error).message}</p>}
+    </section>
   );
 }

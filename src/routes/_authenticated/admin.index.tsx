@@ -1,3 +1,4 @@
+import { useMe } from "@/lib/session";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/lib/db";
@@ -7,8 +8,10 @@ import { fmtDate, fmtRelative } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/admin/")({ component: Overview });
 
 function Overview() {
+  const me = useMe();
+  const orgId = me.org?.id ?? "";
   const q = useQuery({
-    queryKey: ["admin", "overview"],
+    queryKey: ["admin", "overview", orgId],
     queryFn: async () => {
       const count = async (t: string, f: (q: any) => any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         const { count: c, error } = await f(db.from(t).select("id", { count: "exact", head: true }));
@@ -16,15 +19,15 @@ function Overview() {
         return c ?? 0;
       };
       const [open, toReview, contractors, unverified, invited, applying, soon7, expired, closing, recent] = await Promise.all([
-        count("projects", (x) => x.eq("status", "open")),
+        count("projects", (x) => x.eq("status", "open").eq("buyer_org_id", orgId)),
         count("applications", (x) => x.in("status", ["submitted", "under_review"])),
         count("organizations", (x) => x.eq("kind", "contractor").eq("status", "active")),
         count("documents", (x) => x.eq("verification", "unverified").gt("current_version", 0)),
         count("invitations", (x) => x.eq("status", "pending")),
         count("applications", (x) => x.eq("status", "draft")),
-        count("projects", (x) => x.eq("status", "open").gt("closes_at", new Date().toISOString()).lt("closes_at", new Date(Date.now() + 7 * 864e5).toISOString())),
+        count("projects", (x) => x.eq("buyer_org_id", orgId).eq("status", "open").gt("closes_at", new Date().toISOString()).lt("closes_at", new Date(Date.now() + 7 * 864e5).toISOString())),
         count("applications", (x) => x.neq("status", "draft")),
-        db.from("projects").select("id,title,status,closes_at").eq("status", "open").not("closes_at", "is", null).order("closes_at").limit(5),
+        db.from("projects").select("id,title,status,closes_at").eq("buyer_org_id", orgId).eq("status", "open").not("closes_at", "is", null).order("closes_at").limit(5),
         db.from("applications").select("id,status,submitted_at,projects(title),organizations(name)").neq("status", "draft").order("submitted_at", { ascending: false, nullsFirst: false }).limit(6),
       ]);
       return { open, toReview, contractors, unverified, invited, applying, soon7, expired, closing: closing.data ?? [], recent: recent.data ?? [] };

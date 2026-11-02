@@ -8,19 +8,7 @@ import { FleetSignals, fleetLines } from "./FleetSignals";
 import { loadMine } from "@/lib/eye/store";
 import { runRules, money } from "@/lib/eye/rules";
 import { DEFAULTS } from "@/lib/eye/fleet";
-
-type SpeechRecognitionLike = {
-  lang: string;
-  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-};
-
-type EyeWindow = Window & {
-  __eyeMap?: maplibregl.Map;
-  SpeechRecognition?: new () => SpeechRecognitionLike;
-  webkitSpeechRecognition?: new () => SpeechRecognitionLike;
-};
+import { EYE_PIN_CSS, compositeSnapshot } from "@/lib/eye/capture";
 
 
 const chip = (c: string) => c === "confirmed" ? "bg-emerald-100 text-emerald-900" : c === "inferred" ? "bg-amber-100 text-amber-900" : "bg-stone-200 text-stone-800";
@@ -61,7 +49,7 @@ export function EyeView() {
       container: mapEl.current, center: sites[0]!.center, zoom: 14.2, canvasContextAttributes: { preserveDrawingBuffer: true }, attributionControl: { compact: true },
       style: { version: 8, sources: { sat: { type: "raster", tileSize: 256, attribution: "Imagery Esri, Maxar", tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"] } }, layers: [{ id: "sat", type: "raster", source: "sat" }] },
     });
-    (window as EyeWindow).__eyeMap = map.current;
+    (window as any).__eyeMap = map.current;
     return () => { map.current?.remove(); map.current = null; };
   }, []);
 
@@ -146,7 +134,9 @@ export function EyeView() {
   async function addToEvidence() {
     const m = map.current; if (!m) return;
     m.triggerRepaint(); await Promise.race([new Promise((r) => m.once("render", () => r(null))), new Promise((r) => setTimeout(r, 1500))]);
-    const img = m.getCanvas().toDataURL("image/png");
+    // The map canvas does not include the DOM pin overlays or attribution -
+    // composite them so a sealed snapshot matches what the viewer saw.
+    const img = compositeSnapshot(m);
     const bytes = Uint8Array.from(atob(img.split(",")[1]!), (c) => c.charCodeAt(0));
     const sha = await sha256(bytes.buffer);
     const lines = causes(site).map((c) => `${c.rank}. ${c.label}: about ${c.tonnes.toLocaleString()} t, ${c.conf}${c.disputed ? ", DISPUTED" : ""}`);
@@ -177,20 +167,17 @@ export function EyeView() {
     setQ(""); play(r.key);
   }
   function listen() {
-    const browserWindow = window as EyeWindow;
-    const SR = browserWindow.SpeechRecognition || browserWindow.webkitSpeechRecognition;
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { setLog((l) => [{ q: "Voice input", a: "This browser has no speech input. Type your question." }, ...l]); return; }
     const rec = new SR(); rec.lang = "en-ZA"; setListening(true);
-    rec.onresult = (e) => ask(e.results[0]?.[0]?.transcript ?? "");
+    rec.onresult = (e: any) => ask(e.results[0][0].transcript);
     rec.onend = () => setListening(false); rec.start();
   }
   const gap = site.target - site.actual;
 
   return (
     <div className="space-y-3">
-      <style>{`.eye-pin{font:600 11px/1 "Hind",system-ui;padding:4px 7px;border-radius:6px;color:#fff;white-space:nowrap;box-shadow:0 1px 4px #0008}
-      .eye-delay{background:#b45309}.eye-ev{background:#1d4ed8}.eye-m{background:#14532d}.eye-idle{background:#a16207}.eye-down{background:#991b1b}
-      .eye-disp{background:#b91c1c;letter-spacing:.06em;animation:eyep 1.4s infinite}@keyframes eyep{50%{box-shadow:0 0 0 8px #b91c1c33}}`}</style>
+      <style>{EYE_PIN_CSS}</style>
       <div className="flex flex-wrap items-center gap-2">
         <h1 className="font-display text-2xl">Mine Operations Eye</h1>
         <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">SAMPLE DATA</span>

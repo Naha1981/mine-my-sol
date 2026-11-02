@@ -25,7 +25,7 @@ function List() {
         <ul className="space-y-3">
           {q.data.map((a: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
             <li key={a.id}><Link to="/portal/applications/$applicationId" params={{ applicationId: a.id }} className="block rounded-lg border bg-card p-4 hover:border-primary/40">
-              <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-display font-semibold">{a.projects?.title}</p><StatusBadge status={a.status} /></div>
+              <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-display font-semibold">{a.projects?.title ?? "Opportunity unavailable"}</p><StatusBadge status={a.status} /></div>
               <p className="mt-1 text-xs text-muted-foreground">{a.status === "draft" ? `Draft, last edited ${fmtDate(a.updated_at)}` : `Submitted ${fmtDate(a.submitted_at)}`}{a.price ? ` · ${fmtZAR(a.price)}` : ""}</p>
             </Link></li>
           ))}
