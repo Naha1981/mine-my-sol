@@ -49,6 +49,7 @@ export function EyeView() {
       container: mapEl.current, center: sites[0]!.center, zoom: 14.2, canvasContextAttributes: { preserveDrawingBuffer: true }, attributionControl: { compact: true },
       style: { version: 8, sources: { sat: { type: "raster", tileSize: 256, attribution: "Imagery Esri, Maxar", tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"] } }, layers: [{ id: "sat", type: "raster", source: "sat" }] },
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).__eyeMap = map.current;
     return () => { map.current?.remove(); map.current = null; };
   }, []);
@@ -167,9 +168,11 @@ export function EyeView() {
     setQ(""); play(r.key);
   }
   function listen() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { setLog((l) => [{ q: "Voice input", a: "This browser has no speech input. Type your question." }, ...l]); return; }
     const rec = new SR(); rec.lang = "en-ZA"; setListening(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rec.onresult = (e: any) => ask(e.results[0][0].transcript);
     rec.onend = () => setListening(false); rec.start();
   }
