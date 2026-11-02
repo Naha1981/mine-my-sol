@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
+import mapWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
+maplibregl.setWorkerUrl(mapWorkerUrl);
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Camera, Download, Mic, Pause, Play, Send, Volume2 } from "lucide-react";
 import { SAMPLE_SITES, type Site } from "@/lib/eye/sample";

@@ -51,7 +51,7 @@ function Overview() {
         <StatCard label="Incomplete applications" value={d.applying} hint="Drafts in progress" />
         <StatCard label="Closing in 7 days" value={d.soon7} tone={d.soon7 ? "gold" : undefined} />
       </div>
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <section>
           <h2 className="mb-3 text-lg font-bold">Closing soon</h2>
           {!d.closing.length ? <EmptyState title="No open projects with a deadline" /> : (
