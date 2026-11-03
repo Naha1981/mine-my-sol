@@ -1,0 +1,13 @@
+import puppeteer from 'puppeteer-core';
+const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', headless: 'new', args: ['--no-sandbox', '--disable-gpu'] });
+const page = await browser.newPage();
+await page.setViewport({ width: 390, height: 844 });
+await page.goto('https://minemysol.nahalabs.co.za/eye', { waitUntil: 'networkidle2', timeout: 60000 });
+await page.waitForSelector('[data-testid="reports-card"]', { timeout: 30000 });
+await page.waitForSelector('[data-testid="wa-direct"]', { timeout: 15000 });
+await new Promise(r => setTimeout(r, 1500));
+const wa = await page.$eval('[data-testid="reports-card"] [data-testid="wa-direct"]', el => el.innerText.replace(/\n/g,' | '));
+console.log('WA_DIRECT:', wa);
+await (await page.$('[data-testid="reports-card"]')).screenshot({ path: '/downloads/mms-wa-wired.png' });
+await browser.close();
+console.log('DONE');
