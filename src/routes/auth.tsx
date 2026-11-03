@@ -1,5 +1,6 @@
+import { signInWithCooldown } from "@/lib/login-cooldown";
 import { Captcha, captchaEnabled } from "@/components/app/Captcha";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
@@ -29,6 +30,8 @@ const registerSchema = z.object({
 function AuthPage() {
   const { mode, type } = Route.useSearch();
   const navigate = useNavigate();
+  const loginAbort = useRef<AbortController | null>(null);
+  useEffect(() => () => loginAbort.current?.abort(), []);
   const qc = useQueryClient();
   const [form, setForm] = useState({ full_name: "", phone: "", company_name: "", website: "", email: "", invite_code: "", password: "" });
   const [accountType, setAccountType] = useState<"contractor" | "buyer">(type);
@@ -64,7 +67,7 @@ function AuthPage() {
         if (error) throw error;
         if (!data.session) { setVerifySent(true); return; }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email: form.email.trim(), password: form.password, ...(captcha ? { options: { captchaToken: captcha } } : {}) });
+        const { error } = await (captcha ? supabase.auth.signInWithPassword({ email: form.email.trim(), password: form.password, options: { captchaToken: captcha } }) : signInWithCooldown(() => supabase.auth.signInWithPassword({ email: form.email.trim(), password: form.password }), { signal: (loginAbort.current = new AbortController()).signal, onWait: (seconds) => setFormError(`Sign-in is busy. Waiting ${seconds} seconds before one retry. Keep this page open.`) }));
         if (error) throw error;
       }
       qc.clear();
