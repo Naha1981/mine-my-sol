@@ -2,8 +2,10 @@
   "name": "minemysol",
   "account_id": "655bd72036df93c103f655230cf9ade7",
   "compatibility_date": "2025-09-01",
+  "main": "worker/index.js",
   "assets": {
     "directory": ".output/public",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
   }
 }

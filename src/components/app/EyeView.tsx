@@ -11,6 +11,7 @@ import { loadMine } from "@/lib/eye/store";
 import { runRules, money } from "@/lib/eye/rules";
 import { DEFAULTS } from "@/lib/eye/fleet";
 import { EYE_PIN_CSS, compositeSnapshot } from "@/lib/eye/capture";
+import { EyeOps } from "./EyeOps";
 
 
 const chip = (c: string) => c === "confirmed" ? "bg-emerald-100 text-emerald-900" : c === "inferred" ? "bg-amber-100 text-amber-900" : "bg-stone-200 text-stone-800";
@@ -246,6 +247,7 @@ export function EyeView() {
           ))}
         </ol>
       </div>
+      <EyeOps site={site} causes={cs} elapsedMin={t} />
       <FleetSignals siteId={site.id} />
       {mine && <FleetSignals siteId={site.id} fleet={mine.fleet} imported />}
       <div className="rounded-xl border bg-card p-3">
